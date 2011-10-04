@@ -1,8 +1,8 @@
-CC=mpicc -O2 -D_FILE_OFFSET_BITS=64
+CC=mpicc -std=c99 -O2 -D_FILE_OFFSET_BITS=64
 
 CFLAGS=-I./include -I${HOME}/install/include
 LDFLAGS=-L./lib -L${HOME}/install/lib
-LIBS=-lqcd -llime -lm
+LIBS=-lqcd -lgsl -lgslcblas -llime -lm
 
 .PHONY: clean\
 	cleanall\

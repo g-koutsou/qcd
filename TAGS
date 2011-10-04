@@ -1,0 +1,628 @@
+
+threep_idris.c,17
+int main(23,346
+
+zfac.c,17
+int main(28,664
+
+seq_source_uu_idris.c,18
+int main(43,1061
+
+unit_gaugefield.c,15
+int main(8,93
+
+include/lime_defs.h,496
+#define LIME_DEFS_H2,20
+#define LIME_MAGIC_NO 5,66
+#define LIME_VERSION 8,155
+#define LIME_MAX_BUFSIZE 13,392
+#define LIME_SUCCESS 15,454
+#define LIME_ERR_LAST_NOT_WRITTEN 16,526
+#define LIME_ERR_PARAM 17,571
+#define LIME_ERR_HEADER_NEXT 19,671
+#define LIME_LAST_REC_WRITTEN 20,716
+#define LIME_ERR_WRITE 21,760
+#define LIME_EOR 22,846
+#define LIME_EOF 23,918
+#define LIME_ERR_READ 24,988
+#define LIME_ERR_SEEK 25,1066
+#define LIME_ERR_MBME 26,1132
+#define LIME_ERR_CLOSE 27,1207
+
+include/qcd_wilson.h,1068
+#define H_QCD_WILSON 9,145
+#define qcd_ONE_PLUS_GAMMA0(17,344
+#define qcd_ONE_PLUS_GAMMA0_HALFSPINOR(47,1057
+#define qcd_ONE_PLUS_GAMMA1(63,1480
+#define qcd_ONE_PLUS_GAMMA1_HALFSPINOR(93,2190
+#define qcd_ONE_PLUS_GAMMA2(109,2613
+#define qcd_ONE_PLUS_GAMMA2_HALFSPINOR(139,3336
+#define qcd_ONE_PLUS_GAMMA3(155,3761
+#define qcd_ONE_PLUS_GAMMA3_HALFSPINOR(185,4495
+#define qcd_ONE_MINUS_GAMMA0(202,4919
+#define qcd_ONE_MINUS_GAMMA0_HALFSPINOR(232,5629
+#define qcd_ONE_MINUS_GAMMA1(248,6050
+#define qcd_ONE_MINUS_GAMMA1_HALFSPINOR(279,6760
+#define qcd_ONE_MINUS_GAMMA2(296,7181
+#define qcd_ONE_MINUS_GAMMA2_HALFSPINOR(327,7902
+#define qcd_ONE_MINUS_GAMMA3(343,8326
+#define qcd_ONE_MINUS_GAMMA3_HALFSPINOR(373,9047
+#define qcd_MASSTERMS(389,9468
+#define qcd_APPLY_U(419,10406
+#define qcd_APPLY_U_HALFSPINOR(449,13173
+#define qcd_APPLY_U_DAGGER(465,14537
+#define qcd_APPLY_U_DAGGER_HALFSPINOR(495,17311
+#define qcd_SUM_OP(512,18687
+#define qcd_SUM_OP_HALFSPINORS(539,20708
+#define qcd_PHASE_MUL(566,22741
+#define qcd_PHASE_MUL_HALFSPINOR(605,24120
+
+include/lime_config.h,721
+#define LIME_CONFIG_H2,22
+#undef PACKAGE6,124
+#undef PACKAGE_BUGREPORT7,139
+#undef PACKAGE_NAME8,164
+#undef PACKAGE_STRING9,184
+#undef PACKAGE_TARNAME10,206
+#undef PACKAGE_VERSION11,229
+#undef VERSION12,252
+static const char* const LIME_PACKAGE 18,384
+static const char* const LIME_PACKAGE_BUGREPORT 19,433
+static const char* const LIME_PACKAGE_NAME 20,502
+static const char* const LIME_PACKAGE_STRING 21,561
+static const char* const LIME_PACKAGE_TARNAME 22,624
+static const char* const LIME_PACKAGE_VERSION 23,689
+#undef PACKAGE27,833
+#undef PACKAGE_BUGREPORT28,848
+#undef PACKAGE_NAME29,873
+#undef PACKAGE_STRING30,893
+#undef PACKAGE_TARNAME31,915
+#undef PACKAGE_VERSION32,938
+#undef VERSION33,961
+
+include/qcd_stochastic.h,35
+#define _H_QCD_COMMUNICATION 2,29
+
+include/lime_utils.h,26
+#define LIME_UTILS_H2,21
+
+include/lime_config_internal.h,640
+#define HAVE_FSEEKO 5,227
+#define HAVE_INTTYPES_H 8,310
+#define HAVE_MEMORY_H 11,395
+#define HAVE_STDINT_H 14,478
+#define HAVE_STDLIB_H 17,561
+#define HAVE_STRINGS_H 20,645
+#define HAVE_STRING_H 23,729
+#define HAVE_SYS_STAT_H 26,814
+#define HAVE_SYS_TYPES_H 29,902
+#define HAVE_UINT16_T 32,987
+#define HAVE_UINT32_T 35,1069
+#define HAVE_UINT64_T 38,1151
+#define HAVE_UNISTD_H 41,1234
+#define PACKAGE 44,1281
+#define PACKAGE_BUGREPORT 47,1384
+#define PACKAGE_NAME 50,1483
+#define PACKAGE_STRING 53,1571
+#define PACKAGE_TARNAME 56,1667
+#define PACKAGE_VERSION 59,1744
+#define STDC_HEADERS 77,2307
+#define VERSION 80,2363
+
+include/qcd_rng.h,25
+#define _QCD_RNG_H 2,19
+
+include/lime_binary_header.h,647
+#define LIME_BINARY_HEADER_H2,29
+#define MAX_HDR64 9,163
+  n_uint64_t int64[int6412,201
+  n_uint32_t int32[int3213,232
+  n_uint16_t int16[int1614,265
+  unsigned char uchr[uchr15,298
+} lime_header;16,333
+#define LIME_HDR_LENGTH 19,389
+static n_uint32_t *lime_hdr_magic_no lime_hdr_magic_no30,719
+static n_uint16_t *lime_hdr_version lime_hdr_version31,781
+static unsigned char *lime_hdr_mbme lime_hdr_mbme32,843
+#define MB_MASK 35,943
+#define ME_MASK 38,1036
+static n_uint64_t *lime_hdr_data_len lime_hdr_data_len45,1175
+static unsigned char *lime_hdr_rec_type lime_hdr_rec_type53,1394
+#define MAX_LIME_HDR_REC_TYPE 56,1527
+
+include/qcd_gaugeFixing.h,132
+#define H_QCD_GAUGEFIXING 9,160
+#define qcd_LANDAU_GAUGE_FIXING_PRECISION 11,189
+#define qcd_LANDAU_GAUGE_FIXING_MAX_ITER 12,239
+
+include/lime_writer.h,323
+#define LIME_WRITER_H2,22
+  int first_record;11,201
+  int last_written;12,269
+  FILE* fp;13,337
+  int header_nextP;14,400
+  n_uint64_t bytes_total;15,473
+  n_uint64_t bytes_left;16,546
+  n_uint64_t rec_ptr;18,675
+  n_uint64_t rec_start;21,833
+  size_t bytes_pad;22,913
+  int isLastP;23,986
+} LimeWriter;24,1061
+
+include/qcd_observables.h,33
+#define H_QCD_OBSERVABLES 9,160
+
+include/lime.h,20
+#define LIME_H2,15
+
+include/lime_fseeko.h,27
+#define LIME_FSEEKO_H2,22
+
+include/lime_reader.h,348
+#define LIME_READER_H2,22
+  int first_read;12,206
+  int is_last;13,281
+  int header_nextP;14,334
+  FILE *fp;fp15,407
+  LimeRecordHeader *curr_header;curr_header16,462
+  n_uint64_t bytes_left;18,530
+  n_uint64_t bytes_total;19,614
+  n_uint64_t rec_ptr;20,688
+  n_uint64_t rec_start;23,839
+  size_t bytes_pad;24,917
+} LimeReader;25,989
+
+include/qcd_communication.h,35
+#define H_QCD_COMMUNICATION 9,166
+
+include/lime_fixed_types.h,789
+#define LIME_FIXED_TYPES_H2,27
+typedef uint16_t n_uint16_t;13,207
+typedef uint32_t n_uint32_t;19,318
+typedef uint64_t n_uint64_t;25,429
+typedef unsigned char n_uint16_t;37,623
+typedef unsigned short n_uint16_t;39,694
+typedef unsigned int   n_uint16_t;41,764
+typedef unsigned long  n_uint16_t;43,836
+typedef unsigned long long n_uint16_t;45,913
+typedef unsigned char n_uint32_t;52,1084
+typedef unsigned short n_uint32_t;54,1155
+typedef unsigned int   n_uint32_t;56,1225
+typedef unsigned long  n_uint32_t;58,1297
+typedef unsigned long long n_uint32_t;60,1374
+typedef unsigned char n_uint64_t;67,1545
+typedef unsigned short n_uint64_t;69,1616
+typedef unsigned int   n_uint64_t;71,1686
+typedef unsigned long  n_uint64_t;73,1758
+typedef unsigned long long n_uint64_t;75,1835
+
+include/qcd_blas.h,777
+#define H_QCD_BLAS 9,139
+#define qcd_CONJ(12,204
+#define qcd_CMUL(13,261
+#define qcd_CMULR(14,361
+#define qcd_CMULI(15,429
+#define qcd_CADJOINTMUL(16,497
+#define qcd_CADD(18,605
+#define qcd_CADDR(19,671
+#define qcd_CADDI(20,722
+#define qcd_CSUB(22,774
+#define qcd_CSUBR(23,840
+#define qcd_CSUBI(24,891
+#define qcd_CSCALE(26,943
+#define qcd_CSCALER(27,1009
+#define qcd_CSCALEI(28,1059
+#define qcd_CDEV(30,1110
+#define qcd_CDEVR(31,1262
+#define qcd_CDEVI(32,1360
+#define qcd_NORM(34,1459
+#define qcd_NORMSQUARED(35,1530
+#define qcd_ARG(36,1601
+#define qcd_CPOW(37,1657
+#define qcd_CPOWR(38,1785
+#define qcd_CPOWI(39,1865
+#define qcd_MUL3x3(43,1995
+#define qcd_MULADJOINT3x3(103,7151
+#define qcd_ADJOINTMUL3x3(164,12343
+#define qcd_SU3TRACER(224,17481
+
+include/lime_header.h,193
+#define LIME_HEADER_H2,22
+  unsigned int lime_version;10,196
+  int MB_flag;11,248
+  int ME_flag;12,306
+  char *type;type13,362
+  n_uint64_t data_length;14,421
+} LimeRecordHeader;15,495
+
+include/qcd_io.h,202
+#define H_QCD_IO 9,133
+#define qcd_GF_LIME 12,170
+#define qcd_PROP_CMI 13,193
+#define qcd_PROP_HMC 14,216
+#define qcd_PROP_HMCV 15,239
+#define qcd_PROP_LIME 16,263
+#define qcd_SOURCE_LIME 17,287
+
+include/qcd.h,3384
+#define H_QCD 10,162
+#define qcd_MAX_STRING_LENGTH 16,203
+typedef float  qcd_real_4;19,292
+typedef double qcd_real_8;20,360
+typedef char   qcd_int_1;21,428
+typedef short  qcd_int_2;22,493
+typedef int    qcd_int_4;23,558
+typedef long   qcd_int_8;24,623
+typedef unsigned char   qcd_uint_1;25,688
+typedef unsigned short  qcd_uint_2;26,755
+typedef unsigned int    qcd_uint_4;27,822
+typedef unsigned long   qcd_uint_8;28,889
+  qcd_real_8 re;33,1043
+  qcd_real_8 im;34,1060
+} qcd_complex_16;35,1077
+  qcd_real_4 re;40,1116
+  qcd_real_4 im;41,1133
+} qcd_complex_8;42,1150
+   qcd_uint_8 V;46,1186
+   qcd_uint_8 V3;47,1234
+   qcd_uint_2 L[L48,1287
+   qcd_uint_8 lV;49,1362
+   qcd_uint_8 lV3;50,1413
+   qcd_uint_2 lL[lL51,1472
+   qcd_uint_2 Pos[Pos52,1538
+   qcd_real_8 theta[theta53,1602
+   qcd_uint_4 myid;55,1755
+   qcd_uint_4 nproc;56,1830
+   qcd_uint_4 Pplus[Pplus57,1888
+   qcd_uint_4 Pminus[Pminus58,1973
+   qcd_uint_8 (*plus)plus59,2058
+   qcd_uint_8 (*minus)minus60,2136
+   qcd_uint_8 (*plus3d)plus3d61,2174
+   qcd_uint_8 (*minus3d)minus3d62,2264
+   qcd_uint_8 (*eo)eo63,2302
+   qcd_uint_8 startBminus[startBminus64,2372
+   qcd_uint_8 startBplus[startBplus65,2441
+   qcd_uint_8 startBminus3d[startBminus3d66,2510
+   qcd_uint_8 startBplus3d[startBplus3d67,2591
+   qcd_uint_8 boundarySize;68,2674
+   qcd_uint_8 boundarySize3d;69,2749
+   qcd_uint_8 *edge;edge70,2836
+   qcd_uint_8 edgePoints;71,2918
+   qcd_uint_8 *edge0;edge072,2988
+   qcd_uint_8 edge0Points;73,3078
+   MPI_Request requests[requests75,3163
+   int numOfRequests;76,3234
+   MPI_Datatype stypeV[stypeV77,3307
+   MPI_Datatype rtypeV[rtypeV78,3389
+   MPI_Datatype stypeU[stypeU79,3446
+   MPI_Datatype rtypeU[rtypeU80,3490
+   MPI_Datatype stypeT[stypeT81,3546
+   MPI_Datatype rtypeT[rtypeT82,3590
+   MPI_Datatype stypeP[stypeP83,3661
+   MPI_Datatype rtypeP[rtypeP84,3699
+   qcd_uint_2 initialized;86,3764
+} qcd_geometry;87,3834
+   qcd_complex_16 (*D)D92,3870
+   qcd_complex_16 (*Bplus[Bplus93,3916
+   qcd_complex_16 (*Bminus[Bminus94,3986
+   qcd_geometry *geo;geo95,4056
+   qcd_uint_2 initialized;96,4098
+} qcd_vector;97,4170
+   qcd_complex_16 (*D)D102,4204
+   qcd_complex_16 (*Bplus[Bplus103,4252
+   qcd_complex_16 (*Bminus[Bminus104,4345
+   qcd_geometry *geo;geo105,4417
+   qcd_uint_2 initialized;106,4461
+} qcd_vector3d;107,4535
+   qcd_complex_16 (*D)D112,4571
+   qcd_complex_16 (*Bplus[Bplus113,4623
+   qcd_complex_16 (*Bminus[Bminus114,4699
+   qcd_geometry *geo;geo115,4775
+   qcd_uint_2 initialized;116,4823
+} qcd_propagator;117,4901
+   qcd_complex_16 (*D)D121,4937
+   qcd_complex_16 (*Bplus[Bplus122,4985
+   qcd_complex_16 (*Bminus[Bminus123,5057
+   qcd_geometry *geo;geo124,5129
+   qcd_uint_2 initialized;125,5151
+} qcd_gaugeField;126,5225
+   qcd_complex_16 (*D)D130,5261
+   qcd_complex_16 (*Bplus[Bplus131,5306
+   qcd_complex_16 (*Bminus[Bminus132,5375
+   qcd_geometry *geo;geo133,5444
+   qcd_uint_2 initialized;134,5466
+} qcd_gaugeTransformation;135,5540
+  gsl_rng *gsl_rng_state;gsl_rng_state139,5602
+} rng_state;140,5628
+#define qcd_LEXIC(144,5767
+#define qcd_LEXIC0(145,5850
+#define qcd_LEXIC1(146,5921
+#define qcd_LEXIC2(147,5992
+#define qcd_LEXIC3(148,6063
+#define qcd_LEXIC01(149,6134
+#define qcd_LEXIC02(150,6194
+#define qcd_LEXIC03(151,6254
+#define M_PI 157,6391
+
+include/qcd_gamma.h,27
+#define H_QCD_GAMMA 9,154
+
+include/qcd_smearing.h,62
+#define H_QCD_SMEARING 9,151
+#define qcd_SUM_UP_HOPP(11,177
+
+seq_source_dd.c,18
+int main(42,1008
+
+projectors.h,42
+qcd_complex_16 PROJECTOR[PROJECTOR8,139
+
+b_minus_Dx.c,17
+int main(21,335
+
+threep.c,17
+int main(23,340
+
+seq_source_uu.c,18
+int main(43,1055
+
+seq_source_dd_idris.c,18
+int main(42,1014
+
+tests/test.c,63
+void qcd_swap_8(5,58
+void dbyte_swap(26,449
+int main(41,889
+
+tests/qcd_communication.c,68
+int qcd_communicateVectorPMGaugeP(14,324
+void qcd_waitall(52,2014
+
+tests/test_communication.c,17
+int main(15,250
+
+tests/qcd_blas.c,476
+void qcd_zeroVector(11,196
+void qcd_setVector(16,338
+void qcd_copyVector(36,827
+void qcd_copyGaugeField(41,1014
+void qcd_copyVectorPropagator(46,1225
+void qcd_copyVectorPropagator2(56,1503
+void qcd_mulVectorC(67,1783
+void qcd_scaleVector(87,2250
+void qcd_scaleVector3d(98,2440
+void qcd_subVector(119,3001
+void qcd_subGaugeField(129,3306
+void qcd_addVector(151,3947
+void qcd_addVector3d(163,4293
+double qcd_normVector(184,4951
+double qcd_normGaugeField(201,5364
+
+tests/test_smearing.c,17
+int main(16,276
+
+tests/qcd_init.c,299
+void qcd_antilexic(9,166
+int qcd_initGeometry(18,394
+void qcd_destroyGeometry(249,10210
+int qcd_initVector(269,10719
+void qcd_destroyVector(324,12218
+int qcd_initPropagator(337,12433
+void qcd_destroyPropagator(392,13950
+int qcd_initGaugeField(405,14185
+void qcd_destroyGaugeField(459,15648
+
+tests/qcd_smearing.c,65
+#define qcd_SUM_UP_HOPP(8,133
+int qcd_gaussIteration3d(42,1056
+
+tests/qcd_dirac.c,30
+void qcd_applyWilsonTM(8,127
+
+tests/timingTest.c,17
+int main(10,158
+
+tests/qcd_wilson.c,501
+#define qcd_ONE_PLUS_GAMMA0(14,311
+#define qcd_ONE_PLUS_GAMMA1(44,1024
+#define qcd_ONE_PLUS_GAMMA2(74,1734
+#define qcd_ONE_PLUS_GAMMA3(104,2458
+#define qcd_ONE_MINUS_GAMMA0(135,3193
+#define qcd_ONE_MINUS_GAMMA1(165,3903
+#define qcd_ONE_MINUS_GAMMA2(196,4614
+#define qcd_ONE_MINUS_GAMMA3(226,5331
+#define qcd_MASSTERMS(256,6055
+#define qcd_APPLY_U(286,6993
+#define qcd_APPLY_U_DAGGER(316,9760
+#define qcd_SUM_OP(347,12539
+#define qcd_PHASE_MUL(374,14560
+int qcd_applyWilsonTMOp(419,16067
+
+tests/test_gaugefix.c,17
+int main(10,131
+
+tests/test_blas.c,17
+int main(15,250
+
+tests/test_wilson.c,15
+int main(8,93
+
+tests/qcd_io.c,307
+int qcd_isBigEndian(17,295
+     char C[C20,329
+     int  R 21,345
+void qcd_swap_8(34,539
+void qcd_swap_4(56,931
+char* qcd_getParams(75,1222
+char* qcd_getParam(107,1745
+int qcd_getGaugeLime(126,2049
+int qcd_getGaugeField(315,8079
+int qcd_getPropagatorCMI(336,8570
+int qcd_getPropagator(445,11886
+
+twop.c,17
+int main(21,295
+
+invert.c,41
+qcd_int_4 gcr(20,310
+int main(117,3198
+
+landau.c,17
+int main(20,289
+
+source.c,81
+  POINT_SOURCE,18,287
+  NOISE_SOURCE19,303
+} src_type;20,318
+int main(22,332
+
+lib/src/qcd_communication.c,388
+int qcd_communicateVectorPMGaugeP(20,435
+int qcd_communicateVectorPM(60,2192
+int qcd_communicateGaugeM(100,3643
+int qcd_communicateGaugeP(130,4574
+int qcd_communicateGaugePInverse(164,5628
+int qcd_communicateGaugePM(200,6726
+int qcd_communicateTransformationM(240,8254
+int qcd_communicatePropagatorP(271,9247
+int qcd_communicatePropagatorPM(304,10231
+void qcd_waitall(343,11614
+
+lib/src/qcd_blas.c,1410
+void qcd_zero3x3(19,308
+void qcd_unit3x3(24,424
+void qcd_minusUnit3x3(33,608
+void qcd_sub3x3(42,805
+void qcd_add3x3(51,1093
+void qcd_addAdjoint3x3(60,1365
+void qcd_mul3x3(69,1661
+void qcd_mulAdjoint3x3(82,2062
+void qcd_scale3x3(95,2487
+void qcd_cScale3x3(104,2692
+qcd_complex_16 qcd_trace3x3(113,2901
+void qcd_copy3x3(121,3115
+void qcd_dagger3x3(126,3286
+void qcd_zeroVector(137,3585
+void qcd_zeroPropagator(142,3727
+void qcd_zeroGaugeField(147,3894
+void qcd_setVector(152,4047
+void qcd_copyVector(172,4536
+void qcd_copyGaugeField(177,4723
+void qcd_copyVectorPropagator(182,4934
+void qcd_copyPropagatorVector(192,5212
+void qcd_copyVectorPropagator2(202,5490
+void qcd_copyPropagatorVector2(213,5770
+void qcd_mulVectorC(225,6051
+void qcd_mulPropagatorC(236,6284
+void qcd_mulPropagatorC3d(249,6595
+void qcd_scaleVector(276,7281
+void qcd_scaleVector3d(287,7471
+void qcd_subVector(320,8343
+void qcd_subGaugeField(333,8713
+void qcd_addGaugeField(344,9067
+void qcd_scaleGaugeField(355,9398
+void qcd_addVector(378,9955
+void qcd_axpyVector(389,10300
+void qcd_addVector3d(409,10822
+qcd_complex_16 qcd_mulAdjointVectorVector(431,11481
+qcd_real_8 qcd_normVector(453,12073
+qcd_real_8 qcd_normGaugeField(470,12475
+void qcd_conjPropagator(491,12926
+void qcd_projectSU3(516,13807
+void qcd_projectSU33d(925,33473
+void qcd_projectSU33x3(1334,53109
+void qcd_randomGaugeField(1729,71196
+
+lib/src/qcd_gamma.c,628
+const qcd_uint_2 qcd_EPS[qcd_EPS17,312
+const qcd_int_2 qcd_SGN_EPS[qcd_SGN_EPS27,431
+const qcd_complex_16 qcd_ONE[qcd_ONE32,495
+const qcd_complex_16 qcd_GAMMA[qcd_GAMMA50,987
+const qcd_complex_16 qcd_CGAMMA[qcd_CGAMMA109,3810
+const qcd_complex_16 qcd_BAR_CGAMMA[qcd_BAR_CGAMMA154,5938
+const qcd_complex_16 qcd_G5GAMMA[qcd_G5GAMMA199,8074
+const qcd_complex_16 qcd_BAR_G5GAMMA[qcd_BAR_G5GAMMA258,10901
+const qcd_complex_16 qcd_ONE_PLUS_GAMMA[qcd_ONE_PLUS_GAMMA317,13724
+const qcd_complex_16 qcd_ONE_MINUS_GAMMA[qcd_ONE_MINUS_GAMMA362,15862
+void qcd_gamma5Vector(410,18032
+void qcd_gamma5Propagator(425,18371
+
+lib/src/qcd_rng.c,67
+qcd_rng_init(6,65
+qcd_rng_finalize(20,352
+qcd_get_rand_4(27,445
+
+lib/src/qcd_init.c,458
+void qcd_antilexic(16,278
+int qcd_initGeometry(25,506
+void qcd_destroyGeometry(395,16205
+int qcd_initVector(418,16777
+void qcd_destroyVector(473,18276
+int qcd_initVector3d(486,18491
+void qcd_destroyVector3d(534,19816
+int qcd_initPropagator(546,20038
+void qcd_destroyPropagator(601,21555
+int qcd_initGaugeField(614,21790
+void qcd_destroyGaugeField(668,23253
+int qcd_initGaugeTransformation(679,23480
+void qcd_destroyGaugeTransformation(733,24977
+
+lib/src/qcd_smearing.c,100
+int qcd_gaussIteration3d(24,379
+int qcd_gaussIteration3dAll(119,3329
+int qcd_apeSmear3d(215,6178
+
+lib/src/qcd_gaugeFixing.c,91
+void qcd_gluonField(20,369
+void qcd_localGluonField(48,1190
+int qcd_landauGauge(76,2152
+
+lib/src/qcd_wilson.c,322
+void qcd_onePlusGamma(18,287
+void qcd_oneMinusGamma(33,763
+void qcd_applyU(48,1241
+void qcd_applyUDagger(63,1690
+void qcd_massTerms(79,2179
+void qcd_phaseMul(95,2722
+int qcd_applyWilsonTMOp(114,3154
+int qcd_applyWilsonTMOpNoScripts(351,12544
+int qcd_applyWilsonTMOpNoOptim(570,20495
+int qcd_applyQTMOp(795,29177
+
+lib/src/qcd_io.c,865
+int qcd_isBigEndian(24,426
+     char C[C27,460
+     int  R 28,476
+void qcd_swap_8(42,684
+void qcd_swap_4(64,1076
+char* qcd_getParams(83,1367
+char* qcd_getParam(114,1862
+int qcd_getLimeMessage(132,2233
+int qcd_getGaugeLime(204,4361
+int qcd_getGaugeField(399,10648
+int qcd_writeGaugeLime(419,11207
+int qcd_writeGaugeField(576,17118
+int qcd_getPropagatorCMI(604,17792
+int qcd_getPropagatorLime(711,21106
+int qcd_getPropagatorHMC(779,22892
+int qcd_getPropagator(877,25851
+int qcd_getVectorCMI(905,26681
+int qcd_getVectorLime(982,28902
+int qcd_getVectorHMC(1199,35763
+int qcd_getVectorHMCV(1292,38496
+int qcd_getVector(1385,41210
+int qcd_writePropagatorCMI(1415,42018
+int qcd_writePropagatorHMCV(1525,45399
+int qcd_writePropagator(1660,49805
+int qcd_writeVectorCMI(1684,50460
+int qcd_writeVectorLime(1765,52802
+int qcd_writeVector(1949,59397
+
+lib/src/qcd_observables.c,42
+qcd_real_8 qcd_calculatePlaquette(15,247
+
+lib/src/qcd_stochastic.c,25
+void qcd_z2Vector(8,112
+
+source_idris.c,17
+int main(20,286

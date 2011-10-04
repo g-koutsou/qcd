@@ -28,9 +28,6 @@ typedef unsigned int    qcd_uint_4;     // unsigned 4 byte integer
 typedef unsigned long   qcd_uint_8;     // unsigned 8 byte integer
 //------------------------------------------------------------------
 
-
-
-
 typedef struct
 {
   qcd_real_8 re;
@@ -137,6 +134,10 @@ typedef struct
    qcd_uint_2 initialized;              // set to 1 during initialization
 } qcd_gaugeTransformation;
 
+#include <gsl/gsl_rng.h>
+struct {
+  gsl_rng *gsl_rng_state;
+} rng_state;
 
 //////////////////////////////////////////////////////////////////////////////
 // some pre-processor macros. Use carefully!!
@@ -150,7 +151,11 @@ typedef struct
 #define qcd_LEXIC03(x,y,L)  ( (qcd_uint_8) ((x)+L[1]*(y)) )
 
 
-
+#include <math.h>
+/* this is not defined in strict ISO C99 */
+#ifndef M_PI
+#define M_PI 3.14159265358979323846264338327
+#endif 
 #include <qcd_gamma.h>
 #include <qcd_communication.h>
 #include <qcd_blas.h>
@@ -159,6 +164,8 @@ typedef struct
 #include <qcd_gaugeFixing.h>
 #include <qcd_wilson.h>
 #include <qcd_observables.h>
+#include <qcd_stochastic.h>
+#include <qcd_rng.h>
 
 /* prototypes for qcd_init.c*/
 void qcd_antilexic(qcd_uint_2 x[], qcd_uint_8 l, const qcd_uint_2 dim[]);

@@ -27,7 +27,7 @@ int qcd_gaussIteration3d(qcd_vector *v, qcd_gaugeField *u, qcd_real_8 alpha, qcd
    qcd_uint_2 c1,mu,nu,b; 
    qcd_uint_2 bl1[4] = {2,2,1,1};
    qcd_uint_2 bl2[4] = {3,3,3,2};
-   qcd_uint_4 x,y,z,b0,b1,b2,b3,tt;
+   qcd_uint_4 x,y,z,b0,b1,b2,b3,tt=0;
    qcd_complex_16 tmp[3];
    qcd_real_8 nrm = 1.0/(1.0 + alpha*6.0);
    qcd_vector v2;
@@ -44,8 +44,8 @@ int qcd_gaussIteration3d(qcd_vector *v, qcd_gaugeField *u, qcd_real_8 alpha, qcd
    }
    if(qcd_initVector(&v2, v->geo))
    {
-      fprintf(stderr,"process %i: Error in qcd_gaussIteration3d! Could not initialize vector");
-      return(1);
+     fprintf(stderr,"process %i: Error in qcd_gaussIteration3d! Could not initialize vector", v->geo->myid);
+     return(1);
    }   
 
    //start communication (4d comm is in principle too much, but hey...
@@ -139,8 +139,8 @@ int qcd_gaussIteration3dAll(qcd_vector *v, qcd_gaugeField *u, qcd_real_8 alpha, 
    }
    if(qcd_initVector(&v2, v->geo))
    {
-      fprintf(stderr,"process %i: Error in qcd_gaussIteration3dAll! Could not initialize vector");
-      return(1);
+     fprintf(stderr,"process %i: Error in qcd_gaussIteration3dAll! Could not initialize vector", v->geo->myid);
+     return(1);
    }   
 
    if(gaugeCom)

@@ -30,6 +30,7 @@ int qcd_isBigEndian()
    word.R=1;
    if(word.C[3]==1) return 1;
    if(word.C[0]==1) return 0;
+   return -1;
 }
 
 
@@ -135,7 +136,7 @@ int qcd_getLimeMessage(char *fname, qcd_geometry *geo, char **message_ptr)
    char *lime_type,*lime_data;
    n_uint64_t lime_data_size=0;
    int error_occured=0;
-   char *message;
+   char *message = NULL;
          
    if(!geo->initialized)
    {
@@ -212,7 +213,7 @@ int qcd_getGaugeLime(char *fname, qcd_gaugeField *u)
    MPI_File mpifid;
    MPI_Status status;
    int sizes[5], lsizes[5], starts[5];
-   qcd_uint_8 i,j;
+   qcd_uint_8 i=0,j=0;
    qcd_uint_4 stride;
    qcd_uint_2 chunksize,mu,nu,c1,c2;
    char *swap[16*3*3];
@@ -575,7 +576,7 @@ int qcd_writeGaugeLime(char *fname, qcd_gaugeField *u, char *message)
 int qcd_writeGaugeField(char *fname, int type, qcd_gaugeField *u, ...)
 {
    va_list arg_list;
-   char *message;
+   char *message = NULL;
    
    va_start(arg_list, *u);
    if(type==0)
@@ -1766,7 +1767,7 @@ int qcd_writeVectorLime(char *fname, int type, qcd_vector *v)
    FILE *fid;
    int error_in_header=0;
    LimeWriter *limewriter;
-   LimeRecordHeader *limeheader;
+   LimeRecordHeader *limeheader = NULL;
    int ME_flag=0, MB_flag=0, limeStatus;
    qcd_uint_8 message_length;
    MPI_Offset offset;

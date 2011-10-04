@@ -9,7 +9,7 @@ int main(int argc,char* argv[])
 {
    qcd_geometry geo;
    qcd_uint_2 P[4]={2, 2, 2, 2};
-   qcd_uint_2 L[4]={48, 24, 24, 24};
+   qcd_uint_2 L[4]={16, 8, 8, 8};
    qcd_real_8 theta[4]={M_PI,0.,0.,0.}; // boundary conditions
    qcd_gaugeField u;
    qcd_uint_2 mu,c1,c2;
