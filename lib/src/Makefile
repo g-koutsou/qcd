@@ -1,9 +1,8 @@
 CC=mpicc -std=c99 -Wall -Wno-unused-variable -O2 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE
-#CC=mpicc -O0 -D_FILE_OFFSET_BITS=64 -g
 AR=ar
 
 INCLUDE=../../include/*.h
-INCLDDIR= -I../../include/
+INCLDDIR= -I../../include/ -I${GSL_ROOT}/include/
 
 TARGET=../libqcd.a
 

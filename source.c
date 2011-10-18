@@ -28,7 +28,7 @@ int main(int argc,char* argv[])
    char   out_name[qcd_MAX_STRING_LENGTH];
    char   vec_names[1024][qcd_MAX_STRING_LENGTH];
    char   src_type_s[qcd_MAX_STRING_LENGTH];
-   qcd_uint_4   x_src[4],lx_src[4],i,j,t,isource,nsmear,nsmearAPE;
+   qcd_int_4   x_src[4],lx_src[4],i,j,t,isource,nsmear,nsmearAPE;
    qcd_uint_2   mu,nu,col,c1,c2,s;
    qcd_real_8   alpha,alphaAPE,plaq;
    qcd_uint_4   params_len;   

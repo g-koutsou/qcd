@@ -1042,13 +1042,14 @@ int qcd_getVectorLime(char *fname, qcd_vector *v)
 		}
 	      free(lime_data);
             }
-            if(strcmp(lime_type,"etmc-propagator-format")==0)
+//lime_type="scidac-binary-data";
+            if((strcmp(lime_type,"etmc-propagator-format")==0) || (strcmp(lime_type,"etmc-source-format")==0))
             {
 	      lime_data_size = limeReaderBytes(limereader);
 	      lime_data = (char * )malloc(lime_data_size);
 	      limeReaderReadData((void *)lime_data,&lime_data_size, limereader);
 	      sscanf(qcd_getParam("<precision>",lime_data, lime_data_size),"%i",&isDouble);    
-	      //printf("got precision: %i\n",isDouble);
+	      printf("got precision: %i\n",isDouble);
 	      free(lime_data);
 	      
 	      next_rec_is_prop = 1;
@@ -1079,9 +1080,7 @@ int qcd_getVectorLime(char *fname, qcd_vector *v)
    else
    {
      fprintf(stderr,"process %i: Error in %s! Unsupported precision\n",v->geo->myid, __func__);
-      return(1);
-   }   
-   
+   }  
    
    if(isDouble)
    {
@@ -1912,7 +1911,7 @@ int qcd_writeVectorLime(char *fname, int type, qcd_vector *v)
    MPI_Type_commit(&subblock);
 
    MPI_File_open(MPI_COMM_WORLD, fname, MPI_MODE_WRONLY, MPI_INFO_NULL, &mpifid);
-   MPI_File_set_view(mpifid, offset, MPI_DOUBLE, subblock, "native", MPI_INFO_NULL);
+   MPI_File_set_view(mpifid, offset, MPI_FLOAT, subblock, "native", MPI_INFO_NULL);
 
    chunksize=4*3*sizeof(qcd_complex_16);
    buffer = (char*) malloc(chunksize*v->geo->lV);

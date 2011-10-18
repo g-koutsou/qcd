@@ -1,12 +1,10 @@
-CC=mpicc -std=c99 -O2 -D_FILE_OFFSET_BITS=64
+CC=mpicc -std=c99 -O2 -D_FILE_OFFSET_BITS=64 
 
-CFLAGS=-I./include -I${HOME}/install/include
-LDFLAGS=-L./lib -L${HOME}/install/lib
+CFLAGS=-I./include -I${HOME}/install/include -I${GSL_ROOT}/include
+LDFLAGS=-L./lib -L${HOME}/install/lib -L${GSL_ROOT}/lib
 LIBS=-lqcd -lgsl -lgslcblas -llime -lm
 
-.PHONY: clean\
-	cleanall\
-	lib
+.PHONY: clean cleanall lib
 
 TARGETS=b_minus_Dx\
 	invert\
@@ -20,16 +18,16 @@ TARGETS=b_minus_Dx\
 	threep_idris\
 	twop\
 	unit_gaugefield\
+	disc_oneend\
 	zfac
 
 all: lib ${addsuffix .exe, $(TARGETS)}
 
 lib: lib/libqcd.a
-lib/libqcd.a:
 	cd lib/src &&\
 	make
 
-%.exe: %.o lib/libqcd.a
+%.exe: %.o lib
 	$(CC) $< -o $@ $(LDFLAGS) $(LIBS)
 
 %.o: %.c 
