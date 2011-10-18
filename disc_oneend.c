@@ -54,20 +54,13 @@ int main(int argc,char* argv[])
    qcd_complex_16 C, C2;   
    qcd_complex_16 loop, loop2;
    qcd_real_8 plaq;
-   qcd_int_4 ctr, ctr2;
-   qcd_int_2 cg5cg5_ind[16*16][4];
-   qcd_complex_16 cg5cg5_val[16*16];
-   
+   qcd_int_4 ctr, ctr2;   
    qcd_complex_16 *block[16];                       // to store the block
 
    qcd_int_4 (*mom)[3];                         // momenta-list
 
    int myid,numprocs, namelen;    
    char processor_name[MPI_MAX_PROCESSOR_NAME];
-   				 
-				 
-             
-             
              
    //set up MPI
    MPI_Init(&argc, &argv);
@@ -150,6 +143,9 @@ int main(int argc,char* argv[])
          printf("failed to open %s for writing\n",loop_name);
          k=1;
       }
+      if(myid == 0)
+	fprintf(fp_loop, "# i_sol p(x, y, z)  g   t            re im\n");
+
       fp_momlist = fopen(momlist_name,"r");
       if(fp_momlist==NULL)
       {
@@ -158,25 +154,25 @@ int main(int argc,char* argv[])
       }
    }
    MPI_Bcast(&k,1,MPI_INT, 0, MPI_COMM_WORLD);
-      if(k==1) exit(EXIT_FAILURE);
+   if(k==1) exit(EXIT_FAILURE);
   
    //load momenta-list   
-   if(myid==0) fscanf(fp_momlist,"%i\n",&i);
-   MPI_Bcast(&i,1,MPI_INT, 0, MPI_COMM_WORLD);
-   if(myid==0) printf("will read %i momenta combinations\n",i);
+   int n_mom; 
+   if(myid==0) fscanf(fp_momlist,"%i\n",&n_mom);
+   MPI_Bcast(&n_mom,1,MPI_INT, 0, MPI_COMM_WORLD);
+   if(myid==0) printf("will read %i momenta combinations\n",n_mom);
 
-   mom = malloc(i*3*sizeof(qcd_int_4));
+   mom = malloc(n_mom*3*sizeof(qcd_int_4));
 
    if(myid==0)
    {
-      for(j=0; j<i; j++)
-      {
+      for(j=0; j<n_mom; j++)
+	{
          fscanf(fp_momlist,"%i %i %i\n",&(mom[j][0]),&(mom[j][1]),&(mom[j][2]));
-         //printf("got combination %i %i %i\n",mom[j][0],mom[j][1],mom[j][2]);  
       }
       fclose(fp_momlist);   
    }
-   MPI_Bcast(&(mom[0][0]),i*3,MPI_INT,0, MPI_COMM_WORLD);
+   MPI_Bcast(&(mom[0][0]),n_mom*3,MPI_INT,0, MPI_COMM_WORLD);
    if(myid==0) printf("momenta list read and broadcasted\n");   
      
    
@@ -252,58 +248,43 @@ int main(int argc,char* argv[])
 							       sol2.D[iv][icol][c]);
 			   }
 		     }
-         
-/* 	       //Fourier transform time-slice */
-/* 	       for(j=0; j<i; j++) */
-/* 		 { */
-/* 		   if(myid==0)  */
-/* 		     { */
-/* 		       fprintf(fp_loop,"%i %+i %+i %+i ",t,mom[j][0],mom[j][1],mom[j][2]); */
-/* 		     }    */
-/* 		   loop = (qcd_complex_16) {0,0}; */
-		   
-/* 		   for(lx=0; lx<geo.lL[1]; lx++) */
-/* 		     for(ly=0; ly<geo.lL[2]; ly++) */
-/* 		       for(lz=0; lz<geo.lL[3]; lz++) */
-/* 			 { */
-/* 			   v3 = qcd_LEXIC0(lx,ly,lz,geo.lL); */
-/* 			   x=lx+geo.Pos[1]*geo.lL[1]; */
-/* 			   y=ly+geo.Pos[2]*geo.lL[2]; */
-/* 			   z=lz+geo.Pos[3]*geo.lL[3]; */
-/* 			   tmp = (((double) mom[j][0]*x)/geo.L[1] + ((double) mom[j][1]*y)/geo.L[2] + ((double) mom[j][2]*z)/geo.L[3])*2*M_PI; */
-/* 			   C2=(qcd_complex_16) {cos(tmp), -sin(tmp)}; //TABULATE FOR LARGE SPEEDUP!!! */
-/* 			   loop=qcd_CADD(loop, qcd_CMUL(block[v3],C2)); */
-/* 			 } */
-/* 		   //printf("process %i: loop = %f %+fi\n",myid,0.5*loop.re,0.5*loop.im); */
-/* 		   MPI_Reduce(&(loop.re), &(loop2.re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD); */
-/* 		   if(myid==0)  */
-/* 		     { */
-/* 		       fprintf(fp_loop,"%+e %+e\n",loop2.re*0.5,loop2.im*0.5); */
-/* 		     } */
-/* 		 } */
+	       //Fourier transform time-slice
 	       for(int igamma=0; igamma<16; igamma++)
-		 {
-		   qcd_complex_16 accum = {0, 0}, accum_all;
-		   for(lx=0; lx<geo.lL[1]; lx++)
-		     for(ly=0; ly<geo.lL[2]; ly++)
-		       for(lz=0; lz<geo.lL[3]; lz++)
-			 {
-			   int is = qcd_LEXIC0(lx, ly, lz, geo.lL);
-			   accum.re += block[igamma][is].re;
-			   accum.im += block[igamma][is].im;
-			 }
-		   MPI_Reduce(&accum.re, &accum_all.re, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-		   MPI_Reduce(&accum.im, &accum_all.im, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-		   if(myid == 0)
-		     fprintf(fp_loop, " %4d %2d %3d %+e %+e\n", isol, igamma, t, accum_all.re, accum_all.im);
-		   
-		 }
+		 for(j=0; j<n_mom; j++)
+		   {
+		     /* if(myid==0) */
+		     /*   { */
+		     /*     printf("%i %+i %+i %+i\n",t,mom[j][0],mom[j][1],mom[j][2]); */
+		     /*   } */
+		     loop = (qcd_complex_16) {0,0};
 		     
+		     for(lx=0; lx<geo.lL[1]; lx++)
+		       for(ly=0; ly<geo.lL[2]; ly++)
+			 for(lz=0; lz<geo.lL[3]; lz++)
+			   {
+			     v3 = qcd_LEXIC0(lx,ly,lz,geo.lL);
+			     x=lx+geo.Pos[1]*geo.lL[1];
+			     y=ly+geo.Pos[2]*geo.lL[2];
+			     z=lz+geo.Pos[3]*geo.lL[3];
+			     tmp = (((double) mom[j][0]*x)/geo.L[1] + 
+				    ((double) mom[j][1]*y)/geo.L[2] + 
+				    ((double) mom[j][2]*z)/geo.L[3])*2*M_PI;
+			     
+			     C2=(qcd_complex_16) {cos(tmp), -sin(tmp)}; //TABULATE FOR LARGE SPEEDUP!!!
+			     loop = qcd_CADD(loop, qcd_CMUL(block[igamma][v3],C2));
+			   }
 		     
+		     MPI_Reduce(&(loop.re), &(loop2.re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+		     if(myid == 0)
+		       //                                         # i_sol p(x, y, z) g t    re im
+		       fprintf(fp_loop, "  %5d  %+2d %+2d %+2d  %2d %3d %+e %+e\n", 
+			       isol, mom[j][0], mom[j][1], mom[j][2], igamma, t, loop2.re*0.5, loop2.im*0.5);
+		   }
+	       
 	     }
 	 }
      }
-   
+
    if(myid==0)
    {
       fclose(fp_loop);

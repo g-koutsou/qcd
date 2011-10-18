@@ -27,6 +27,10 @@ lib: lib/libqcd.a
 	cd lib/src &&\
 	make
 
+lib/libqcd.a:
+	cd lib/src &&\
+	make
+
 %.exe: %.o lib
 	$(CC) $< -o $@ $(LDFLAGS) $(LIBS)
 
