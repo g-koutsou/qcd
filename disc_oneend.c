@@ -211,17 +211,17 @@ int main(int argc,char* argv[])
        qcd_getVectorLime(sol1_name, &sol1);
        qcd_getVectorLime(sol2_name, &sol2);
 
-       for(int ig=0; ig<16; ig++)
-	 {
-	   for(v3=0; v3<geo.lV3; v3++)   //set blocks to zero
-	     block[ig][v3]= (qcd_complex_16) {0,0};
-	   
-	 }
 
        for(t=t_start; t<=t_stop; t++)
 	 {
 	   lt = t % geo.lL[0];
 	   int t_proc = t / geo.lL[0];
+	   for(int ig=0; ig<16; ig++)
+	     {
+	       for(v3=0; v3<geo.lV3; v3++)   //set blocks to zero
+		 block[ig][v3]= (qcd_complex_16) {0,0};
+	       
+	     }
 	   if(geo.Pos[0] == t_proc)  //inside the local lattice, otherwise nothing to calculate
 	     {
 	       if(myid==0) 
@@ -278,7 +278,7 @@ int main(int argc,char* argv[])
 		     if(myid == 0)
 		       //                                         # i_sol p(x, y, z) g t    re im
 		       fprintf(fp_loop, "  %5d  %+2d %+2d %+2d  %2d %3d %+e %+e\n", 
-			       isol, mom[j][0], mom[j][1], mom[j][2], igamma, t, loop2.re*0.5, loop2.im*0.5);
+			       isol, mom[j][0], mom[j][1], mom[j][2], igamma, t, loop2.re, loop2.im);
 		   }
 	       
 	     }
