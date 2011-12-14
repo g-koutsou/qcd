@@ -99,8 +99,7 @@ int qcd_communicateVectorPM(qcd_vector *v)
  */ 
 int qcd_communicateGaugeM(qcd_gaugeField *u)
 {
-   qcd_uint_2 b,bb;
-   qcd_uint_8 startpos;
+   qcd_uint_2 b;
    
    if(u->geo->numOfRequests != 0)
    {
@@ -239,8 +238,7 @@ int qcd_communicateGaugePM(qcd_gaugeField *u)
  */ 
 int qcd_communicateTransformationM(qcd_gaugeTransformation *u)
 {
-   qcd_uint_2 b,bb;
-   qcd_uint_8 startpos;
+  qcd_uint_2 b;
    
    if(u->geo->numOfRequests != 0)
    {

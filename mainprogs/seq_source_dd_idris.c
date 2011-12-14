@@ -43,19 +43,18 @@ int main(int argc,char* argv[])
 {  
    qcd_uint_4 i,mu,nu,ku,lu,c1,c2,v,x,y,z;   // loop variables
    qcd_uint_4 c3,c1p,c2p,c3p,ctr,ctr2;
-   qcd_uint_4 cc1,cc2,a,b,j,gu,ju;
+   qcd_uint_4 cc1,cc2,a,b;
    qcd_uint_4 isource;                 // ..
-   qcd_uint_4 t_sink,t_src,lt_sink;    // sink/source time-slice
+   qcd_uint_4 t_sink,lt_sink;    // sink/source time-slice
 
    qcd_uint_2 nsources;                // number of different sources
 
    qcd_uint_4 nsmear, nsmearAPE;       // gaussian and APE smearing: n
    qcd_real_8 alpha, alphaAPE;         // gaussian and APE smearing: alpha
    int params_len;                     // needed to read inputfiles
-   char *params;                       // needed to read inputfiles
+   char *params = NULL;                       // needed to read inputfiles
    char tmp_string[qcd_MAX_STRING_LENGTH]; // general purpuse
    char param_name[qcd_MAX_STRING_LENGTH];
-   double tmp;                         // general purpuse
 
    char gauge_name[qcd_MAX_STRING_LENGTH]; // name of gauge-config file
    char **source_name;                 // names of output files
@@ -80,7 +79,6 @@ int main(int argc,char* argv[])
    qcd_uint_2     cg5cg5_ind[16][4];
    qcd_complex_16 cg5cg5_val[16];
    
-   qcd_complex_16 z1, z2;               // temp variables
    qcd_complex_16 C, factor;              
    qcd_real_8 plaq;
    

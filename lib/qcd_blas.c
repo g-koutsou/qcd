@@ -1333,7 +1333,7 @@ void qcd_projectSU33d(qcd_gaugeField *gf)
 */
 void qcd_projectSU33x3(qcd_complex_16 g[3][3])
 {
-   qcd_uint_4 iv,mu,c1,c2;
+   qcd_uint_4 c1,c2;
    qcd_complex_16 H[3][3],detM,U[3][3],M[3][3];
    qcd_complex_16 b,D,v[3][3],vr[3][3];
    qcd_real_8 a,ThirdRoot_18,ThirdRoot_12,ThirdRoot_2_3;

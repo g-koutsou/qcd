@@ -24,11 +24,8 @@
 int qcd_gaussIteration3d(qcd_vector *v, qcd_gaugeField *u, qcd_real_8 alpha, qcd_uint_4 t)
 {
    qcd_uint_8 i,j;
-   qcd_uint_2 c1,mu,nu,b; 
-   qcd_uint_2 bl1[4] = {2,2,1,1};
-   qcd_uint_2 bl2[4] = {3,3,3,2};
-   qcd_uint_4 x,y,z,b0,b1,b2,b3,tt=0;
-   qcd_complex_16 tmp[3];
+   qcd_uint_2 nu;
+   qcd_uint_4 x,y,z,tt=0;
    qcd_real_8 nrm = 1.0/(1.0 + alpha*6.0);
    qcd_vector v2;
    qcd_real_8 *uu;
@@ -119,11 +116,8 @@ int qcd_gaussIteration3d(qcd_vector *v, qcd_gaugeField *u, qcd_real_8 alpha, qcd
 int qcd_gaussIteration3dAll(qcd_vector *v, qcd_gaugeField *u, qcd_real_8 alpha, qcd_uint_2 gaugeCom)
 {
    qcd_uint_8 i,j;
-   qcd_uint_2 c1,mu,nu,b; 
-   qcd_uint_2 bl1[4] = {2,2,1,1};
-   qcd_uint_2 bl2[4] = {3,3,3,2};
-   qcd_uint_4 x,y,z,b0,b1,b2,b3,t,tt;
-   qcd_complex_16 tmp[3];
+   qcd_uint_2 nu; 
+   qcd_uint_4 x,y,z,tt;
    qcd_real_8 nrm = 1.0/(1.0 + alpha*6.0);
    qcd_vector v2;
    qcd_real_8 *uu;
@@ -217,7 +211,7 @@ int qcd_apeSmear3d(qcd_gaugeField *apeu, qcd_gaugeField *u, qcd_real_8 alpha)
    qcd_propagator edge;
    qcd_complex_16 stapleForward[3][3];
    qcd_complex_16 stapleBackward[3][3];
-   qcd_uint_2 mu,nu,i=0,c1,c2;
+   qcd_uint_2 mu,nu,c1,c2;
    qcd_uint_4 l;
    qcd_complex_16 tmp[3][3];
 

@@ -77,13 +77,10 @@ int qcd_landauGauge(qcd_gaugeField *landauu, qcd_gaugeField *u, qcd_real_8 overp
 {
    qcd_real_8 prec=1.0,tr,trold=0.0;
    qcd_int_4 iter=0,x,xeo;
-   qcd_int_2 c1,c2,mu,eo;
-   qcd_complex_16 C;
-   qcd_uint_2 coord[4];
+   qcd_int_2 mu,eo;
      
-   qcd_complex_16 tmp[3][3],tmp2[3][3];
+   qcd_complex_16 tmp[3][3];
    qcd_gaugeTransformation g;
-   qcd_complex_16 glu1[3][3],glu2[3][3];
    int myid = u->geo->myid;   
    
    /* put some tests for the input parameters here */

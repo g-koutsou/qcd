@@ -19,15 +19,14 @@
  
 int main(int argc,char* argv[])
 {
-   FILE*  pfile;
-   char*  params;
+  char*  params = NULL;
    char   gauge_name[qcd_MAX_STRING_LENGTH];
    char   param_name[qcd_MAX_STRING_LENGTH];
    char   out_name[qcd_MAX_STRING_LENGTH];
-   qcd_uint_4   x_src[4],lx_src[4],i,j,t,isource,nsmear,nsmearAPE;
-   qcd_uint_2   mu,nu,col,c1,c2,s;
+   qcd_uint_4   x_src[4],lx_src[4],i,nsmear,nsmearAPE;
+   qcd_uint_2   mu,col;
    qcd_real_8   alpha,alphaAPE,plaq;
-   qcd_uint_4   params_len;   
+   int params_len;   
 
    qcd_geometry geo;
    qcd_gaugeField u, uAPE;
@@ -37,9 +36,6 @@ int main(int argc,char* argv[])
    qcd_uint_2 P[4];
    qcd_uint_2 L[4];
    qcd_real_8 theta[4]={M_PI,0.,0.,0.}; // boundary conditions
-
-   qcd_uint_4    ismear,nsources;
-   qcd_uint_4    ape_ismear;
    
    int myid,numprocs, namelen;    
    char processor_name[MPI_MAX_PROCESSOR_NAME];

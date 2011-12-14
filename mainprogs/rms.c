@@ -14,37 +14,23 @@
 #include <math.h>
 #include <qcd.h>
  
-enum {
-  POINT_SOURCE,
-  NOISE_SOURCE
-} src_type;
- 
 int main(int argc,char* argv[])
 {
-   FILE*  pfile;
-   char*  params;
+   char*  params = NULL;
    char   gauge_name[qcd_MAX_STRING_LENGTH];
    char   param_name[qcd_MAX_STRING_LENGTH];
-   char   out_name[qcd_MAX_STRING_LENGTH];
-   char   vec_names[1024][qcd_MAX_STRING_LENGTH];
-   char   src_type_s[qcd_MAX_STRING_LENGTH];
-   qcd_int_4   x_src[4],lx_src[4],i,j,t,isource,nsmear,nsmearAPE;
-   qcd_uint_2   mu,nu,col,c1,c2,s;
-   qcd_real_8   alpha,alphaAPE,plaq;
-   qcd_uint_4   params_len;   
+   qcd_int_4   x_src[4],lx_src[4],i,nsmear,nsmearAPE;
+   qcd_real_8   alpha_i, alpha_f, d_alpha ,alphaAPE,plaq;
+   int params_len;   
 
    qcd_geometry geo;
    qcd_gaugeField u, uAPE;
    qcd_gaugeField *u_ptr, *uAPE_ptr, *utmp_ptr;
-   qcd_propagator source;
    qcd_vector vec;
    qcd_uint_2 P[4];
    qcd_uint_2 L[4];
    qcd_real_8 theta[4]={M_PI,0.,0.,0.}; // boundary conditions
 
-   qcd_uint_4    ismear,nsources;
-   qcd_uint_4    ape_ismear;
-   
    int myid,numprocs, namelen;    
    char processor_name[MPI_MAX_PROCESSOR_NAME];
 
@@ -86,29 +72,12 @@ int main(int argc,char* argv[])
    if(qcd_initGeometry(&geo,L,P, theta, myid, numprocs)) exit(EXIT_FAILURE);
    
    if(myid==0) printf(" Local lattice: %i x %i x %i x %i\n",geo.lL[0],geo.lL[1],geo.lL[2],geo.lL[3]);  
-   
-   strcpy(src_type_s, qcd_getParam("<source_type>",params,params_len));
-   if(strcmp(src_type_s, "Point") == 0)
-     {
-       src_type = POINT_SOURCE;
-     }
-   else if(strcmp(src_type_s, "Noise") == 0)
-     {
-       src_type = NOISE_SOURCE;
-     }
-   else
-     {
-       if(myid == 0)
-	 {
-	   fprintf(stderr, " <source_type> should be one of:\n");
-	   fprintf(stderr, " Point,\n");
-	   fprintf(stderr, " Noise\n");
-	   exit(EXIT_FAILURE);
-	 }
-     }
 
-   sscanf(qcd_getParam("<alpha_gauss>",params,params_len),"%lf",&alpha);
-   if(myid==0) printf(" Got alpha_gauss: %lf\n",alpha);
+   sscanf(qcd_getParam("<source_pos_txyz>",params,params_len),"%d %d %d %d",&x_src[0], &x_src[1], &x_src[2], &x_src[3]);
+   if(myid==0) printf(" Got source coords: %d %d %d %d\n",x_src[0],x_src[1],x_src[2],x_src[3]);
+   
+   sscanf(qcd_getParam("<alpha_gauss>",params,params_len),"%lf %lf %lf",&alpha_i, &d_alpha, &alpha_f);
+   if(myid==0) printf(" Got alpha_gauss: from %lf, to %lf, every %lf\n",alpha_i, alpha_f, d_alpha);
    sscanf(qcd_getParam("<nsmear_gauss>",params,params_len),"%d",&nsmear);
    if(myid==0) printf(" Got nsmear_gauss: %d\n",nsmear);
    sscanf(qcd_getParam("<alpha_APE>",params,params_len),"%lf",&alphaAPE);
@@ -117,45 +86,11 @@ int main(int argc,char* argv[])
    if(myid==0) printf(" Got nsmear_APE: %d\n",nsmearAPE);   
    strcpy(gauge_name,qcd_getParam("<cfg_name>",params,params_len));
    if(myid==0) printf(" Got conf name: %s\n",gauge_name);
-   strcpy(out_name,qcd_getParam("<source>",params,params_len));
-   if(myid==0) printf(" Got source name %s\n",out_name);
-
-   int numb_sources;
-   unsigned long int seed;
-   switch(src_type)
-     {
-     case POINT_SOURCE:       
-       sscanf(qcd_getParam("<source_pos_txyz>",params,params_len),"%d %d %d %d",&x_src[0], &x_src[1], &x_src[2], &x_src[3]);
-       if(myid==0) printf(" Got source coords: %d %d %d %d\n",x_src[0],x_src[1],x_src[2],x_src[3]);
-
-       numb_sources = 12;
-       break;
-       
-     case NOISE_SOURCE:
-       sscanf(qcd_getParam("<n_sources>",params, params_len), "%d", &numb_sources);
-       if(myid==0) printf(" Got numb. sources: %d\n", numb_sources);
-
-       sscanf(qcd_getParam("<rng_seed>",params, params_len), "%d", &seed);
-       if(myid==0) printf(" Got rng seed: %d\n", seed);
-
-       sscanf(qcd_getParam("<source_pos_t>",params,params_len),"%d",&x_src[0]);
-       if(myid==0) printf(" Got noise-source t-slice: %d\n",x_src[0]);
-
-       break;
-     }
-   
+  
 
    free(params);      
    ///////////////////////////////////////////////////////////////////////////////////////////////////
    
-   if((pfile=fopen(out_name,"r"))==NULL)
-   {
-      if(myid==0) fprintf(stderr,"Error! Cannot open %s for reading.\n",out_name);
-      exit(EXIT_FAILURE);
-   }
-   for(i=0;i<numb_sources;i++)
-      fscanf(pfile,"%s\n",vec_names[i]);
-
    if(nsmear != 0)
      {
        qcd_initGaugeField(&u,&geo);
@@ -191,26 +126,23 @@ int main(int argc,char* argv[])
    
    qcd_initVector(&vec,&geo);
   
+   // which process has the source coords?
    for(i=0; i<4; i++)
-      lx_src[i] = x_src[i]-geo.Pos[i]*geo.lL[i];  //source_pos in local lattice
-       
-   qcd_rng_init(seed, geo.myid);
- 
-   for(int is=0; is<numb_sources; is++)
-     {
-       int mu = is / 3;
-       int col = is % 3;
-       if(src_type == POINT_SOURCE)
+      lx_src[i] = x_src[i]/geo.lL[i];
+          
+   for(double alpha=alpha_i; alpha <= alpha_f; alpha+=d_alpha)
+     {       
+       qcd_zeroVector(&vec); 
+       if( (lx_src[0]==geo.Pos[0]) && 
+	   (lx_src[1]==geo.Pos[1]) && 
+	   (lx_src[2]==geo.Pos[2]) && 
+	   (lx_src[3]==geo.Pos[3]) )
 	 {
-	   qcd_zeroVector(&vec); 
-	   if( (lx_src[0]>=0) && (lx_src[0]<geo.lL[0]) && (lx_src[1]>=0) && (lx_src[1]<geo.lL[1]) && (lx_src[2]>=0) && (lx_src[2]<geo.lL[2]) && (lx_src[3]>=0) && (lx_src[3]<geo.lL[3]))
-	     vec.D[qcd_LEXIC(lx_src[0],lx_src[1],lx_src[2],lx_src[3],geo.lL)][mu][col].re=1.;
+	   vec.D[qcd_LEXIC((x_src[0]%geo.lL[0]),
+	   		   (x_src[1]%geo.lL[1]),
+	   		   (x_src[2]%geo.lL[2]),
+	   		   (x_src[3]%geo.lL[3]), geo.lL)][0][0].re=1.;
 	 }
-       else if (src_type == NOISE_SOURCE)
-	 {
-	   qcd_z2Vector(&vec, x_src[0]);
-	 }
-
        for(i=0; i<nsmear; i++)
 	 {
 	   if(qcd_gaussIteration3d(&vec,&uAPE,alpha,x_src[0]))
@@ -218,12 +150,42 @@ int main(int argc,char* argv[])
 	       fprintf(stderr,"process %i: Error while smearing!\n",geo.myid);
 	       exit(EXIT_FAILURE);
 	     }
-	 }
 
-       //qcd_copyPropagatorVector(&source, &vec, mu, col);
-       //qcd_writeVector(vec_names[is],qcd_PROP_LIME,mu,col,&vec);
-       qcd_writeVectorLime(vec_names[is], qcd_SOURCE_LIME, &vec);
-       if(myid==0) printf(" Done vector: %4d / %4d\n", is, numb_sources);  
+	   double denom = 0, sum_r2 = 0;
+	   if( lx_src[0]==geo.Pos[0] )
+	     {
+	       for(int z=0; z<geo.lL[3]; z++)
+		 for(int y=0; y<geo.lL[2]; y++)
+		   for(int x=0; x<geo.lL[1]; x++)
+		     {
+		       int gx = abs(geo.lL[1]*geo.Pos[1] + x - x_src[1]);
+		       int gy = abs(geo.lL[2]*geo.Pos[2] + y - x_src[2]);
+		       int gz = abs(geo.lL[3]*geo.Pos[3] + z - x_src[3]);
+
+		       gx = gx>geo.L[1]/2 ? geo.L[1] - gx : gx;
+		       gy = gy>geo.L[2]/2 ? geo.L[2] - gy : gy;
+		       gz = gz>geo.L[3]/2 ? geo.L[3] - gz : gz;
+
+		       int lv = qcd_LEXIC((x_src[0]%geo.lL[0]), x, y, z, geo.lL);
+		       double loc_norm = 0;
+		       for(int mu=0; mu<4; mu++)
+			 for(int c=0; c<3; c++)
+			   {
+			     loc_norm += qcd_NORMSQUARED(vec.D[lv][mu][c]);
+			   }
+		       denom += loc_norm;
+		       sum_r2 += loc_norm*(gx*gx + gy*gy + gz*gz);
+		     }
+	     }
+	   MPI_Barrier(MPI_COMM_WORLD);
+	   double glob_denom, glob_sum_r2;
+	   MPI_Reduce(&denom, &glob_denom, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	   MPI_Reduce(&sum_r2, &glob_sum_r2, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	   if(geo.myid == 0)
+	     printf(" Nsmear = %3d, alpha = %10.5f, <r^2> = %+e\n", i+1, alpha, glob_sum_r2/glob_denom);
+	 }
+       if(geo.myid == 0)
+	 printf("\n\n");
      }
    qcd_destroyVector(&vec);
 

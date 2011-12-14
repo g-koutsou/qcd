@@ -22,7 +22,7 @@
 
 int main(int argc,char* argv[])
 {
-   qcd_uint_2 mu,nu,ku,lu,c1,c2,id1,id2,id3;  // various loop variables
+   qcd_uint_2 mu,nu,ku,lu,id1,id2,id3;  // various loop variables
    qcd_uint_4 i,j,k,v,lx,ly,lz,ip1,im1; 
    qcd_int_4 x,y,z;
    qcd_uint_4 numOfMom;                       // number of momenta
@@ -30,19 +30,19 @@ int main(int argc,char* argv[])
    qcd_uint_4 x_src[4];                       // source and sink coordinates
    qcd_uint_4 t_sink, t_start, t_stop, t,lt;
    qcd_real_8 tmp;                            // general purpuse
-   FILE *fp_momlist;
+   FILE *fp_momlist = NULL;
   
-   FILE *fp_corrnoe_v;                      // output files
-   FILE *fp_corrloc_v;      
-   FILE *fp_corrloc_a;      
-//   FILE *fp_corrloc_t;   
-   FILE *fp_corr_vD;
-   FILE *fp_corr_aD;
-//   FILE *fp_corr_tD;
-   FILE *fp_corr_d1;
+   FILE *fp_corrnoe_v = NULL;                      // output files
+   FILE *fp_corrloc_v = NULL;      
+   FILE *fp_corrloc_a = NULL;      
+//   FILE *fp_corrloc_t = NULL;   
+   FILE *fp_corr_vD = NULL;
+   FILE *fp_corr_aD = NULL;
+//   FILE *fp_corr_tD = NULL;
+   FILE *fp_corr_d1 = NULL;
   
    int params_len;               // needed to read inputfiles
-   char *params;                 // needed to read inputfiles
+   char *params = NULL;                 // needed to read inputfiles
 
    char gauge_name[qcd_MAX_STRING_LENGTH];      // name of gauge-configuration file
    char corrloc_v_name[qcd_MAX_STRING_LENGTH];  // name of output file name local vector current
@@ -68,8 +68,7 @@ int main(int argc,char* argv[])
    qcd_uint_2 L[4];
    qcd_uint_2 P[4];
    qcd_complex_16 phase_factor, phase_factor_b;         
-   qcd_complex_16 z1, z2;                       // temp variables
-   qcd_complex_16 C, C2;
+   qcd_complex_16 C2;
    qcd_complex_16 corr[4],corr2[4];                      
    
    qcd_complex_16 **block_n, **block_l;         // to store the blocks (local & noether vector)
@@ -82,7 +81,7 @@ int main(int argc,char* argv[])
    qcd_complex_16 backfor;                      // backward-prop x forward-prop partially traced
    qcd_complex_16 bdfmu[4][4][4];               // stores backward-prop D_mu forward-prop
    
-   qcd_int_4 (*mom)[3];                         // momenta-list
+   qcd_int_4 (*mom)[3] = NULL;                         // momenta-list
 
    int myid,numprocs, namelen;    
    char processor_name[MPI_MAX_PROCESSOR_NAME];

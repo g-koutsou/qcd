@@ -117,10 +117,6 @@ int qcd_applyWilsonTMOp(qcd_vector *Dv, qcd_vector *v, qcd_gaugeField *u, qcd_re
 
    qcd_uint_4 t,x,y,z;
    qcd_uint_8 l,j;
-   qcd_uint_4 b0,b1,b2,b3;
-   qcd_uint_2 bl0[4] = {1,0,0,0}; 
-   qcd_uint_2 bl1[4] = {2,2,1,1};
-   qcd_uint_2 bl2[4] = {3,3,3,2};
    qcd_uint_2 isPeriodic[4];
    
    qcd_real_8 epg0[12], emg0[12], epg1[12], emg1[12]; // vectors to store (1+-gamma_mu)psi
@@ -354,10 +350,6 @@ int qcd_applyWilsonTMOpNoScripts(qcd_vector *Dv, qcd_vector *v, qcd_gaugeField *
 
    qcd_uint_4 t,x,y,z;
    qcd_uint_8 l,j;
-   qcd_uint_4 b0,b1,b2,b3;
-   qcd_uint_2 bl0[4] = {1,0,0,0}; 
-   qcd_uint_2 bl1[4] = {2,2,1,1};
-   qcd_uint_2 bl2[4] = {3,3,3,2};
    qcd_uint_2 isPeriodic[4],di,co;
    
    qcd_complex_16 epg0[4][3], emg0[4][3], epg1[4][3], emg1[4][3]; // vectors to store (1+-gamma_mu)psi
@@ -366,8 +358,6 @@ int qcd_applyWilsonTMOpNoScripts(qcd_vector *Dv, qcd_vector *v, qcd_gaugeField *
    qcd_complex_16 uepg2[4][3], uemg2[4][3], uepg3[4][3], uemg3[4][3];
    qcd_complex_16 diag[4][3];
    qcd_real_8 mplus4=4+m;
-   qcd_real_8 *uu;
-   qcd_real_8 tmp;
    
    qcd_complex_16 pphases[4];
    qcd_complex_16 mphases[4];
@@ -573,10 +563,6 @@ int qcd_applyWilsonTMOpNoOptim(qcd_vector *Dv, qcd_vector *v, qcd_gaugeField *u,
 
    qcd_uint_4 t,x,y,z;
    qcd_uint_8 l,j;
-   qcd_uint_4 b0,b1,b2,b3;
-   qcd_uint_2 bl0[4] = {1,0,0,0}; 
-   qcd_uint_2 bl1[4] = {2,2,1,1};
-   qcd_uint_2 bl2[4] = {3,3,3,2};
    qcd_uint_2 isPeriodic[4];
    
    qcd_real_8 epg0[24], emg0[24], epg1[24], emg1[24]; // vectors to store (1+-gamma_mu)psi
@@ -798,7 +784,7 @@ int qcd_applyQTMOp(qcd_vector *Dv, qcd_vector *v, qcd_gaugeField *u, qcd_real_8 
     * works only in basis with gamma_5 = diag(-1,-1,1,1) */
    
    qcd_uint_8 i;
-   qcd_uint_2 mu, col;
+   qcd_uint_2 col;
    
    qcd_applyWilsonTMOpNoOptim(Dv, v, u,  m, tm);
    

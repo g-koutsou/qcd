@@ -19,21 +19,18 @@
 
 int main(int argc,char* argv[])
 {
-   qcd_uint_2 mu,nu,ku,lu,c1,c2,c3,c1p,c2p,c3p;// various loop variables
-   qcd_uint_2 id1,id2,id3,cc1,cc2,al,be;
-   qcd_uint_4 i,j,k, v,lx,ly,lz,ip1,im1,v3; 
+   qcd_uint_4 i,j,k,lx=0,ly=0,lz=0,v3; 
    qcd_int_4 x,y,z;
-   qcd_uint_2 ic1,ic2,ic3;                    //
-   qcd_uint_4 t_sink, t_start, t_stop, t,lt;
+   qcd_uint_4 t_start, t_stop, t,lt;
    qcd_real_8 tmp;                            // general purpuse
-   FILE *fp_momlist;
+   FILE *fp_momlist = NULL;
   
-   FILE *fp_loop;                           // output file
+   FILE *fp_loop = NULL;                           // output file
    FILE *fp_sol1_list;
    FILE *fp_sol2_list;
   
    int params_len;                            // needed to read inputfiles
-   char *params;                              // needed to read inputfiles
+   char *params = NULL;                              // needed to read inputfiles
 
    char loop_name[qcd_MAX_STRING_LENGTH];
    
@@ -41,20 +38,16 @@ int main(int argc,char* argv[])
    char momlist_name[qcd_MAX_STRING_LENGTH];    // name of momenta-list file
    char sol1_list_name[qcd_MAX_STRING_LENGTH];
    char sol2_list_name[qcd_MAX_STRING_LENGTH]; 
-
-   qcd_geometry geo;                            // geometry structure
+ 
+  qcd_geometry geo;                            // geometry structure
    qcd_vector sol1, sol2;                              
 
 
    qcd_real_8 theta[4] = {M_PI,0.0,0.0,0.0};    // antiperiodic b.c. in time
    qcd_uint_2 L[4];
    qcd_uint_2 P[4];
-   qcd_complex_16 phase_factor;         
-   qcd_complex_16 z1, z2;                       // temp variables
-   qcd_complex_16 C, C2;   
+   qcd_complex_16 C2;
    qcd_complex_16 loop, loop2;
-   qcd_real_8 plaq;
-   qcd_int_4 ctr, ctr2;   
    qcd_complex_16 *block[16];                       // to store the block
 
    qcd_int_4 (*mom)[3];                         // momenta-list

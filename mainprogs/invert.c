@@ -120,7 +120,7 @@ int main(int argc,char* argv[])
    qcd_uint_2 mu,col;
    
    int params_len;               // needed to read inputfiles
-   char *params;                 // needed to read inputfiles
+   char *params = NULL;                 // needed to read inputfiles
 
    
    qcd_uint_4 Nrestart;                         // restart GCR every Nrestart iterations

@@ -150,7 +150,8 @@ struct {
 #define qcd_LEXIC02(x,z,L)  ( (qcd_uint_8) ((x)+L[1]*(z)) )
 #define qcd_LEXIC03(x,y,L)  ( (qcd_uint_8) ((x)+L[1]*(y)) )
 
-
+#include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 /* this is not defined in strict ISO C99 */
 #ifndef M_PI

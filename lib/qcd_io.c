@@ -133,7 +133,7 @@ int qcd_getLimeMessage(char *fname, qcd_geometry *geo, char **message_ptr)
 {
    LimeReader *limereader;
    FILE *fid;
-   char *lime_type,*lime_data;
+   char *lime_type;
    n_uint64_t lime_data_size=0;
    int error_occured=0;
    char *message = NULL;
@@ -214,9 +214,7 @@ int qcd_getGaugeLime(char *fname, qcd_gaugeField *u)
    MPI_Status status;
    int sizes[5], lsizes[5], starts[5];
    qcd_uint_8 i=0,j=0;
-   qcd_uint_4 stride;
    qcd_uint_2 chunksize,mu,nu,c1,c2;
-   char *swap[16*3*3];
    char *buffer;
    qcd_uint_4 x,y,z,t;
    int  isDouble;
@@ -429,9 +427,8 @@ int qcd_writeGaugeLime(char *fname, qcd_gaugeField *u, char *message)
    MPI_File mpifid;
    MPI_Status status;
    int sizes[5], lsizes[5], starts[5];
-   qcd_uint_8 i,j;
-   qcd_uint_4 stride;
-   qcd_uint_2 chunksize,mu,nu,c1,c2;
+   qcd_uint_8 i;
+   qcd_uint_2 chunksize,mu,nu;
    char *buffer;
    qcd_uint_4 x,y,z,t;
    char ildgHeader[2048];
@@ -605,8 +602,7 @@ int qcd_getPropagatorCMI(char *fname, qcd_propagator *p)
 {
    char vecnames[12][qcd_MAX_STRING_LENGTH];
    FILE *fid;
-   qcd_int_4 i;
-   qcd_uint_4 mu,nu,c1,c2;
+   qcd_uint_4 mu,nu,c1,c2,i;
    qcd_uint_4 x,y,z,t;
    qcd_uint_8 l;
    int sizes[5],lsizes[5],starts[5];
@@ -782,7 +778,6 @@ int qcd_getPropagatorHMC(char *fname, qcd_propagator *p)
    double beta,kappa,mu_tm;
    int fL, fT;
    long firstlinelength;
-   qcd_int_4 i;
    qcd_uint_4 mu,nu,c1,c2;
    qcd_uint_4 x,y,z,t;
    qcd_uint_8 l;
@@ -905,7 +900,6 @@ int qcd_getPropagator(char *fname, int type, qcd_propagator *p)
 int qcd_getVectorCMI(char *fname, qcd_uint_2 nu, qcd_uint_2 c2, qcd_vector *v)
 {
    FILE *fid;
-   qcd_int_4 i;
    qcd_uint_2 mu,c1;
    qcd_uint_4 x,y,z,t;
    qcd_uint_8 l;
@@ -992,8 +986,7 @@ int qcd_getVectorLime(char *fname, qcd_vector *v)
    MPI_Status status;
    int sizes[5], lsizes[5], starts[5];
    qcd_uint_8 i,j;
-   qcd_uint_4 stride;
-   qcd_uint_2 chunksize,mu,nu,c1,c2;
+   qcd_uint_2 chunksize,mu,c1;
    char *buffer;
    qcd_uint_4 x,y,z,t;
    int  isDouble;
@@ -1201,7 +1194,6 @@ int qcd_getVectorHMC(char *fname, qcd_uint_2 nu, qcd_uint_2 c2, qcd_vector *v)
    double beta,kappa,mu_tm;
    int fL, fT;
    long firstlinelength;
-   qcd_int_4 i;
    qcd_uint_2 mu,c1;
    qcd_uint_4 x,y,z,t;
    qcd_uint_8 l;
@@ -1294,7 +1286,6 @@ int qcd_getVectorHMCV(char *fname, qcd_uint_2 nu, qcd_uint_2 c2, qcd_vector *v)
    double beta,kappa,mu_tm;
    int fL, fT;
    long firstlinelength;
-   qcd_int_4 i;
    qcd_uint_2 mu,c1;
    qcd_uint_4 x,y,z,t;
    qcd_uint_8 l;
@@ -1683,7 +1674,6 @@ int qcd_writePropagator(char *fname, int type, qcd_propagator *p)
 int qcd_writeVectorCMI(char *fname, qcd_uint_2 nu, qcd_uint_2 c2, qcd_vector *v)
 {
    FILE *fid;
-   qcd_int_4 i;
    qcd_uint_4 mu,c1;
    qcd_uint_4 x,y,z,t;
    qcd_uint_8 l;
@@ -1764,6 +1754,7 @@ int qcd_writeVectorCMI(char *fname, qcd_uint_2 nu, qcd_uint_2 c2, qcd_vector *v)
 int qcd_writeVectorLime(char *fname, int type, qcd_vector *v)
 {
    FILE *fid;
+   qcd_int_4 i;
    int error_in_header=0;
    LimeWriter *limewriter;
    LimeRecordHeader *limeheader = NULL;
@@ -1774,9 +1765,7 @@ int qcd_writeVectorLime(char *fname, int type, qcd_vector *v)
    MPI_File mpifid;
    MPI_Status status;
    int sizes[5], lsizes[5], starts[5];
-   qcd_uint_8 i,j;
-   qcd_uint_4 stride;
-   qcd_uint_2 chunksize,mu,nu,c1,c2;
+   qcd_uint_2 chunksize,mu,c1;
    char *buffer;
    qcd_uint_4 x,y,z,t;
    char tmp_string[2048];

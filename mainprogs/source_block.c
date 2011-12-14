@@ -1,4 +1,4 @@
-source.c
+/* source.c
  *
  * creates smeared sources
  * Gaussian smearing with 
@@ -16,28 +16,22 @@ source.c
  
 int main(int argc,char* argv[])
 {
-   FILE*  pfile;
-   char*  params;
+   char*  params = NULL;
    char   gauge_name[qcd_MAX_STRING_LENGTH];
    char   param_name[qcd_MAX_STRING_LENGTH];
    char   out_name[qcd_MAX_STRING_LENGTH];
-   qcd_int_4   x_src[4],lx_src[4],i,j,t,isource,nsmear,nsmearAPE;
-   qcd_uint_2   mu,nu,col,c1,c2,s;
+   qcd_int_4   x_src[4],lx_src[4],i,nsmear,nsmearAPE;
    qcd_real_8   alpha ,alphaAPE,plaq;
    int params_len;   
 
    qcd_geometry geo;
    qcd_gaugeField u, uAPE;
    qcd_gaugeField *u_ptr, *uAPE_ptr, *utmp_ptr;
-   qcd_propagator source;
    qcd_vector vec;
    qcd_uint_2 P[4];
    qcd_uint_2 L[4];
    qcd_real_8 theta[4]={M_PI,0.,0.,0.}; // boundary conditions
 
-   qcd_uint_4    ismear,nsources;
-   qcd_uint_4    ape_ismear;
-   
    int myid,numprocs, namelen;    
    char processor_name[MPI_MAX_PROCESSOR_NAME];
 
@@ -194,7 +188,6 @@ int main(int argc,char* argv[])
 
    MPI_Datatype fileview;
    MPI_File fh;
-   MPI_Info info;
    MPI_Status status;
    int globv3[] = {geo.L[3], geo.L[2], geo.L[1]};
    int locv3[] = {geo.lL[3], geo.lL[2], geo.lL[1]};

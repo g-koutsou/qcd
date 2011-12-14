@@ -23,7 +23,7 @@ int main(int argc,char* argv[])
    int myid,numprocs, namelen;    
    char processor_name[MPI_MAX_PROCESSOR_NAME];
    int params_len;                               // needed to read inputfiles
-   char *params;                                 // needed to read inputfiles				 
+   char *params = NULL;                          // needed to read inputfiles				 
 	char param_name[qcd_MAX_STRING_LENGTH];       // name of parameter file 
    qcd_real_8 pover; 		                      // stochastic over-relaxation probability	 
    char gauge_name[qcd_MAX_STRING_LENGTH];       // name of gauge-configuration file

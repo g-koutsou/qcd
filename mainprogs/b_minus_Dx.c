@@ -20,17 +20,16 @@
  
 int main(int argc,char* argv[])
 {
-   FILE*  pfile;
-   char*  params;
+   char*  params = NULL;
    char   gauge_name[qcd_MAX_STRING_LENGTH];
    char   src_name[qcd_MAX_STRING_LENGTH];
    char   srcname[qcd_MAX_STRING_LENGTH];
    char   sol_name[qcd_MAX_STRING_LENGTH];
    char   out_name[qcd_MAX_STRING_LENGTH];
    char   param_name[qcd_MAX_STRING_LENGTH];
-   qcd_uint_4   i,j,t;
+   qcd_uint_4   i;
    qcd_uint_2   nu,c2;
-   qcd_uint_4   params_len;
+   int   params_len;
 
    qcd_geometry geo;
    qcd_gaugeField u;
@@ -92,11 +91,11 @@ int main(int argc,char* argv[])
    strcpy(sol_name,qcd_getParam("<sol_name>",params,params_len));
    if(myid==0) printf(" Got solution name %s\n",sol_name);
 
-   sscanf(qcd_getParam("<src_col>",params,params_len),"%i",&c2);
-   if(myid==0) printf(" Got source col=%i\n",c2); 
+   sscanf(qcd_getParam("<src_col>",params,params_len),"%hd",&c2);
+   if(myid==0) printf(" Got source col=%u\n",c2); 
 
-   sscanf(qcd_getParam("<src_spin>",params,params_len),"%i",&nu);
-   if(myid==0) printf(" Got source spin=%i\n",nu); 
+   sscanf(qcd_getParam("<src_spin>",params,params_len),"%hd",&nu);
+   if(myid==0) printf(" Got source spin=%u\n",nu); 
 
    sscanf(qcd_getParam("<kappa>",params,params_len),"%lf",&kappa);
    if(myid==0) printf(" Got kappa=%f\n",kappa); 

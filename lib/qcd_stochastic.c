@@ -13,7 +13,6 @@ void qcd_z2Vector(qcd_vector *vec, int t_slice)
     (qcd_complex_16){-1., +0.},
     (qcd_complex_16){+0., -1.}};
 
-  qcd_uint_2 *dims = vec->geo->L;
   qcd_uint_2 *ldims = vec->geo->lL;
 
   int proc_t = t_slice / ldims[0];

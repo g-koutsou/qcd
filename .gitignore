@@ -1,0 +1,6 @@
+Makefile.in
+*.exe
+*.d
+*.o
+*.a
+*~

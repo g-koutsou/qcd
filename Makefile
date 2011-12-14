@@ -1,48 +1,12 @@
-CC=mpicc -std=c99 -O2 -D_FILE_OFFSET_BITS=64 
+include ./Makefile.in
 
-CFLAGS=-I./include -I${HOME}/mit-install/include
-LDFLAGS=-L./lib -L${HOME}/mit-install/lib
-LIBS=-lqcd -lgsl -lgslcblas -llime -lm
+DIRS = mainprogs lib
 
-.PHONY: clean cleanall lib
+all: 
+	-for d in $(DIRS); do (cd $$d && $(MAKE)); done
 
-TARGETS=b_minus_Dx\
-	invert\
-	landau\
-	seq_source_dd\
-	seq_source_dd_idris\
-	seq_source_uu\
-	seq_source_uu_idris\
-	source\
-	source_idris\
-	threep_idris\
-	twop\
-	unit_gaugefield\
-	disc_oneend\
-	zfac\
-	rms\
-	source_block
-
-all: lib ${addsuffix .exe, $(TARGETS)}
-
-lib: lib/libqcd.a
-	cd lib/src &&\
-	make
-
-lib/libqcd.a:
-	cd lib/src &&\
-	make
-
-%.exe: %.o lib
-	$(CC) $< -o $@ $(LDFLAGS) $(LIBS)
-
-%.o: %.c 
-	$(CC) $(CFLAGS) -c $<
-
-clean:		
-	rm -vf ${addsuffix .o, $(TARGETS)}
+clean:
+	-for d in $(DIRS); do (cd $$d && $(MAKE) clean); done
 
 cleanall: clean
-	rm -vf ${addsuffix .exe, $(TARGETS)} &&\
-	cd lib/src/ &&\
-	make clean
+	-for d in $(DIRS); do (cd $$d && $(MAKE) cleanall); done

@@ -1,4 +1,4 @@
-/* seq_source_uu.c
+/* seq_source_uu_idris.c
  *
  * creates sequential sources
  * for proton-operator-proton correlators with u-quarks in the current
@@ -44,19 +44,18 @@ int main(int argc,char* argv[])
 {  
    qcd_uint_4 i,mu,nu,ku,lu,c1,c2,v,x,y,z;   // loop variables
    qcd_uint_4 c3,c1p,c2p,c3p,ctr,ctr2;
-   qcd_uint_4 cc1,cc2,a,b,j,gu,ju;
+   qcd_uint_4 cc1,cc2,a,b,gu,ju;
    qcd_uint_4 isource;                 // ..
-   qcd_uint_4 t_sink,t_src,lt_sink;    // sink/source time-slice
+   qcd_uint_4 t_sink,lt_sink;    // sink/source time-slice
 
    qcd_uint_2 nsources;                // number of different sources
 
    qcd_uint_4 nsmear, nsmearAPE;       // gaussian and APE smearing: n
    qcd_real_8 alpha, alphaAPE;         // gaussian and APE smearing: alpha
    int params_len;                     // needed to read inputfiles
-   char *params;                       // needed to read inputfiles
+   char *params = NULL;                       // needed to read inputfiles
    char tmp_string[qcd_MAX_STRING_LENGTH]; // general purpuse
    char param_name[qcd_MAX_STRING_LENGTH];
-   double tmp;                         // general purpuse
 
    char gauge_name[qcd_MAX_STRING_LENGTH]; // name of gauge-config file
    char **source_name;                 // names of output files
@@ -83,7 +82,6 @@ int main(int argc,char* argv[])
    qcd_uint_2     cg5cg5_ind[16][4];
    qcd_complex_16 cg5cg5_val[16];
    
-   qcd_complex_16 z1, z2;               // temp variables
    qcd_complex_16 C, factor;          
    qcd_real_8 plaq;
    
@@ -138,7 +136,7 @@ int main(int argc,char* argv[])
 //   sscanf(qcd_getParam("<t_src>",params,params_len),"%d",&t_src);
 //   if(myid==0) printf("process %i: Got source time slice: %d\n",myid, t_src);
       
-   sscanf(qcd_getParam("<nsources>",params,params_len),"%d",&nsources);
+   sscanf(qcd_getParam("<nsources>",params,params_len),"%hd",&nsources);
    if(myid==0) printf("process %i: Got number of sources: %d\n",myid, nsources);
    
    source_name= malloc(nsources*sizeof(*source_name));
@@ -148,7 +146,7 @@ int main(int argc,char* argv[])
    {
       source_name[i]= malloc(qcd_MAX_STRING_LENGTH*sizeof(char));
       sprintf(tmp_string,"<projector_%d>",i+1);
-      sscanf(qcd_getParam(tmp_string,params,params_len),"%ud",&source_type[i]);
+      sscanf(qcd_getParam(tmp_string,params,params_len),"%hu",&source_type[i]);
       if(myid==0) printf("Sequential source #%d type: Proj%d\n",i, source_type[i]);
       sprintf(tmp_string,"<seq_src_name_%d>",i+1);
       strcpy(source_name[i],qcd_getParam(tmp_string,params,params_len));
@@ -214,8 +212,8 @@ int main(int argc,char* argv[])
 
    
    /* load propagators */
-   if(qcd_getPropagator(prop_u_name,qcd_PROP_CMI, &prop_u)) exit(EXIT_FAILURE);
-   if(qcd_getPropagator(prop_d_name,qcd_PROP_CMI, &prop_d)) exit(EXIT_FAILURE); 
+   if(qcd_getPropagator(prop_u_name,qcd_PROP_HMC, &prop_u)) exit(EXIT_FAILURE);
+   if(qcd_getPropagator(prop_d_name,qcd_PROP_HMC, &prop_d)) exit(EXIT_FAILURE); 
    if(myid==0) printf("propagators loaded\n");    
       
           
@@ -356,7 +354,7 @@ int main(int argc,char* argv[])
       }   
       if(myid==0) printf("seq. source smeared\n");
    
-      qcd_writePropagator(source_name[isource], qcd_PROP_CMI, &prop_tmp);
+      qcd_writePropagator(source_name[isource], qcd_PROP_HMCV, &prop_tmp);
    }//end isource-loop
    
    

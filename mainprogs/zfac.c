@@ -35,14 +35,14 @@ int main(int argc,char* argv[])
    qcd_uint_2 xx[4];
    int faciip1, faciim1;                      // factors related to b.c.
   
-   FILE *fp_vfun_v, *fp_vfun_a;   // output files
-   FILE *fp_vfun_s, *fp_vfun_p;
-   FILE *fp_vfun_t, *fp_vfun_vD, *fp_vfun_aD;
-   FILE *fp_vfun_tD, *fp_vfun_d1;
-   FILE *fp_pprop;      
+   FILE *fp_vfun_v = NULL, *fp_vfun_a = NULL;   // output files
+   FILE *fp_vfun_s = NULL, *fp_vfun_p = NULL;
+   FILE *fp_vfun_t = NULL, *fp_vfun_vD = NULL, *fp_vfun_aD = NULL;
+   FILE *fp_vfun_tD = NULL, *fp_vfun_d1 = NULL;
+   FILE *fp_pprop = NULL;      
   
    int params_len;               // needed to read inputfiles
-   char *params;                 // needed to read inputfiles
+   char *params = NULL;                 // needed to read inputfiles
 
    char gauge_name[qcd_MAX_STRING_LENGTH];      // name of gauge-configuration file
    char vfun_s_name[qcd_MAX_STRING_LENGTH];     // output file name, local scalar density vertex function

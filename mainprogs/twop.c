@@ -21,19 +21,18 @@
 int main(int argc,char* argv[])
 {
    qcd_uint_2 mu,nu,ku,lu,c1,c2,c3,c1p,c2p,c3p;// various loop variables
-   qcd_uint_2 id1,id2,id3,cc1,cc2,al,be;
-   qcd_uint_4 i,j,k, v,lx,ly,lz,ip1,im1,v3; 
+   qcd_uint_2 cc1,cc2,al,be;
+   qcd_uint_4 i,j,k, v,lx,ly,lz,v3; 
    qcd_int_4 x,y,z;
-   qcd_uint_2 ic1,ic2,ic3;                    //
    qcd_uint_4 x_src[4];                       // source and sink coordinates
-   qcd_uint_4 t_sink, t_start, t_stop, t,lt;
+   qcd_uint_4 t_start, t_stop, t,lt;
    qcd_real_8 tmp;                            // general purpuse
-   FILE *fp_momlist;
+   FILE *fp_momlist = NULL;
   
-   FILE *fp_corr_p;                           // output file
+   FILE *fp_corr_p = NULL;                           // output file
   
    int params_len;                            // needed to read inputfiles
-   char *params;                              // needed to read inputfiles
+   char *params = NULL;                              // needed to read inputfiles
 
    char gauge_name[qcd_MAX_STRING_LENGTH];      // name of gauge-configuration file
    char corr_p_name[qcd_MAX_STRING_LENGTH];     // name of output file proton 2pt function
@@ -58,7 +57,6 @@ int main(int argc,char* argv[])
    qcd_uint_2 L[4];
    qcd_uint_2 P[4];
    qcd_complex_16 phase_factor;         
-   qcd_complex_16 z1, z2;                       // temp variables
    qcd_complex_16 C, C2;   
    qcd_complex_16 corr, corr2;
    qcd_real_8 plaq;
