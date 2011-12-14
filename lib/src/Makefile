@@ -2,7 +2,7 @@ CC=mpicc -std=c99 -Wall -Wno-unused-variable -O2 -D_FILE_OFFSET_BITS=64 -D_GNU_S
 AR=ar
 
 INCLUDE=../../include/*.h
-INCLDDIR= -I../../include/ -I${HOME}/install/include -I${GSL_ROOT}/include/
+INCLDDIR= -I../../include/ -I${HOME}/mit-install/include
 
 TARGET=../libqcd.a
 

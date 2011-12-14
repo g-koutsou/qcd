@@ -1,7 +1,7 @@
 CC=mpicc -std=c99 -O2 -D_FILE_OFFSET_BITS=64 
 
-CFLAGS=-I./include -I${HOME}/install/include -I${GSL_ROOT}/include
-LDFLAGS=-L./lib -L${HOME}/install/lib -L${GSL_ROOT}/lib
+CFLAGS=-I./include -I${HOME}/mit-install/include
+LDFLAGS=-L./lib -L${HOME}/mit-install/lib
 LIBS=-lqcd -lgsl -lgslcblas -llime -lm
 
 .PHONY: clean cleanall lib
@@ -19,7 +19,9 @@ TARGETS=b_minus_Dx\
 	twop\
 	unit_gaugefield\
 	disc_oneend\
-	zfac
+	zfac\
+	rms\
+	source_block
 
 all: lib ${addsuffix .exe, $(TARGETS)}
 

@@ -246,8 +246,16 @@ int main(int argc,char* argv[])
 			     block[igamma][is].im += qcd_CMULI(
 							       qcd_CMUL(qcd_CONJ(sol1.D[iv][mu][c]), qcd_GAMMA[5][mu][irow]),
 							       sol2.D[iv][icol][c]);
-			   }
+			   }		       
 		     }
+	       for(int igamma=0; igamma<16; igamma++)
+		 {
+		   char fname[256];
+		   sprintf(fname, "%s.g%02d.t%02d", "block", igamma, t);
+		   FILE *fp = fopen(fname, "w");
+		   fwrite(block[igamma], sizeof(double), 2*lx*ly*lz, fp);
+		   fclose(fp);
+		 }
 	       //Fourier transform time-slice
 	       for(int igamma=0; igamma<16; igamma++)
 		 for(j=0; j<n_mom; j++)
@@ -266,9 +274,9 @@ int main(int argc,char* argv[])
 			     x=lx+geo.Pos[1]*geo.lL[1];
 			     y=ly+geo.Pos[2]*geo.lL[2];
 			     z=lz+geo.Pos[3]*geo.lL[3];
-			     tmp = (((double) mom[j][0]*x)/geo.L[1] + 
-				    ((double) mom[j][1]*y)/geo.L[2] + 
-				    ((double) mom[j][2]*z)/geo.L[3])*2*M_PI;
+			     tmp = (((double) mom[j][0]*x)/(double)geo.L[1] + 
+				    ((double) mom[j][1]*y)/(double)geo.L[2] + 
+				    ((double) mom[j][2]*z)/(double)geo.L[3])*2*M_PI;
 			     
 			     C2=(qcd_complex_16) {cos(tmp), -sin(tmp)}; //TABULATE FOR LARGE SPEEDUP!!!
 			     loop = qcd_CADD(loop, qcd_CMUL(block[igamma][v3],C2));

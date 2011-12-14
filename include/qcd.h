@@ -89,11 +89,11 @@ typedef struct
 
 typedef struct 
 {
-   qcd_complex_16 (*D)[4][3];         // data
-   qcd_complex_16 (*Bplus[4])[4][3];  // boundary data in + direction
-   qcd_complex_16 (*Bminus[4])[4][3]; // boundary data in - direction
-   qcd_geometry *geo;                 // 
-   qcd_uint_2 initialized;            // set to 1 during initialization
+  qcd_complex_16 (*D)[4][3];         // data
+  qcd_complex_16 (*Bplus[4])[4][3];  // boundary data in + direction
+  qcd_complex_16 (*Bminus[4])[4][3]; // boundary data in - direction
+  qcd_geometry *geo;                 // 
+  qcd_uint_2 initialized;            // set to 1 during initialization
 } qcd_vector;
 
 
