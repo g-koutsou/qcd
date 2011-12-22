@@ -189,6 +189,18 @@ void qcd_copyVectorPropagator(qcd_vector *vec, qcd_propagator *prop, qcd_uint_2 
       vec->D[i][mu][c1] = prop->D[i][mu][nu][c1][c2];
 }
 
+void qcd_copyPropagatorPropagator(qcd_propagator *prop_new, qcd_propagator *prop_old)
+{
+  qcd_uint_8 i;
+  qcd_uint_2 mu,nu,c1,c2;
+  for(i=0; i < prop_old->geo->lV ; i++)
+    for(mu = 0; mu < 4 ; mu++)
+      for(c1 =0; c1 < 3 ; c1++)
+	for(nu = 0 ; nu <4 ; nu++)
+	  for(c2 = 0 ; c2<3 ; c2++)
+	    prop_new->D[i][mu][nu][c1][c2] = prop_old ->D[i][mu][nu][c1][c2];
+}
+
 void qcd_copyPropagatorVector(qcd_propagator *prop, qcd_vector *vec, qcd_uint_2 nu, qcd_uint_2 c2)
 {
    qcd_uint_8 i;
@@ -230,6 +242,19 @@ void qcd_mulVectorC(qcd_vector *vec, qcd_complex_16 c)
    for(mu=0; mu<4; mu++)
    for(a=0; a<3; a++)
       vec->D[i][mu][a] = qcd_CMUL(vec->D[i][mu][a],c);
+}
+
+void qcd_mulVectorC3d(qcd_vector *vec, qcd_complex_16 c, qcd_uint_4 t)
+{
+   qcd_uint_8 i,v;
+   qcd_uint_2 mu,a;
+   for(i=0; i<vec->geo->lV3; i++)
+   {
+      v = i*vec->geo->lL[0] + t; // works only with current lexicographical conventions
+      for(mu=0; mu<4; mu++)
+      for(a=0; a<3; a++)
+         vec->D[v][mu][a] = qcd_CMUL(vec->D[v][mu][a],c);
+   }      
 }
 
 
