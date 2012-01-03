@@ -17,7 +17,12 @@
 #define Nmu 4
 #define Nic 3
 #define MAX_NUM_PHI 1000
-#define Noperators 16
+#define N_op_local 16
+#define N_op_noether 4
+#define 
+#define max(a, b) (a > b ? a : b)
+#define min(a, b) (a < b ? a : b)
+
 int main(int argc, char* argv[]){
 
   qcd_uint_2 mu,nu,ku,lu,lambda,xita,beta,rho,phita, delta, sigma,zita, kappa; // dirac indices
@@ -79,17 +84,26 @@ int main(int argc, char* argv[]){
   qcd_uint_4 nsmear, nsmearAPE;               // smearing parameters
   qcd_real_8 alpha, alphaAPE;                  // smearing parameters
 
-  qcd_int_4 ctr, ctr2, ctr11[Noperators], ctr22, ctr33;           // special spin indices trick for gammas multiplications  
-  qcd_int_2 cg5cg5g5_ind[16*16*16][6], gammag5_ind[Noperators][16][2], cg5g5cg5_ind[16*16][4]; // store the non zero indices and gamma values
-  qcd_complex_16 cg5cg5g5_val[16*16*16], gammag5_val[Noperators][16], cg5g5cg5_val[16*16];  // %
-  qcd_complex_16 gammag5[Noperators][4][4], g5cg5[4][4];
-  qcd_complex_16 z1, z2;                       // temp complex variables                                                                                                                                     
-  qcd_complex_16 C, C2;                        // temp complex variables                                                                           
-  qcd_complex_16 *W1[Nmu][Nic], *W2[Noperators][Nmu][Nic], *W3[Nmu][Nmu][Nmu][Nic], *W5[Nmu][Nmu][Nmu][Nic], *W7[Nmu][Nic]; //W8=W6=W4=W2         W terms for contractions    
-  qcd_complex_16 *W1p[Nmu][Nic], *W2p[Noperators][Nmu][Nic], *W3p[Nmu][Nmu][Nmu][Nic], *W5p[Nmu][Nmu][Nmu][Nic], *W7p[Nmu][Nic]; //W8=W6=W4=W2    W terms after fourier
-  qcd_complex_16 *W1p_r[Nmu][Nic], *W2p_r[Noperators][Nmu][Nic], *W3p_r[Nmu][Nmu][Nmu][Nic], *W5p_r[Nmu][Nmu][Nmu][Nic], *W7p_r[Nmu][Nic];        // W after reduce to root
-  qcd_complex_16 *W12[Noperators][Nmu][Nmu], *W34[Noperators][Nmu][Nmu], *W56[Noperators][Nmu][Nmu], *W78[Noperators][Nmu][Nmu];                                                    // after do all the color-spin sums
-  qcd_complex_16 *threep[Noperators][Nmu][Nmu], *threep_proj[Noperators],*threep_test[Noperators][Nmu][Nmu];                                                                                                 // store three point function
+  // special spin indices trick for gammas multiplications  
+  qcd_int_4 ctr, ctr2, gammag5_count[N_op_local], ctr22, ctr33, g5_one_p_gmu_count[N_op_noether], g5_one_m_gmu_count[N_op_noether];
+
+  // store the non zero indices and gamma values
+  qcd_int_2 cg5cg5g5_ind[16*16*16][6], gammag5_ind[N_op_local][16][2], cg5g5cg5_ind[16*16][4]; 
+  qcd_complex_16 cg5cg5g5_val[16*16*16], gammag5_val[N_op_local][16], cg5g5cg5_val[16*16];  // %
+  qcd_int_2 g5_one_p_gmu_ind[N_op_noether][16][2], g5_one_m_gmu_ind[N_op_noether][16][2];
+  qcd_complex_16 g5_one_p_gmu_val[N_op_noether][16], g5_one_m_gmu_val[N_op_noether][16];
+  
+  qcd_complex_16 g5_one_p_gmu[N_op_noether][4][4], g5_one_m_gmu[N_op_noether][4][4];
+  qcd_complex_16 g5cg5[4][4], gammag5[N_op_local][4][4];
+  qcd_complex_16 z1, z2;                       // temp complex variables
+  qcd_complex_16 C, C2;                        // temp complex variables
+  qcd_complex_16 *W1[Nmu][Nic], *W2[N_op_local + N_op_noether][Nmu][Nic]; 
+  qcd_complex_16 *W3[Nmu][Nmu][Nmu][Nic], *W5[Nmu][Nmu][Nmu][Nic], *W7[Nmu][Nic]; //W8=W6=W4=W2  W terms for contractions    
+  qcd_complex_16 *W1p[Nmu][Nic], *W2p[N_op_local + N_op_noether][Nmu][Nic];
+  qcd_complex_16 *W3p[Nmu][Nmu][Nmu][Nic], *W5p[Nmu][Nmu][Nmu][Nic], *W7p[Nmu][Nic]; //W8=W6=W4=W2  W terms after fourier
+  qcd_complex_16 *W1p_r[Nmu][Nic], *W2p_r[N_op_local + N_op_noether][Nmu][Nic], *W3p_r[Nmu][Nmu][Nmu][Nic], *W5p_r[Nmu][Nmu][Nmu][Nic], *W7p_r[Nmu][Nic];        // W after reduce to root
+  qcd_complex_16 *W12[N_op_local + N_op_noether][Nmu][Nmu], *W34[N_op_local + N_op_noether][Nmu][Nmu], *W56[N_op_local + N_op_noether][Nmu][Nmu], *W78[N_op_local + N_op_noether][Nmu][Nmu];                                                    // after do all the color-spin sums
+  qcd_complex_16 *threep[N_op_local + N_op_noether][Nmu][Nmu], *threep_proj[N_op_local + N_op_noether],*threep_test[N_op_local + N_op_noether][Nmu][Nmu];                                                                                                 // store three point function
 
 
  //set up MPI                                                                                 
@@ -369,7 +383,7 @@ int main(int argc, char* argv[]){
 	    }
 	}
 
-  for(int gamma_index = 0 ; gamma_index < Noperators ; gamma_index++){
+  for(int gamma_index = 0 ; gamma_index < N_op_local ; gamma_index++){
     for(zita = 0 ; zita < 4 ; zita++)
       for(phita = 0 ; phita < 4 ; phita++){
 	sum = (qcd_complex_16) {0,0};
@@ -380,18 +394,57 @@ int main(int argc, char* argv[]){
       }
   }
 
-  for(int gamma_index = 0 ; gamma_index < Noperators ; gamma_index++){
-    ctr11[gamma_index] = 0 ;
+  for(int gamma_index = 0 ; gamma_index < N_op_local ; gamma_index++){
+    gammag5_count[gamma_index] = 0 ;
     for(zita =0; zita < 4 ; zita++)                               // now for gamma inserion matrix only
       for(phita=0; phita < 4 ; phita++){
 	C = gammag5[gamma_index][zita][phita] ;
 	if(qcd_NORM(C) > 1e-3)
 	  {
-	    gammag5_val[gamma_index][ctr11[gamma_index]].re = C.re;
-	    gammag5_val[gamma_index][ctr11[gamma_index]].im = C.im;
-	    gammag5_ind[gamma_index][ctr11[gamma_index]][0] = zita;
-	    gammag5_ind[gamma_index][ctr11[gamma_index]][1] = phita;
-	    ctr11[gamma_index]++;
+	    gammag5_val[gamma_index][gammag5_count[gamma_index]].re = C.re;
+	    gammag5_val[gamma_index][gammag5_count[gamma_index]].im = C.im;
+	    gammag5_ind[gamma_index][gammag5_count[gamma_index]][0] = zita;
+	    gammag5_ind[gamma_index][gammag5_count[gamma_index]][1] = phita;
+	    gammag5_count[gamma_index]++;
+	  }
+      }
+  }
+
+  for(int g = 0 ; g < N_op_noether ; g++){
+    g5_one_p_gmu_count[g] = 0;
+    g5_one_m_gmu_count[g] = 0;
+    for(zita = 0 ; zita < 4 ; zita++)
+      for(phita = 0 ; phita < 4 ; phita++){
+	qcd_complex_16 sum_p = (qcd_complex_16) {0,0};
+	qcd_complex_16 sum_m = (qcd_complex_16) {0,0};
+	for( rho = 0 ; rho < 4 ; rho++){
+	  sum_p = qcd_CADD(sum_p, qcd_CMUL(qcd_GAMMA[5][zita][rho],
+					   qcd_ONE_PLUS_GAMMA[g][rho][phita]));
+
+	  sum_m = qcd_CADD(sum_m, qcd_CMUL(qcd_GAMMA[5][zita][rho],
+					   qcd_ONE_MINUS_GAMMA[g][rho][phita]));
+	}
+
+	if(qcd_NORM(sum_p) > 1e-3)
+	  {
+	    g5_one_p_gmu_val[g][g5_one_p_gmu_count[g]].re = sum_p.re;
+	    g5_one_p_gmu_val[g][g5_one_p_gmu_count[g]].im = sum_p.im;
+	    
+	    g5_one_p_gmu_ind[g][g5_one_p_gmu_count[g]][0] = zita;
+	    g5_one_p_gmu_ind[g][g5_one_p_gmu_count[g]][1] = phita;	    	    
+
+	    g5_one_p_gmu_count[g]++;
+	  }
+	
+	if(qcd_NORM(sum_m) > 1e-3)
+	  {
+	    g5_one_m_gmu_val[g][g5_one_m_gmu_count[g]].re = sum_m.re;
+	    g5_one_m_gmu_val[g][g5_one_m_gmu_count[g]].im = sum_m.im;
+	    
+	    g5_one_m_gmu_ind[g][g5_one_m_gmu_count[g]][0] = zita;
+	    g5_one_m_gmu_ind[g][g5_one_m_gmu_count[g]][1] = phita;	    	    
+
+	    g5_one_m_gmu_count[g]++;
 	  }
       }
   }
@@ -445,7 +498,7 @@ int main(int argc, char* argv[]){
       W7p[i][j] =(qcd_complex_16*)malloc(num_momenta *sizeof(qcd_complex_16));
       W1p_r[i][j] =(qcd_complex_16*)malloc(num_momenta *sizeof(qcd_complex_16));
       W7p_r[i][j] =(qcd_complex_16*)malloc(num_momenta *sizeof(qcd_complex_16));
-      for(int gamma_index = 0; gamma_index < Noperators ; gamma_index++){
+      for(int gamma_index = 0; gamma_index < N_op_local+N_op_noether ; gamma_index++){
 	W2[gamma_index][i][j] = (qcd_complex_16*)malloc(geo.lV3 * sizeof(qcd_complex_16));
 	W2p[gamma_index][i][j] =(qcd_complex_16*)malloc(num_momenta *sizeof(qcd_complex_16));
 	W2p_r[gamma_index][i][j] =(qcd_complex_16*)malloc(num_momenta *sizeof(qcd_complex_16));
@@ -464,7 +517,7 @@ int main(int argc, char* argv[]){
 	  W5p_r[i][j][k][l] =(qcd_complex_16*)malloc(num_momenta * sizeof(qcd_complex_16));
 	}
 
-  for(int gamma_index = 0 ;gamma_index < Noperators ; gamma_index++){
+  for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++){
     threep_proj[gamma_index] = (qcd_complex_16*)malloc(num_momenta*geo.L[0]*sizeof(qcd_complex_16));
     for( i = 0 ; i < Nmu ; i++)
       for(j = 0 ; j <Nmu ; j++)
@@ -479,7 +532,7 @@ int main(int argc, char* argv[]){
 	}
   }
 
-  for(int gamma_index =0 ;gamma_index < Noperators ; gamma_index++){
+  for(int gamma_index =0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++){
     for(kk=0; kk < num_momenta*geo.L[0] ; kk++){
       threep_proj[gamma_index][kk] = (qcd_complex_16) {0,0};
       for( i = 0 ; i < Nmu ; i++)
@@ -513,7 +566,7 @@ int main(int argc, char* argv[]){
       fscanf(fp_phi_name,"%s",&(phi_files[i][0]));
     }  
     
-fclose(fp_phi_name);
+  fclose(fp_phi_name);
 
 
   for(int i=0;i<num_xi_1;i++)
@@ -527,7 +580,7 @@ fclose(fp_phi_name);
   //###################################### MAIN CALCULATIONS ####################################################
   for(int r = 0 ; r < num_phi ; r++){        // a summation over the ensemble of noise vectors
 
-    for(int gamma_index = 0 ;gamma_index < Noperators ; gamma_index++){
+    for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++){
       for( i = 0 ; i < Nmu ; i++)
 	for(j = 0 ; j <Nmu ; j++)
 	  for(kk = 0 ; kk < num_momenta*geo.L[0] ; kk++)
@@ -642,14 +695,15 @@ fclose(fp_phi_name);
       {
 	if(myid == 0)printf("start W2 r = %d , t = %d\n",r,it);
 	t = ((it+x_src[0])%geo.L[0]);
-	for(int gamma_index = 0 ;gamma_index < Noperators ; gamma_index++){
+	for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++){
 	  for(i=0; i < Nmu ; i++)
 	    for(j=0; j < Nic ; j++)
 	      for(v=0; v<geo.lV3; v++)
 		W2[gamma_index][i][j][v] = (qcd_complex_16) {0,0};          // this term must be zero and for noise loop & for time loop
 	}
 	
-	for(int gamma_index = 0 ;gamma_index < Noperators ; gamma_index++){
+	// Local operators
+	for(int gamma_index = 0 ;gamma_index < N_op_local ; gamma_index++){
 	  for(lx = 0 ; lx < geo.lL[1] ; lx++)                  // each processors do his work for its local lattice
 	    for(ly = 0 ; ly< geo.lL[2] ; ly++)
 	      for(lz = 0 ; lz < geo.lL[3] ; lz++){
@@ -658,21 +712,83 @@ fclose(fp_phi_name);
 
 		// for W2 term
 		for(tt=0 ; tt< Nic ;tt++)
-		  for( ctr2 =0 ; ctr2 < ctr11[gamma_index] ; ctr2++){
+		  for( ctr2 =0 ; ctr2 < gammag5_count[gamma_index] ; ctr2++){
 		    zita = gammag5_ind[gamma_index][ctr2][0];
 		    phita = gammag5_ind[gamma_index][ctr2][1];
 		    
 		    for(hh=0; hh<Nic ;hh++)
 		      for(sigma =0 ;sigma<Nmu ; sigma++){
 			W2[gamma_index][sigma][hh][v3] = qcd_CADD(W2[gamma_index][sigma][hh][v3], 
-								  qcd_CMUL(gammag5_val[gamma_index][ctr2],qcd_CMUL(qcd_CONJ(phi.D[v][zita][tt]),uprop_unsmear.D[v][phita][sigma][tt][hh])));
+								  qcd_CMUL(gammag5_val[gamma_index][ctr2],
+									   qcd_CMUL(qcd_CONJ(phi.D[v][zita][tt]),
+										    uprop_unsmear.D[v][phita][sigma][tt][hh])));
 		    
 		      }
 		  } //close color and dirac
 	      } // close spatial for W2
 	} // close for all operators
-	    // Fourier Transform //////////////////////////////////
 
+	// Conserved current
+	for(v3=0; v3<geo.lV3; v3++) {
+	  int lv = t + v3*geo.lL[0]; // assumes no parallelization along t-direction	    
+	  for(int c1=0; c1<Nic; c1++)
+	    for(int c2=0; c2<Nic; c2++)
+	      for(int c3=0; c3<Nic; c3++)
+		for(int g=0; g<N_op_noether; g++) {
+		  int idx = g + N_op_local;
+		  mu = g;  // direction of current
+		  int ip1 = geo.plus[lv][mu];
+		  int im1 = geo.minus[lv][mu];
+
+		  for(int ku=0; ku<Nmu; ku++)
+		    {
+		      for(int nu=0; nu<g5_one_p_gmu_count[g]; nu++)
+			{
+			  zita = g5_one_p_gmu_ind[g][nu][0];
+			  phita = g5_one_p_gmu_ind[g][nu][1];
+			  qcd_complex_16 gval = g5_one_p_gmu_val[g][nu];
+			
+			  // phi[x+mu] u[x] G[x]
+			  W2[idx][ku][c1][v3] = qcd_CADD(W2[idx][ku][c1][v3],
+							 qcd_CMUL(gval,
+								  qcd_CMUL(qcd_CONJ(phi.D[ip1][zita][c2]),
+									   qcd_CMUL(qcd_CONJ(u.D[lv][mu][c3][c2]),
+										    uprop_unsmear.D[lv][phita][ku][c3][c1]))));
+
+			  // phi[x] u[x-mu] G[x-mu]
+			  W2[idx][ku][c1][v3] = qcd_CADD(W2[idx][ku][c1][v3],
+							 qcd_CMUL(gval,
+								  qcd_CMUL(qcd_CONJ(phi.D[lv][zita][c2]),
+									   qcd_CMUL(qcd_CONJ(u.D[im1][mu][c3][c2]),
+										    uprop_unsmear.D[im1][phita][ku][c3][c1]))));
+			}
+
+		      for(int nu=0; nu<g5_one_m_gmu_count[g]; nu++)
+			{
+			  zita = g5_one_m_gmu_ind[g][nu][0];
+			  phita = g5_one_m_gmu_ind[g][nu][1];
+			  qcd_complex_16 gval = g5_one_m_gmu_val[g][nu];
+			
+			  // phi[x] u[x] G[x+mu]
+			  W2[idx][ku][c1][v3] = qcd_CSUB(W2[idx][ku][c1][v3],
+							 qcd_CMUL(gval,
+								  qcd_CMUL(qcd_CONJ(phi.D[lv][zita][c2]),
+									   qcd_CMUL(u.D[lv][mu][c2][c3],
+										    uprop_unsmear.D[ip1][phita][ku][c3][c1]))));
+
+			  // phi[x-mu] u[x-mu] G[x]
+			  W2[idx][ku][c1][v3] = qcd_CSUB(W2[idx][ku][c1][v3],
+							 qcd_CMUL(gval,
+								  qcd_CMUL(qcd_CONJ(phi.D[im1][zita][c2]),
+									   qcd_CMUL(u.D[im1][mu][c2][c3],
+										    uprop_unsmear.D[lv][phita][ku][c3][c1]))));
+			}
+		    }
+		}
+	}
+	
+	// Fourier Transform //////////////////////////////////
+	
 	for(i=0; i < Nmu ; i++) // set to zero
 	  for(j=0; j < Nic ; j++)
 	    for(v=0; v< num_momenta; v++){
@@ -680,7 +796,7 @@ fclose(fp_phi_name);
 	      W7p[i][j][v] = (qcd_complex_16) {0,0};
 	      W1p_r[i][j][v] = (qcd_complex_16) {0,0};
 	      W7p_r[i][j][v] = (qcd_complex_16) {0,0};
-	      for(int gamma_index = 0 ;gamma_index < Noperators ; gamma_index++){
+	      for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++){
 		W2p[gamma_index][i][j][v] = (qcd_complex_16) {0,0};
 		W2p_r[gamma_index][i][j][v] = (qcd_complex_16) {0,0};
 	      }
@@ -711,13 +827,14 @@ fclose(fp_phi_name);
 		  y=ly+geo.Pos[2]*geo.lL[2] - x_src[2];
 		  z=lz+geo.Pos[3]*geo.lL[3] - x_src[3];
 		  tmp = (((double) mom[j][0]*x)/geo.L[1] + ((double) mom[j][1]*y)/geo.L[2] + ((double) mom[j][2]*z)/geo.L[3])*2*M_PI;
-		  C2=(qcd_complex_16) {cos(tmp),sin(tmp)}; //TABULATE FOR LARGE SPEEDUP!!!                                                                                                   
+		  C2=(qcd_complex_16) {cos(tmp),sin(tmp)}; //TABULATE FOR LARGE SPEEDUP!!!
 		  
 		  for( hh = 0 ; hh < Nic ; hh++)
 		    for( delta = 0 ; delta < Nmu ; delta++){
 		      W1p[delta][hh][j]=qcd_CADD(W1p[delta][hh][j], qcd_CMUL(W1[delta][hh][v3],C2));
-		      for(int gamma_index = 0 ;gamma_index < Noperators ; gamma_index++)
+		      for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++)
 			W2p[gamma_index][delta][hh][j]=qcd_CADD(W2p[gamma_index][delta][hh][j], qcd_CMUL(W2[gamma_index][delta][hh][v3],C2));
+
 		      W7p[delta][hh][j]=qcd_CADD(W7p[delta][hh][j], qcd_CMUL(W7[delta][hh][v3],C2));
 
 		      for( mu = 0 ; mu< Nmu ; mu++)
@@ -731,8 +848,10 @@ fclose(fp_phi_name);
 	  for( hh = 0 ; hh < Nic ; hh++) // reduce the values to root
 	    for(delta = 0 ;delta <Nmu ; delta++){
 	      MPI_Reduce(&(W1p[delta][hh][j].re), &(W1p_r[delta][hh][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-	      for(int gamma_index = 0 ;gamma_index < Noperators ; gamma_index++)
-		MPI_Reduce(&(W2p[gamma_index][delta][hh][j].re), &(W2p_r[gamma_index][delta][hh][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	      for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++)
+		MPI_Reduce(&(W2p[gamma_index][delta][hh][j].re), &(W2p_r[gamma_index][delta][hh][j].re), 2, 
+			   MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
 	      MPI_Reduce(&(W7p[delta][hh][j].re), &(W7p_r[delta][hh][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 	      for( mu = 0 ; mu < Nmu ; mu++)
 		for(nu = 0 ; nu < Nmu ; nu++){
@@ -741,8 +860,6 @@ fclose(fp_phi_name);
 		}
 	    }
 	  
-
-	  
 	} // close loop for momentum for fourier
 
 	
@@ -750,18 +867,25 @@ fclose(fp_phi_name);
 
 	    ////////////////////////////////////////////////////////////////////////
 	  
-	for(int gamma_index = 0 ;gamma_index < Noperators ; gamma_index++){
+	for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++){
 	  for( int q = 0 ; q < num_momenta; q++)
 	    for( delta = 0 ; delta < Nmu ; delta++)
 	      for( sigma = 0 ; sigma < Nmu ; sigma++){
 		
 		for( hh = 0 ; hh < Nic ; hh++){
-		  W12[gamma_index][delta][sigma][q*geo.L[0]+t] = qcd_CADD(W12[gamma_index][delta][sigma][q*geo.L[0]+t],qcd_CMUL(W1p_r[delta][hh][0] , W2p_r[gamma_index][sigma][hh][q]));
-		  W78[gamma_index][delta][sigma][q*geo.L[0]+t] = qcd_CADD(W78[gamma_index][delta][sigma][q*geo.L[0]+t],qcd_CMUL(W7p_r[delta][hh][0] , W2p_r[gamma_index][sigma][hh][q]));
+		  W12[gamma_index][delta][sigma][q*geo.L[0]+t] = qcd_CADD(W12[gamma_index][delta][sigma][q*geo.L[0]+t],
+									  qcd_CMUL(W1p_r[delta][hh][0] , W2p_r[gamma_index][sigma][hh][q]));
+		  W78[gamma_index][delta][sigma][q*geo.L[0]+t] = qcd_CADD(W78[gamma_index][delta][sigma][q*geo.L[0]+t],
+									  qcd_CMUL(W7p_r[delta][hh][0] , W2p_r[gamma_index][sigma][hh][q]));
 		  
 		  for(int lambda = 0 ; lambda < Nmu ; lambda++){
-		     W34[gamma_index][delta][sigma][q*geo.L[0]+t] = qcd_CADD(W34[gamma_index][delta][sigma][q*geo.L[0]+t],qcd_CMUL(W3p_r[delta][sigma][lambda][hh][0],W2p_r[gamma_index][lambda][hh][q]));
-		     W56[gamma_index][delta][sigma][q*geo.L[0]+t] = qcd_CADD(W56[gamma_index][delta][sigma][q*geo.L[0]+t],qcd_CMUL(W5p_r[delta][sigma][lambda][hh][0],W2p_r[gamma_index][lambda][hh][q]));
+		     W34[gamma_index][delta][sigma][q*geo.L[0]+t] = qcd_CADD(W34[gamma_index][delta][sigma][q*geo.L[0]+t],
+									     qcd_CMUL(W3p_r[delta][sigma][lambda][hh][0],
+										      W2p_r[gamma_index][lambda][hh][q]));
+
+		     W56[gamma_index][delta][sigma][q*geo.L[0]+t] = qcd_CADD(W56[gamma_index][delta][sigma][q*geo.L[0]+t],
+									     qcd_CMUL(W5p_r[delta][sigma][lambda][hh][0],
+										      W2p_r[gamma_index][lambda][hh][q]));
 		  }
 		  
 		}
@@ -770,8 +894,12 @@ fclose(fp_phi_name);
 	  for( int q = 0 ; q < num_momenta; q++)
 	    for( delta = 0 ; delta < Nmu ; delta++)
 	      for( sigma = 0 ; sigma < Nmu ; sigma++){
-		threep[gamma_index][delta][sigma][q*geo.L[0]+t] = qcd_CADD(threep[gamma_index][delta][sigma][q*geo.L[0]+t],qcd_CADD(qcd_CSUB(W12[gamma_index][delta][sigma][q*geo.L[0]+t],
-																	     W34[gamma_index][delta][sigma][q*geo.L[0]+t]),qcd_CSUB(W56[gamma_index][delta][sigma][q*geo.L[0]+t], W78[gamma_index][delta][sigma][q*geo.L[0]+t])));
+		threep[gamma_index][delta][sigma][q*geo.L[0]+t] = qcd_CADD(threep[gamma_index][delta][sigma][q*geo.L[0]+t],
+									   qcd_CADD(qcd_CSUB(W12[gamma_index][delta][sigma][q*geo.L[0]+t],
+											     W34[gamma_index][delta][sigma][q*geo.L[0]+t]),
+										    qcd_CSUB(W56[gamma_index][delta][sigma][q*geo.L[0]+t], 
+											     W78[gamma_index][delta][sigma][q*geo.L[0]+t])));
+
 		threep_test[gamma_index][delta][sigma][q*geo.L[0]+t] = threep[gamma_index][delta][sigma][q*geo.L[0]+t];
 	      }
 	}
@@ -781,7 +909,7 @@ fclose(fp_phi_name);
 
     
     if(myid == 0){
-      for(int gamma_index = 0 ;gamma_index < Noperators ; gamma_index++){
+      for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++){
 	for( int q = 0 ; q < num_momenta; q++)
 	  for(int it = 0 ; it < Tseperation ; it++)
 	    {
@@ -795,10 +923,13 @@ fclose(fp_phi_name);
 
 	      for(int delta = 0 ; delta < Nmu ; delta++)
 		for(int sigma = 0 ; sigma < Nmu ; sigma++){
-		  threep_proj[gamma_index][q*geo.L[0]+t] = qcd_CADD(threep_proj[gamma_index][q*geo.L[0]+t],qcd_CMUL(PROJECTOR[proj_index][delta][sigma],threep_test[gamma_index][sigma][delta][q*geo.L[0]+t]));
+		  threep_proj[gamma_index][q*geo.L[0]+t] = qcd_CADD(threep_proj[gamma_index][q*geo.L[0]+t],
+								    qcd_CMUL(PROJECTOR[proj_index][delta][sigma],
+									     threep_test[gamma_index][sigma][delta][q*geo.L[0]+t]));
 		}
 
-	      fprintf(fp_threep,"%6d %2d %3d %4d %+e %+e\n",r,gamma_index,it,q,threep_proj[gamma_index][q*geo.L[0]+t].re,threep_proj[gamma_index][q*geo.L[0]+t].im);
+	      fprintf(fp_threep,"%6d %2d %3d %4d %+e %+e\n",r,gamma_index,it,q,
+		      threep_proj[gamma_index][q*geo.L[0]+t].re,threep_proj[gamma_index][q*geo.L[0]+t].im);
 
 	    }
       }
