@@ -19,7 +19,7 @@
 #define MAX_NUM_PHI 1000
 #define N_op_local 16
 #define N_op_noether 4
-#define 
+
 #define max(a, b) (a > b ? a : b)
 #define min(a, b) (a < b ? a : b)
 
@@ -97,13 +97,13 @@ int main(int argc, char* argv[]){
   qcd_complex_16 g5cg5[4][4], gammag5[N_op_local][4][4];
   qcd_complex_16 z1, z2;                       // temp complex variables
   qcd_complex_16 C, C2;                        // temp complex variables
-  qcd_complex_16 *W1[Nmu][Nic], *W2[N_op_local + N_op_noether][Nmu][Nic]; 
+  qcd_complex_16 *W1[Nmu][Nic], *W2[5*N_op_local + N_op_noether][Nmu][Nic]; 
   qcd_complex_16 *W3[Nmu][Nmu][Nmu][Nic], *W5[Nmu][Nmu][Nmu][Nic], *W7[Nmu][Nic]; //W8=W6=W4=W2  W terms for contractions    
-  qcd_complex_16 *W1p[Nmu][Nic], *W2p[N_op_local + N_op_noether][Nmu][Nic];
+  qcd_complex_16 *W1p[Nmu][Nic], *W2p[5*N_op_local + N_op_noether][Nmu][Nic];
   qcd_complex_16 *W3p[Nmu][Nmu][Nmu][Nic], *W5p[Nmu][Nmu][Nmu][Nic], *W7p[Nmu][Nic]; //W8=W6=W4=W2  W terms after fourier
-  qcd_complex_16 *W1p_r[Nmu][Nic], *W2p_r[N_op_local + N_op_noether][Nmu][Nic], *W3p_r[Nmu][Nmu][Nmu][Nic], *W5p_r[Nmu][Nmu][Nmu][Nic], *W7p_r[Nmu][Nic];        // W after reduce to root
-  qcd_complex_16 *W12[N_op_local + N_op_noether][Nmu][Nmu], *W34[N_op_local + N_op_noether][Nmu][Nmu], *W56[N_op_local + N_op_noether][Nmu][Nmu], *W78[N_op_local + N_op_noether][Nmu][Nmu];                                                    // after do all the color-spin sums
-  qcd_complex_16 *threep[N_op_local + N_op_noether][Nmu][Nmu], *threep_proj[N_op_local + N_op_noether],*threep_test[N_op_local + N_op_noether][Nmu][Nmu];                                                                                                 // store three point function
+  qcd_complex_16 *W1p_r[Nmu][Nic], *W2p_r[5*N_op_local + N_op_noether][Nmu][Nic], *W3p_r[Nmu][Nmu][Nmu][Nic], *W5p_r[Nmu][Nmu][Nmu][Nic], *W7p_r[Nmu][Nic];        // W after reduce to root
+  qcd_complex_16 *W12[5*N_op_local + N_op_noether][Nmu][Nmu], *W34[5*N_op_local + N_op_noether][Nmu][Nmu], *W56[5*N_op_local + N_op_noether][Nmu][Nmu], *W78[5*N_op_local + N_op_noether][Nmu][Nmu];                                                    // after do all the color-spin sums
+  qcd_complex_16 *threep[5*N_op_local + N_op_noether][Nmu][Nmu], *threep_proj[5*N_op_local + N_op_noether],*threep_test[5*N_op_local + N_op_noether][Nmu][Nmu];                                                                                                 // store three point function
 
 
  //set up MPI                                                                                 
@@ -498,7 +498,7 @@ int main(int argc, char* argv[]){
       W7p[i][j] =(qcd_complex_16*)malloc(num_momenta *sizeof(qcd_complex_16));
       W1p_r[i][j] =(qcd_complex_16*)malloc(num_momenta *sizeof(qcd_complex_16));
       W7p_r[i][j] =(qcd_complex_16*)malloc(num_momenta *sizeof(qcd_complex_16));
-      for(int gamma_index = 0; gamma_index < N_op_local+N_op_noether ; gamma_index++){
+      for(int gamma_index = 0; gamma_index < 5*N_op_local+N_op_noether ; gamma_index++){
 	W2[gamma_index][i][j] = (qcd_complex_16*)malloc(geo.lV3 * sizeof(qcd_complex_16));
 	W2p[gamma_index][i][j] =(qcd_complex_16*)malloc(num_momenta *sizeof(qcd_complex_16));
 	W2p_r[gamma_index][i][j] =(qcd_complex_16*)malloc(num_momenta *sizeof(qcd_complex_16));
@@ -517,7 +517,7 @@ int main(int argc, char* argv[]){
 	  W5p_r[i][j][k][l] =(qcd_complex_16*)malloc(num_momenta * sizeof(qcd_complex_16));
 	}
 
-  for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++){
+  for(int gamma_index = 0 ;gamma_index < 5*N_op_local+N_op_noether ; gamma_index++){
     threep_proj[gamma_index] = (qcd_complex_16*)malloc(num_momenta*geo.L[0]*sizeof(qcd_complex_16));
     for( i = 0 ; i < Nmu ; i++)
       for(j = 0 ; j <Nmu ; j++)
@@ -532,7 +532,7 @@ int main(int argc, char* argv[]){
 	}
   }
 
-  for(int gamma_index =0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++){
+  for(int gamma_index =0 ;gamma_index < 5*N_op_local+N_op_noether ; gamma_index++){
     for(kk=0; kk < num_momenta*geo.L[0] ; kk++){
       threep_proj[gamma_index][kk] = (qcd_complex_16) {0,0};
       for( i = 0 ; i < Nmu ; i++)
@@ -580,7 +580,7 @@ int main(int argc, char* argv[]){
   //###################################### MAIN CALCULATIONS ####################################################
   for(int r = 0 ; r < num_phi ; r++){        // a summation over the ensemble of noise vectors
 
-    for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++){
+    for(int gamma_index = 0 ;gamma_index < 5*N_op_local+N_op_noether ; gamma_index++){
       for( i = 0 ; i < Nmu ; i++)
 	for(j = 0 ; j <Nmu ; j++)
 	  for(kk = 0 ; kk < num_momenta*geo.L[0] ; kk++)
@@ -695,7 +695,7 @@ int main(int argc, char* argv[]){
       {
 	if(myid == 0)printf("start W2 r = %d , t = %d\n",r,it);
 	t = ((it+x_src[0])%geo.L[0]);
-	for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++){
+	for(int gamma_index = 0 ;gamma_index < 5*N_op_local+N_op_noether ; gamma_index++){
 	  for(i=0; i < Nmu ; i++)
 	    for(j=0; j < Nic ; j++)
 	      for(v=0; v<geo.lV3; v++)
@@ -728,65 +728,126 @@ int main(int argc, char* argv[]){
 	      } // close spatial for W2
 	} // close for all operators
 
-	// Conserved current
 	for(v3=0; v3<geo.lV3; v3++) {
-	  int lv = t + v3*geo.lL[0]; // assumes no parallelization along t-direction	    
-	  for(int c1=0; c1<Nic; c1++)
-	    for(int c2=0; c2<Nic; c2++)
-	      for(int c3=0; c3<Nic; c3++)
-		for(int g=0; g<N_op_noether; g++) {
-		  int idx = g + N_op_local;
-		  mu = g;  // direction of current
-		  int ip1 = geo.plus[lv][mu];
-		  int im1 = geo.minus[lv][mu];
-
-		  for(int ku=0; ku<Nmu; ku++)
-		    {
-		      for(int nu=0; nu<g5_one_p_gmu_count[g]; nu++)
+	  int lv = t + v3*geo.lL[0]; /* assumes no parallelization along t-direction
+					otherwise lv is incorrect */
+	  for(int ku=0; ku<Nmu; ku++) {
+	    for(int c1=0; c1<Nic; c1++) {
+	      qcd_complex_16 deriv[4][Nmu][Nmu];
+	      for(int dir=0; dir<4; dir++)
+		for(int mu=0; mu<Nmu; mu++)
+		  for(int nu=0; nu<Nmu; nu++)
+		    deriv[dir][mu][nu] = (qcd_complex_16){0., 0.};
+	      
+	      // construct the derivative terms
+	      for(int dir=0; dir<4; dir++) {
+		int ip1 = geo.plus[lv][mu];
+		int im1 = geo.minus[lv][mu];
+		
+		for(int mu=0; mu<Nmu; mu++)
+		  for(int nu=0; nu<Nmu; nu++)
+		    for(int c2=0; c2<Nic; c2++)
+		      for(int c3=0; c3<Nic; c3++)
 			{
-			  zita = g5_one_p_gmu_ind[g][nu][0];
-			  phita = g5_one_p_gmu_ind[g][nu][1];
-			  qcd_complex_16 gval = g5_one_p_gmu_val[g][nu];
-			
-			  // phi[x+mu] u[x] G[x]
-			  W2[idx][ku][c1][v3] = qcd_CADD(W2[idx][ku][c1][v3],
-							 qcd_CMUL(gval,
-								  qcd_CMUL(qcd_CONJ(phi.D[ip1][zita][c2]),
-									   qcd_CMUL(qcd_CONJ(u.D[lv][mu][c3][c2]),
-										    uprop_unsmear.D[lv][phita][ku][c3][c1]))));
+			  // phi[x] u[x] G[x+dir]
+			  deriv[dir][mu][nu] = qcd_CADD(deriv[dir][mu][nu],
+							qcd_CMUL(qcd_CONJ(phi.D[ip1][mu][c2]),
+								 qcd_CMUL(u.D[lv][dir][c2][c3],
+									  uprop_unsmear.D[ip1][nu][ku][c3][c1])));
 
-			  // phi[x] u[x-mu] G[x-mu]
-			  W2[idx][ku][c1][v3] = qcd_CADD(W2[idx][ku][c1][v3],
-							 qcd_CMUL(gval,
-								  qcd_CMUL(qcd_CONJ(phi.D[lv][zita][c2]),
-									   qcd_CMUL(qcd_CONJ(u.D[im1][mu][c3][c2]),
-										    uprop_unsmear.D[im1][phita][ku][c3][c1]))));
+			  // phi[x] u[x-dir] G[x-dir]
+			  deriv[dir][mu][nu] = qcd_CSUB(deriv[dir][mu][nu],
+							qcd_CMUL(qcd_CONJ(phi.D[lv][mu][c2]),
+								 qcd_CMUL(qcd_CONJ(u.D[im1][dir][c2][c3]),
+									  uprop_unsmear.D[im1][nu][ku][c3][c1])));
+
+			  // phi[x+dir] u[x] G[x]
+			  deriv[dir][mu][nu] = qcd_CSUB(deriv[dir][mu][nu],
+							qcd_CMUL(qcd_CONJ(phi.D[ip1][mu][c2]),
+								 qcd_CMUL(qcd_CONJ(u.D[lv][dir][c2][c3]),
+									  uprop_unsmear.D[lv][nu][ku][c3][c1])));
+			  
+			  // phi[x-dir] u[x-dir] G[x]
+			  deriv[dir][mu][nu] = qcd_CADD(deriv[dir][mu][nu],
+							qcd_CMUL(qcd_CONJ(phi.D[im1][mu][c2]),
+								 qcd_CMUL(u.D[im1][dir][c2][c3],
+									  uprop_unsmear.D[lv][nu][ku][c3][c1])));
 			}
+	      }
 
-		      for(int nu=0; nu<g5_one_m_gmu_count[g]; nu++)
-			{
-			  zita = g5_one_m_gmu_ind[g][nu][0];
-			  phita = g5_one_m_gmu_ind[g][nu][1];
-			  qcd_complex_16 gval = g5_one_m_gmu_val[g][nu];
+	      for(int g=0; g<4; g++) {
+		mu = g;  // direction of current or deriv.  
+		int ip1 = geo.plus[lv][mu];
+		int im1 = geo.minus[lv][mu];
+
+		int idx = g + N_op_local;
+		for(int c2=0; c2<Nic; c2++)
+		  for(int c3=0; c3<Nic; c3++) {		    
+
+		    // Conserved current, indices W2[ (N_op_local) : (N_op_local + 4)]
+		    for(int nu=0; nu<g5_one_p_gmu_count[g]; nu++)
+		      {
+			zita = g5_one_p_gmu_ind[g][nu][0];
+			phita = g5_one_p_gmu_ind[g][nu][1];
+			qcd_complex_16 gval = g5_one_p_gmu_val[g][nu];
 			
-			  // phi[x] u[x] G[x+mu]
-			  W2[idx][ku][c1][v3] = qcd_CSUB(W2[idx][ku][c1][v3],
-							 qcd_CMUL(gval,
-								  qcd_CMUL(qcd_CONJ(phi.D[lv][zita][c2]),
-									   qcd_CMUL(u.D[lv][mu][c2][c3],
-										    uprop_unsmear.D[ip1][phita][ku][c3][c1]))));
+			// phi[x+mu] u[x] G[x]
+			W2[idx][ku][c1][v3] = qcd_CADD(W2[idx][ku][c1][v3],
+						       qcd_CMUL(gval,
+								qcd_CMUL(qcd_CONJ(phi.D[ip1][zita][c2]),
+									 qcd_CMUL(qcd_CONJ(u.D[lv][mu][c3][c2]),
+										  uprop_unsmear.D[lv][phita][ku][c3][c1]))));
+			
+			// phi[x] u[x-mu] G[x-mu]
+			W2[idx][ku][c1][v3] = qcd_CADD(W2[idx][ku][c1][v3],
+						       qcd_CMUL(gval,
+								qcd_CMUL(qcd_CONJ(phi.D[lv][zita][c2]),
+									 qcd_CMUL(qcd_CONJ(u.D[im1][mu][c3][c2]),
+										  uprop_unsmear.D[im1][phita][ku][c3][c1]))));
+		      }
+		    
+		    for(int nu=0; nu<g5_one_m_gmu_count[g]; nu++)
+		      {
+			zita = g5_one_m_gmu_ind[g][nu][0];
+			phita = g5_one_m_gmu_ind[g][nu][1];
+			qcd_complex_16 gval = g5_one_m_gmu_val[g][nu];
+			
+			// phi[x] u[x] G[x+mu]
+			W2[idx][ku][c1][v3] = qcd_CSUB(W2[idx][ku][c1][v3],
+						       qcd_CMUL(gval,
+								qcd_CMUL(qcd_CONJ(phi.D[lv][zita][c2]),
+									 qcd_CMUL(u.D[lv][mu][c2][c3],
+										  uprop_unsmear.D[ip1][phita][ku][c3][c1]))));
+			
+			// phi[x-mu] u[x-mu] G[x]
+			W2[idx][ku][c1][v3] = qcd_CSUB(W2[idx][ku][c1][v3],
+						       qcd_CMUL(gval,
+								qcd_CMUL(qcd_CONJ(phi.D[im1][zita][c2]),
+									 qcd_CMUL(u.D[im1][mu][c2][c3],
+										  uprop_unsmear.D[lv][phita][ku][c3][c1]))));
+		      }
+		    
+		  }
 
-			  // phi[x-mu] u[x-mu] G[x]
-			  W2[idx][ku][c1][v3] = qcd_CSUB(W2[idx][ku][c1][v3],
-							 qcd_CMUL(gval,
-								  qcd_CMUL(qcd_CONJ(phi.D[im1][zita][c2]),
-									   qcd_CMUL(u.D[im1][mu][c2][c3],
-										    uprop_unsmear.D[lv][phita][ku][c3][c1]))));
-			}
-		    }
+		// Derivatives	: g is the direction of the deriv.
+		//		  op is the index of the operator [same as those used for local]
+		// Stored in indices: (N_op_local+N_op_noether) : (5*N_op_local+N_op_noether)
+		// ordering: gamma matrix runs fastest (0 to 15), then derivative direction (0 to 3)
+		for(int op=0; op<N_op_local; op++) {
+		  idx = N_op_local + N_op_noether + op + g*N_op_local;
+		  for(int nu=0; nu<gammag5_count[op]; nu++) {
+		    zita = gammag5_ind[op][nu][0];
+		    phita = gammag5_ind[op][nu][1];
+		    qcd_complex_16 gval = gammag5_val[op][nu];
+		    
+		    W2[idx][ku][c1][v3] = qcd_CADD(W2[idx][ku][c1][v3],
+						   qcd_CMUL(gval, deriv[g][zita][phita]));
+		  }
 		}
+	      }
+	    }
+	  }
 	}
-	
 	// Fourier Transform //////////////////////////////////
 	
 	for(i=0; i < Nmu ; i++) // set to zero
@@ -796,7 +857,7 @@ int main(int argc, char* argv[]){
 	      W7p[i][j][v] = (qcd_complex_16) {0,0};
 	      W1p_r[i][j][v] = (qcd_complex_16) {0,0};
 	      W7p_r[i][j][v] = (qcd_complex_16) {0,0};
-	      for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++){
+	      for(int gamma_index = 0 ;gamma_index < 5*N_op_local+N_op_noether ; gamma_index++){
 		W2p[gamma_index][i][j][v] = (qcd_complex_16) {0,0};
 		W2p_r[gamma_index][i][j][v] = (qcd_complex_16) {0,0};
 	      }
@@ -832,7 +893,7 @@ int main(int argc, char* argv[]){
 		  for( hh = 0 ; hh < Nic ; hh++)
 		    for( delta = 0 ; delta < Nmu ; delta++){
 		      W1p[delta][hh][j]=qcd_CADD(W1p[delta][hh][j], qcd_CMUL(W1[delta][hh][v3],C2));
-		      for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++)
+		      for(int gamma_index = 0 ;gamma_index < 5*N_op_local+N_op_noether ; gamma_index++)
 			W2p[gamma_index][delta][hh][j]=qcd_CADD(W2p[gamma_index][delta][hh][j], qcd_CMUL(W2[gamma_index][delta][hh][v3],C2));
 
 		      W7p[delta][hh][j]=qcd_CADD(W7p[delta][hh][j], qcd_CMUL(W7[delta][hh][v3],C2));
@@ -848,7 +909,7 @@ int main(int argc, char* argv[]){
 	  for( hh = 0 ; hh < Nic ; hh++) // reduce the values to root
 	    for(delta = 0 ;delta <Nmu ; delta++){
 	      MPI_Reduce(&(W1p[delta][hh][j].re), &(W1p_r[delta][hh][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-	      for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++)
+	      for(int gamma_index = 0 ;gamma_index < 5*N_op_local+N_op_noether ; gamma_index++)
 		MPI_Reduce(&(W2p[gamma_index][delta][hh][j].re), &(W2p_r[gamma_index][delta][hh][j].re), 2, 
 			   MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
@@ -867,7 +928,7 @@ int main(int argc, char* argv[]){
 
 	    ////////////////////////////////////////////////////////////////////////
 	  
-	for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++){
+	for(int gamma_index = 0 ;gamma_index < 5*N_op_local+N_op_noether ; gamma_index++){
 	  for( int q = 0 ; q < num_momenta; q++)
 	    for( delta = 0 ; delta < Nmu ; delta++)
 	      for( sigma = 0 ; sigma < Nmu ; sigma++){
@@ -909,7 +970,7 @@ int main(int argc, char* argv[]){
 
     
     if(myid == 0){
-      for(int gamma_index = 0 ;gamma_index < N_op_local+N_op_noether ; gamma_index++){
+      for(int gamma_index = 0 ;gamma_index < 5*N_op_local+N_op_noether ; gamma_index++){
 	for( int q = 0 ; q < num_momenta; q++)
 	  for(int it = 0 ; it < Tseperation ; it++)
 	    {
