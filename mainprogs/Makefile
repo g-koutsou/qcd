@@ -9,8 +9,7 @@ TARGETS=b_minus_Dx\
 	seq_source_uu_idris\
 	source\
 	source_idris\
-	threep_idris\
-	threep_stoch\
+	threep\
 	twop\
 	unit_gaugefield\
 	disc_oneend\
@@ -26,14 +25,11 @@ LIB=$(LIBDIR)/libqcd.a
 
 all: ${addsuffix .exe, $(TARGETS)}
 
-%.exe: %.c lib
+%.exe: %.c $(LIB)
 	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS) $(LIBS)
 
-lib: 
+$(LIB): 
 	cd $(LIBDIR) && $(MAKE)
-
-clean:
-	$(RM) *.o && cd $(LIBDIR) && $(MAKE) clean
 
 cleanall: clean
 	$(RM) ${addsuffix .exe, $(TARGETS)} && cd $(LIBDIR) && $(MAKE) cleanall

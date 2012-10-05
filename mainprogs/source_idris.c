@@ -23,7 +23,8 @@ int main(int argc,char* argv[])
    char   gauge_name[qcd_MAX_STRING_LENGTH];
    char   param_name[qcd_MAX_STRING_LENGTH];
    char   out_name[qcd_MAX_STRING_LENGTH];
-   qcd_uint_4   x_src[4],lx_src[4],i,nsmear,nsmearAPE;
+   qcd_uint_4   x_src[4],i,nsmear,nsmearAPE;
+   int lx_src[4];
    qcd_uint_2   mu,col;
    qcd_real_8   alpha,alphaAPE,plaq;
    int params_len;   

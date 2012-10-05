@@ -28,7 +28,8 @@ int main(int argc,char* argv[])
    qcd_uint_4 numOfMom;                       // number of momenta
    qcd_uint_2 ic1,ic2,ic3;                    //
    qcd_uint_4 x_src[4];                       // source and sink coordinates
-   qcd_uint_4 t_sink, t_start, t_stop, t,lt;
+   qcd_uint_4 t_sink, t_start, t_stop, t;
+   int lt;
    qcd_real_8 tmp;                            // general purpuse
    FILE *fp_momlist = NULL;
   

@@ -45,7 +45,8 @@ int main(int argc,char* argv[])
    qcd_uint_4 c3,c1p,c2p,c3p,ctr,ctr2;
    qcd_uint_4 cc1,cc2,a,b;
    qcd_uint_4 isource;                 // ..
-   qcd_uint_4 t_sink,lt_sink;    // sink/source time-slice
+   qcd_uint_4 t_sink;
+   int lt_sink;    // sink/source time-slice
 
    qcd_uint_2 nsources;                // number of different sources
 

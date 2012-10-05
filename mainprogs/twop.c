@@ -25,7 +25,8 @@ int main(int argc,char* argv[])
    qcd_uint_4 i,j,k, v,lx,ly,lz,v3; 
    qcd_int_4 x,y,z;
    qcd_uint_4 x_src[4];                       // source and sink coordinates
-   qcd_uint_4 t_start, t_stop, t,lt;
+   qcd_uint_4 t_start, t_stop, t;
+   int lt;
    qcd_real_8 tmp;                            // general purpuse
    FILE *fp_momlist = NULL;
   

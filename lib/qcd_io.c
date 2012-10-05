@@ -575,7 +575,7 @@ int qcd_writeGaugeField(char *fname, int type, qcd_gaugeField *u, ...)
    va_list arg_list;
    char *message = NULL;
    
-   va_start(arg_list, *u);
+   va_start(arg_list, u);
    if(type==0)
       message = va_arg(arg_list,char *);
    va_end(arg_list);   

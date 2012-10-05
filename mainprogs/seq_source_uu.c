@@ -46,7 +46,8 @@ int main(int argc,char* argv[])
    qcd_uint_4 c3,c1p,c2p,c3p,ctr,ctr2;
    qcd_uint_4 cc1,cc2,a,b,gu,ju;
    qcd_uint_4 isource;                 // ..
-   qcd_uint_4 t_sink,lt_sink;    // sink/source time-slice
+   qcd_uint_4 t_sink;
+   int lt_sink;    // sink/source time-slice
 
    qcd_uint_2 nsources;                // number of different sources
 
@@ -212,8 +213,8 @@ int main(int argc,char* argv[])
 
    
    /* load propagators */
-   if(qcd_getPropagator(prop_u_name,qcd_PROP_CMI, &prop_u)) exit(EXIT_FAILURE);
-   if(qcd_getPropagator(prop_d_name,qcd_PROP_CMI, &prop_d)) exit(EXIT_FAILURE); 
+   if(qcd_getPropagator(prop_u_name,qcd_PROP_LIME, &prop_u)) exit(EXIT_FAILURE);
+   if(qcd_getPropagator(prop_d_name,qcd_PROP_LIME, &prop_d)) exit(EXIT_FAILURE); 
    if(myid==0) printf("propagators loaded\n");    
       
           
@@ -351,10 +352,13 @@ int main(int argc,char* argv[])
             }
          }
          qcd_copyPropagatorVector(&prop_tmp,&vec,mu,c1);
+	 char tmp_name[qcd_MAX_STRING_LENGTH];
+	 sprintf(tmp_name, "%s.%00005d", source_name[isource], c1 + mu*3);
+	 qcd_writeVector(tmp_name, qcd_PROP_LIME, mu, c1, &vec);
       }   
       if(myid==0) printf("seq. source smeared\n");
    
-      qcd_writePropagator(source_name[isource], qcd_PROP_CMI, &prop_tmp);
+      //qcd_writePropagator(source_name[isource], qcd_PROP_CMI, &prop_tmp);
    }//end isource-loop
    
    
