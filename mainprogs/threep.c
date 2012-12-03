@@ -23,12 +23,13 @@
 int main(int argc,char* argv[])
 {
    qcd_uint_2 mu,nu,ku,lu,c1,c2,id1,id2,id3;  // various loop variables
-   qcd_uint_4 i,j,k,v,lx,ly,lz,ip1,im1; 
+   qcd_uint_4 i,k,v,lx,ly,lz,ip1,im1; 
    qcd_int_4 x,y,z;
    qcd_uint_4 numOfMom;                       // number of momenta
    qcd_uint_2 ic1,ic2,ic3;                    //
    qcd_uint_4 x_src[4];                       // source and sink coordinates
    qcd_uint_4 t_sink, t_start, t_stop, t;
+   int ierr;
    int lt;
    qcd_real_8 tmp;                            // general purpuse
    FILE *fp_momlist;
@@ -74,9 +75,7 @@ int main(int argc,char* argv[])
    qcd_uint_2 P[4];
    qcd_complex_16 phase_factor, phase_factor_b;         
    qcd_complex_16 z1, z2;                       // temp variables
-   qcd_complex_16 C, C2;
-   qcd_complex_16 corr[4],corr2[4];                      
-   
+  
    qcd_complex_16 *block_p;			// to store the blocks (pseudo-scalar)
    qcd_complex_16 *block_s;			// to store the blocks (scalar)
    qcd_complex_16 **block_n, **block_l;         // to store the blocks (local & noether vector)
@@ -85,9 +84,6 @@ int main(int argc,char* argv[])
    qcd_complex_16 /* **block_tD ,*/ **block_d1; // (one derivative tensor & antisym. vector)
    
    qcd_complex_16 g5sigmu0[5][4][4];            // gamma_5 * [gamma_mu, gamma_0] *1/2
-   
-   qcd_complex_16 backfor;                      // backward-prop x forward-prop partially traced
-   qcd_complex_16 bdfmu[4][4][4];               // stores backward-prop D_mu forward-prop
    
    qcd_int_4 (*mom)[3];                         // momenta-list
 
@@ -215,10 +211,10 @@ int main(int argc,char* argv[])
    //#####################################################################   
    // allocate memory
   
-   j = 0;
-   j += qcd_initPropagator(&prop, &geo);
-   j += qcd_initPropagator(&backprop, &geo);
-   j += qcd_initGaugeField(&u, &geo);
+   ierr = 0;
+   ierr += qcd_initPropagator(&prop, &geo);
+   ierr += qcd_initPropagator(&backprop, &geo);
+   ierr += qcd_initGaugeField(&u, &geo);
    
    block_n = (qcd_complex_16**)malloc(4*sizeof(*block_n));
    block_l = (qcd_complex_16**)malloc(4*sizeof(*block_l));
@@ -237,26 +233,26 @@ int main(int argc,char* argv[])
       if(block_n[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for noether isovector block)\n",myid);
-         j++;
+         ierr++;
       }
       block_l[i] = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
       if(block_l[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for local isovector block)\n",myid);
-         j++;
+         ierr++;
       }
       block_a[i] = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
       if(block_a[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for local axial block)\n",myid);
-         j++;
+         ierr++;
       }   
 /*      
       block_t[i] = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
       if(block_t[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for local tensor block)\n",myid);
-         j++;
+         ierr++;
       }         */
    }
    for(i=0; i<16; i++)
@@ -265,31 +261,31 @@ int main(int argc,char* argv[])
       if(block_vD[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for vD block)\n",myid);
-         j++;
+         ierr++;
       }
       block_aD[i] = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
       if(block_aD[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for aD block)\n",myid);
-         j++;
+         ierr++;
       }
 /*      
       block_tD[i] = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
       if(block_t[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for tD block)\n",myid);
-         j++;
+         ierr++;
       }   
 */
       block_d1[i] = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
       if(block_d1[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for d1 block)\n",myid);
-         j++;
+         ierr++;
       }         
    }
          
-   MPI_Allreduce(&j, &k, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   MPI_Allreduce(&ierr, &k, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
    if(k>0)
    {
       if(myid==0) printf("not enough memory\n");
@@ -345,6 +341,7 @@ int main(int argc,char* argv[])
    
    
    
+   qcd_complex_16 *corr[4], *corr_master[4];
    for(t=t_start; t<=t_stop; t++)
    {
       if(myid==0) printf("t=%i\n",t);
@@ -371,8 +368,12 @@ int main(int argc,char* argv[])
       lt = ((t+x_src[0])%geo.L[0]) - geo.Pos[0]*geo.lL[0];
       if(lt>=0 && lt<geo.lL[0])  //inside the local lattice, otherwise nothing to calculate
       {
-         for(j=0; j<geo.lV3; j++)
-         {   
+#pragma omp parallel for private(id1,id2,id3,ip1,im1,ic1,ic2,ic3,i,mu,nu) 
+         for(int j=0; j<geo.lV3; j++)
+	   {   
+	     qcd_complex_16 backfor;                      // backward-prop x forward-prop partially traced
+	     qcd_complex_16 bdfmu[4][4][4];               // stores backward-prop D_mu forward-prop
+	     
             i=lt + j*geo.lL[0];         
             for(id1=0; id1<4; id1++)
             for(id3=0; id3<4; id3++)
@@ -539,9 +540,9 @@ int main(int argc,char* argv[])
 
                   if(qcd_NORM(qcd_G5GAMMA[nu][id1][id3])>1e-4)
                   {
-                     block_aD[mu*4+nu][j] = qcd_CADD(block_aD[mu*4+nu][j],
-                                                     qcd_CMUL(qcd_G5GAMMA[nu][id1][id3],
-                                                              bdfmu[mu][id1][id3]));
+		    block_aD[mu*4+nu][j] = qcd_CADD(block_aD[mu*4+nu][j],
+						    qcd_CMUL(qcd_G5GAMMA[nu][id1][id3],
+							     bdfmu[mu][id1][id3]));
 
                      block_d1[mu*4+nu][j] = qcd_CSUB(block_d1[mu*4+nu][j],
                                                      qcd_CMUL(qcd_G5GAMMA[nu][id1][id3],
@@ -683,7 +684,7 @@ int main(int argc,char* argv[])
          
          if(myid==0)
          {
-            for(j=0; j<numOfMom; j++)
+	   for(int j=0; j<numOfMom; j++)
             {
                fscanf(fp_momlist,"%i %i %i\n",&(mom[j][0]),&(mom[j][1]),&(mom[j][2]));
                //printf("got combination %i %i %i\n",mom[j][0],mom[j][1],mom[j][2]);  
@@ -692,18 +693,20 @@ int main(int argc,char* argv[])
          }
          MPI_Bcast(&(mom[0][0]),numOfMom*3,MPI_INT,0, MPI_COMM_WORLD);
          if(myid==0) printf("momenta list read and broadcasted\n");   
+
+	 for(int j=0; j<4; j++)
+	   {
+	     corr[j] = malloc(numOfMom*sizeof(qcd_complex_16));
+	     if(myid == 0)
+	       corr_master[j] = malloc(numOfMom*sizeof(qcd_complex_16));
+	   }
       }
-
-
-      for(j=0; j<numOfMom; j++)
+      
+#pragma omp parallel for private(lx,ly,lz,v,x,y,z,tmp)
+      for(int j=0; j<numOfMom; j++)
 	{
-	  if(myid==0) 
-            {
-	      fprintf(fp_corrloc_s,"%i %+i %+i %+i ",t,mom[j][0],mom[j][1],mom[j][2]);
-	      fprintf(fp_corrloc_p,"%i %+i %+i %+i ",t,mom[j][0],mom[j][1],mom[j][2]);
-            }   
-	  corr[0] = (qcd_complex_16) {0,0};
-	  corr[1] = (qcd_complex_16) {0,0};
+	  corr[0][j] = (qcd_complex_16) {0,0};
+	  corr[1][j] = (qcd_complex_16) {0,0};
           
 	  if(lt>=0 && lt<geo.lL[0])  //inside the local lattice, otherwise nothing to calculate
             for(lx=0; lx<geo.lL[1]; lx++)
@@ -715,32 +718,29 @@ int main(int argc,char* argv[])
 		    y=ly+geo.Pos[2]*geo.lL[2] - x_src[2];
 		    z=lz+geo.Pos[3]*geo.lL[3] - x_src[3];
 		    tmp = (((double)mom[j][0]*x)/geo.L[1] + ((double)mom[j][1]*y)/geo.L[2] + ((double)mom[j][2]*z)/geo.L[3])*2*M_PI;
-		    C2=(qcd_complex_16) {cos(tmp), sin(tmp)};
-		    corr[0]=qcd_CADD(corr[0], qcd_CMUL(block_s[v],C2));
-		    corr[1]=qcd_CADD(corr[1], qcd_CMUL(block_p[v],C2));
+		    qcd_complex_16 C2 = (qcd_complex_16) {cos(tmp), sin(tmp)};
+		    corr[0][j]=qcd_CADD(corr[0][j], qcd_CMUL(block_s[v],C2));
+		    corr[1][j]=qcd_CADD(corr[1][j], qcd_CMUL(block_p[v],C2));
 		  }
-	  MPI_Reduce(&(corr[0].re), &(corr2[0].re), 4, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-	  if(myid==0) 
-            {
-	      fprintf(fp_corrloc_s,"%+e %+e\n",corr2[0].re,corr2[0].im);
-	      fprintf(fp_corrloc_p,"%+e %+e\n",corr2[1].re,corr2[1].im);
-            }   
 	}
+      MPI_Reduce(&(corr[0][0].re), &(corr_master[0][0].re), numOfMom*2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+      MPI_Reduce(&(corr[1][0].re), &(corr_master[1][0].re), numOfMom*2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+      if(myid==0) 
+	for(int j=0; j<numOfMom; j++)
+	  {
+	    fprintf(fp_corrloc_s,"%i %+i %+i %+i %+e %+e\n",t,mom[j][0],mom[j][1],mom[j][2],corr_master[0][j].re,corr_master[0][j].im);
+	    fprintf(fp_corrloc_p,"%i %+i %+i %+i %+e %+e\n",t,mom[j][0],mom[j][1],mom[j][2],corr_master[1][j].re,corr_master[1][j].im);
+	  }
       
       for(mu=0; mu<4; mu++)
       {
-         for(j=0; j<numOfMom; j++)
+#pragma omp parallel for private(lx,ly,lz,v,x,y,z,tmp)
+         for(int j=0; j<numOfMom; j++)
          {
-            if(myid==0) 
-            {
-               fprintf(fp_corrnoe_v,"%i %+i %+i %+i ",t,mom[j][0],mom[j][1],mom[j][2]);
-               fprintf(fp_corrloc_v,"%i %+i %+i %+i ",t,mom[j][0],mom[j][1],mom[j][2]);
-               fprintf(fp_corrloc_a,"%i %+i %+i %+i ",t,mom[j][0],mom[j][1],mom[j][2]);
-               //fprintf(fp_corrloc_t,"%i %+i %+i %+i ",t,mom[j][0],mom[j][1],mom[j][2]);
-            }   
-            corr[0] = (qcd_complex_16) {0,0};
-            corr[1] = (qcd_complex_16) {0,0};
-            corr[2] = (qcd_complex_16) {0,0};
+	    corr[0][j] = (qcd_complex_16) {0,0};
+            corr[1][j] = (qcd_complex_16) {0,0};
+            corr[2][j] = (qcd_complex_16) {0,0};
             //corr[3] = (qcd_complex_16) {0,0};
             
             if(lt>=0 && lt<geo.lL[0])  //inside the local lattice, otherwise nothing to calculate
@@ -753,37 +753,38 @@ int main(int argc,char* argv[])
                y=ly+geo.Pos[2]*geo.lL[2] - x_src[2];
                z=lz+geo.Pos[3]*geo.lL[3] - x_src[3];
                tmp = (((double)mom[j][0]*x)/geo.L[1] + ((double)mom[j][1]*y)/geo.L[2] + ((double)mom[j][2]*z)/geo.L[3])*2*M_PI;
-               C2=(qcd_complex_16) {cos(tmp), sin(tmp)};
-               corr[0]=qcd_CADD(corr[0], qcd_CMUL(block_n[mu][v],C2));
-               corr[1]=qcd_CADD(corr[1], qcd_CMUL(block_l[mu][v],C2));
-               corr[2]=qcd_CADD(corr[2], qcd_CMUL(block_a[mu][v],C2));
+               qcd_complex_16 C2=(qcd_complex_16) {cos(tmp), sin(tmp)};
+               corr[0][j]=qcd_CADD(corr[0][j], qcd_CMUL(block_n[mu][v],C2));
+               corr[1][j]=qcd_CADD(corr[1][j], qcd_CMUL(block_l[mu][v],C2));
+               corr[2][j]=qcd_CADD(corr[2][j], qcd_CMUL(block_a[mu][v],C2));
             }
-            MPI_Reduce(&(corr[0].re), &(corr2[0].re), 6, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-            if(myid==0) 
-            {
-               fprintf(fp_corrnoe_v,"%+e %+e %i\n",corr2[0].re*0.25,corr2[0].im*0.25,mu);
-               fprintf(fp_corrloc_v,"%+e %+e %i\n",corr2[1].re,corr2[1].im,mu);
-               fprintf(fp_corrloc_a,"%+e %+e %i\n",corr2[2].re,corr2[2].im,mu);
-            }   
          }
+
+	 for(int j=0; j<3; j++)
+	   MPI_Reduce(&(corr[j][0].re), &(corr_master[j][0].re), numOfMom*2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+	 if(myid==0) 
+	   for(int j=0; j<numOfMom; j++)
+	     {
+	       fprintf(fp_corrnoe_v,"%i %+i %+i %+i %+e %+e %i\n",t,mom[j][0],mom[j][1],mom[j][2],
+		       corr_master[0][j].re*0.25,corr_master[0][j].im*0.25,mu);
+	       fprintf(fp_corrloc_v,"%i %+i %+i %+i %+e %+e %i\n",t,mom[j][0],mom[j][1],mom[j][2],
+		       corr_master[1][j].re,corr_master[1][j].im,mu);
+	       fprintf(fp_corrloc_a,"%i %+i %+i %+i %+e %+e %i\n",t,mom[j][0],mom[j][1],mom[j][2],
+		       corr_master[2][j].re,corr_master[2][j].im,mu);
+	     }
       }//end mu loop
 
+      
       for(mu=0; mu<4; mu++)
       for(nu=0; nu<=mu; nu++)
       {
-         for(j=0; j<numOfMom; j++)
+#pragma omp parallel for private(lx,ly,lz,v,x,y,z,tmp)
+         for(int j=0; j<numOfMom; j++)
          {
-            if(myid==0) 
-            {
-               fprintf(fp_corr_vD,"%i %+i %+i %+i ",t,mom[j][0],mom[j][1],mom[j][2]);
-               fprintf(fp_corr_aD,"%i %+i %+i %+i ",t,mom[j][0],mom[j][1],mom[j][2]);
-               if(mu != nu)
-                  fprintf(fp_corr_d1,"%i %+i %+i %+i ",t,mom[j][0],mom[j][1],mom[j][2]);
-               //fprintf(fp_corrloc_t,"%i %+i %+i %+i ",t,mom[j][0],mom[j][1],mom[j][2]);
-            }
-            corr[0] = (qcd_complex_16) {0,0};
-            corr[1] = (qcd_complex_16) {0,0};
-            corr[2] = (qcd_complex_16) {0,0};
+	    corr[0][j] = (qcd_complex_16) {0,0};
+            corr[1][j] = (qcd_complex_16) {0,0};
+            corr[2][j] = (qcd_complex_16) {0,0};
             //corr[3] = (qcd_complex_16) {0,0};
             
             if(lt>=0 && lt<geo.lL[0])  //inside the local lattice, otherwise nothing to calculate
@@ -796,24 +797,33 @@ int main(int argc,char* argv[])
                y=ly+geo.Pos[2]*geo.lL[2] - x_src[2];
                z=lz+geo.Pos[3]*geo.lL[3] - x_src[3];
                tmp = (((double) mom[j][0]*x)/geo.L[1] + ((double) mom[j][1]*y)/geo.L[2] + ((double) mom[j][2]*z)/geo.L[3])*2*M_PI;
-               C2=(qcd_complex_16) {cos(tmp), sin(tmp)};
-               corr[0]=qcd_CADD(corr[0], qcd_CMUL(block_vD[mu*4+nu][v],C2));
-               corr[1]=qcd_CADD(corr[1], qcd_CMUL(block_aD[mu*4+nu][v],C2));
-               corr[2]=qcd_CADD(corr[2], qcd_CMUL(block_d1[mu*4+nu][v],C2));
+               qcd_complex_16 C2=(qcd_complex_16) {cos(tmp), sin(tmp)};
+               corr[0][j]=qcd_CADD(corr[0][j], qcd_CMUL(block_vD[mu*4+nu][v],C2));
+               corr[1][j]=qcd_CADD(corr[1][j], qcd_CMUL(block_aD[mu*4+nu][v],C2));
+               corr[2][j]=qcd_CADD(corr[2][j], qcd_CMUL(block_d1[mu*4+nu][v],C2));
                //corr[3]=qcd_CADD(corr[3], qcd_CMUL(block_t[mu][v],C2));
             }
-            MPI_Reduce(&(corr[0].re), &(corr2[0].re), 6, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-            if(myid==0) 
-            {
-               fprintf(fp_corr_vD,"%+e %+e %i %i\n",corr2[0].re*0.125,corr2[0].im*0.125,mu,nu);
-               fprintf(fp_corr_aD,"%+e %+e %i %i\n",corr2[1].re*0.125,corr2[1].im*0.125,mu,nu);
-               if(mu != nu)
-                  fprintf(fp_corr_d1,"%+e %+e %i %i\n",corr2[2].re*0.125,corr2[2].im*0.125,mu,nu);
-               //fprintf(fp_corrloc_t,"%+e %+e %i\n",corr2[3].re,corr2[3].im,mu);
-            }   
          }
-      }//end mu/nu loop
+	 
+	 for(int j=0; j<3; j++)   
+	   MPI_Reduce(&(corr[j][0].re), &(corr_master[j][0].re), numOfMom*2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	 
+	 if(myid==0) 
+	   for(int j=0; j<numOfMom; j++)
+	     {
+               fprintf(fp_corr_vD,"%i %+i %+i %+i %+e %+e %i %i\n",t,mom[j][0],mom[j][1],mom[j][2],
+		       corr_master[0][j].re*0.125,corr_master[0][j].im*0.125,mu,nu);
+               fprintf(fp_corr_aD,"%i %+i %+i %+i %+e %+e %i %i\n",t,mom[j][0],mom[j][1],mom[j][2],
+		       corr_master[1][j].re*0.125,corr_master[1][j].im*0.125,mu,nu);
+            }   
 
+	 if(myid==0)
+	   if(mu != nu)
+	     for(int j=0; j<numOfMom; j++)
+	       fprintf(fp_corr_d1,"%i %+i %+i %+i %+e %+e %i %i\n",t,mom[j][0],mom[j][1],mom[j][2],
+		       corr_master[2][j].re*0.125,corr_master[2][j].im*0.125,mu,nu);
+	 
+      }//end mu/nu loop    
 
       if(t==t_stop && myid==0)
       {
@@ -826,6 +836,14 @@ int main(int argc,char* argv[])
          fclose(fp_corr_aD);
          fclose(fp_corr_d1);
          //fclose(fp_corrloc_t);
+
+	 for(int j=0; j<4; j++)
+	   {
+	     free(corr[j]);
+	     if(myid == 0)
+	       free(corr_master[j]);
+	   }
+
       }
 
    }//end t-loop   
