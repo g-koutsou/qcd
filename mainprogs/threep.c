@@ -23,12 +23,13 @@
 int main(int argc,char* argv[])
 {
    qcd_uint_2 mu,nu,ku,lu,c1,c2,id1,id2,id3;  // various loop variables
-   qcd_uint_4 i,j,k,v,lx,ly,lz,ip1,im1; 
+   qcd_uint_4 i,k,v,lx,ly,lz,ip1,im1; 
    qcd_int_4 x,y,z;
    qcd_uint_4 numOfMom;                       // number of momenta
    qcd_uint_2 ic1,ic2,ic3;                    //
    qcd_uint_4 x_src[4];                       // source and sink coordinates
    qcd_uint_4 t_sink, t_start, t_stop, t;
+   int ierr;
    int lt;
    qcd_real_8 tmp;                            // general purpuse
    FILE *fp_momlist;
@@ -85,9 +86,6 @@ int main(int argc,char* argv[])
    qcd_complex_16 /* **block_tD ,*/ **block_d1; // (one derivative tensor & antisym. vector)
    
    qcd_complex_16 g5sigmu0[5][4][4];            // gamma_5 * [gamma_mu, gamma_0] *1/2
-   
-   qcd_complex_16 backfor;                      // backward-prop x forward-prop partially traced
-   qcd_complex_16 bdfmu[4][4][4];               // stores backward-prop D_mu forward-prop
    
    qcd_int_4 (*mom)[3];                         // momenta-list
 
@@ -215,10 +213,10 @@ int main(int argc,char* argv[])
    //#####################################################################   
    // allocate memory
   
-   j = 0;
-   j += qcd_initPropagator(&prop, &geo);
-   j += qcd_initPropagator(&backprop, &geo);
-   j += qcd_initGaugeField(&u, &geo);
+   ierr = 0;
+   ierr += qcd_initPropagator(&prop, &geo);
+   ierr += qcd_initPropagator(&backprop, &geo);
+   ierr += qcd_initGaugeField(&u, &geo);
    
    block_n = (qcd_complex_16**)malloc(4*sizeof(*block_n));
    block_l = (qcd_complex_16**)malloc(4*sizeof(*block_l));
@@ -237,26 +235,26 @@ int main(int argc,char* argv[])
       if(block_n[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for noether isovector block)\n",myid);
-         j++;
+         ierr++;
       }
       block_l[i] = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
       if(block_l[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for local isovector block)\n",myid);
-         j++;
+         ierr++;
       }
       block_a[i] = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
       if(block_a[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for local axial block)\n",myid);
-         j++;
+         ierr++;
       }   
 /*      
       block_t[i] = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
       if(block_t[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for local tensor block)\n",myid);
-         j++;
+         ierr++;
       }         */
    }
    for(i=0; i<16; i++)
@@ -265,31 +263,31 @@ int main(int argc,char* argv[])
       if(block_vD[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for vD block)\n",myid);
-         j++;
+         ierr++;
       }
       block_aD[i] = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
       if(block_aD[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for aD block)\n",myid);
-         j++;
+         ierr++;
       }
 /*      
       block_tD[i] = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
       if(block_t[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for tD block)\n",myid);
-         j++;
+         ierr++;
       }   
 */
       block_d1[i] = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
       if(block_d1[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for d1 block)\n",myid);
-         j++;
+         ierr++;
       }         
    }
          
-   MPI_Allreduce(&j, &k, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   MPI_Allreduce(&ierr, &k, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
    if(k>0)
    {
       if(myid==0) printf("not enough memory\n");
@@ -371,8 +369,12 @@ int main(int argc,char* argv[])
       lt = ((t+x_src[0])%geo.L[0]) - geo.Pos[0]*geo.lL[0];
       if(lt>=0 && lt<geo.lL[0])  //inside the local lattice, otherwise nothing to calculate
       {
-         for(j=0; j<geo.lV3; j++)
-         {   
+#pragma omp parallel for private(id1,id2,id3,ip1,im1,ic1,ic2,ic3,i,mu,nu) 
+         for(int j=0; j<geo.lV3; j++)
+	   {   
+	     qcd_complex_16 backfor;                      // backward-prop x forward-prop partially traced
+	     qcd_complex_16 bdfmu[4][4][4];               // stores backward-prop D_mu forward-prop
+	     
             i=lt + j*geo.lL[0];         
             for(id1=0; id1<4; id1++)
             for(id3=0; id3<4; id3++)
@@ -539,9 +541,9 @@ int main(int argc,char* argv[])
 
                   if(qcd_NORM(qcd_G5GAMMA[nu][id1][id3])>1e-4)
                   {
-                     block_aD[mu*4+nu][j] = qcd_CADD(block_aD[mu*4+nu][j],
-                                                     qcd_CMUL(qcd_G5GAMMA[nu][id1][id3],
-                                                              bdfmu[mu][id1][id3]));
+		    block_aD[mu*4+nu][j] = qcd_CADD(block_aD[mu*4+nu][j],
+						    qcd_CMUL(qcd_G5GAMMA[nu][id1][id3],
+							     bdfmu[mu][id1][id3]));
 
                      block_d1[mu*4+nu][j] = qcd_CSUB(block_d1[mu*4+nu][j],
                                                      qcd_CMUL(qcd_G5GAMMA[nu][id1][id3],
@@ -683,7 +685,7 @@ int main(int argc,char* argv[])
          
          if(myid==0)
          {
-            for(j=0; j<numOfMom; j++)
+	   for(int j=0; j<numOfMom; j++)
             {
                fscanf(fp_momlist,"%i %i %i\n",&(mom[j][0]),&(mom[j][1]),&(mom[j][2]));
                //printf("got combination %i %i %i\n",mom[j][0],mom[j][1],mom[j][2]);  
@@ -695,7 +697,7 @@ int main(int argc,char* argv[])
       }
 
 
-      for(j=0; j<numOfMom; j++)
+      for(int j=0; j<numOfMom; j++)
 	{
 	  if(myid==0) 
             {
@@ -729,7 +731,7 @@ int main(int argc,char* argv[])
       
       for(mu=0; mu<4; mu++)
       {
-         for(j=0; j<numOfMom; j++)
+         for(int j=0; j<numOfMom; j++)
          {
             if(myid==0) 
             {
@@ -771,7 +773,7 @@ int main(int argc,char* argv[])
       for(mu=0; mu<4; mu++)
       for(nu=0; nu<=mu; nu++)
       {
-         for(j=0; j<numOfMom; j++)
+         for(int j=0; j<numOfMom; j++)
          {
             if(myid==0) 
             {
