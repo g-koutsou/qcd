@@ -763,7 +763,8 @@ int qcd_getPropagatorLime(char *fname, qcd_propagator *p)
 		for(c1=0; c1<3; c1++)
 		  {
 		    p->D[qcd_LEXIC(t,x,y,z,p->geo->lL)][mu][nu][c1][c2] = 
-		      (qcd_complex_16) v->D[qcd_LEXIC(t,x,y,z,v->geo->lL)][mu][c1];
+		      (qcd_complex_16) {v->D[qcd_LEXIC(t,x,y,z,v->geo->lL)][mu][c1].re,
+					v->D[qcd_LEXIC(t,x,y,z,v->geo->lL)][mu][c1].im};
 		  }
       qcd_destroyVector (v);
      }

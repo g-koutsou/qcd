@@ -24,7 +24,7 @@ libqcd.a: ${addsuffix .o, $(SOURCES)}
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
-	$(CC) -MM $(CFLAGS) $< > $*.d
+	$(CC) -MM $(CFLAGS) -c $< > $*.d
 
 clean:
 	$(RM) *.o *.d

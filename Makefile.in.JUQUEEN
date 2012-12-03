@@ -1,0 +1,7 @@
+AR=ar
+RANLIB=ranlib
+CC=mpixlc_r
+CFLAGS=-O3 -I./ -I$(HOME)/koutsou/install/include/ -I$(GSL_DIR)/include
+LDFLAGS=-L$(HOME)/koutsou/install/lib -L$(GSL_DIR)/lib
+LIBS=-llime -lgslcblas -lgsl -lm
+
