@@ -368,8 +368,9 @@ int main(int argc,char* argv[])
       lt = ((t+x_src[0])%geo.L[0]) - geo.Pos[0]*geo.lL[0];
       if(lt>=0 && lt<geo.lL[0])  //inside the local lattice, otherwise nothing to calculate
       {
-#pragma omp parallel for private(id1,id2,id3,ip1,im1,ic1,ic2,ic3,i,mu,nu) 
-         for(int j=0; j<geo.lV3; j++)
+	int j;
+#pragma omp parallel for private(id1,id2,id3,ip1,im1,ic1,ic2,ic3,i,mu,nu)
+         for(j=0; j<geo.lV3; j++)
 	   {   
 	     qcd_complex_16 backfor;                      // backward-prop x forward-prop partially traced
 	     qcd_complex_16 bdfmu[4][4][4];               // stores backward-prop D_mu forward-prop
@@ -549,30 +550,9 @@ int main(int argc,char* argv[])
                                                               bdfmu[mu][id1][id3]));
                   }
                }//end mu nu loop
-
-/*
-               for(mu=1; mu<4; mu++)
-               for(nu=0; nu<4; nu++)
-               {                       
-                  // *********** one derivative tensor operator **********
-                  if(qcd_NORM(g5sig[mu][nu][id1][id3])>1e-4)
-                  {        
-                     block_tD[mu*4+nu][i] = qcd_CADD(block_tD[mu*4+nu][i],
-                                                     qcd_CMUL(g5sig[mu][nu][id1][id3],
-                                                              bdfmu[0][id1][id3]));
-                  }
-
-                  if(qcd_NORM(g5sig[mu][0][id1][id3])>1e-4)
-                  {
-                     block_tD[mu*4+nu][i] = qcd_CADD(block_tD[mu*4+nu][i],
-                                                     qcd_CMUL(g5sig[mu][0][id1][id3],
-                                                              bdfmu[nu][id1][id3]));
-                  }
-               }//end mu/nu loop
-*/
             }//end id1 id3 loop   
-               
-         }//end j loop   
+            
+	   }//end j loop   
       }//end lt inside local block condition
       //#####################################################################   
       // Fourier transform the blocks and write the correlators
@@ -702,8 +682,9 @@ int main(int argc,char* argv[])
 	   }
       }
       
+      int j;
 #pragma omp parallel for private(lx,ly,lz,v,x,y,z,tmp)
-      for(int j=0; j<numOfMom; j++)
+      for(j=0; j<numOfMom; j++)
 	{
 	  corr[0][j] = (qcd_complex_16) {0,0};
 	  corr[1][j] = (qcd_complex_16) {0,0};
@@ -736,7 +717,7 @@ int main(int argc,char* argv[])
       for(mu=0; mu<4; mu++)
       {
 #pragma omp parallel for private(lx,ly,lz,v,x,y,z,tmp)
-         for(int j=0; j<numOfMom; j++)
+         for(j=0; j<numOfMom; j++)
          {
 	    corr[0][j] = (qcd_complex_16) {0,0};
             corr[1][j] = (qcd_complex_16) {0,0};
@@ -780,7 +761,7 @@ int main(int argc,char* argv[])
       for(nu=0; nu<=mu; nu++)
       {
 #pragma omp parallel for private(lx,ly,lz,v,x,y,z,tmp)
-         for(int j=0; j<numOfMom; j++)
+         for(j=0; j<numOfMom; j++)
          {
 	    corr[0][j] = (qcd_complex_16) {0,0};
             corr[1][j] = (qcd_complex_16) {0,0};
