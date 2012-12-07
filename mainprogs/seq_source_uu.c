@@ -134,6 +134,12 @@ int main(int argc,char* argv[])
    sscanf(qcd_getParam("<t_sink>",params,params_len),"%d",&t_sink);
    if(myid==0) printf("process %i: Got sink time slice: %d\n",myid, t_sink);
    
+   if(t_sink >= L[0])
+     {
+       if(myid==0) fprintf(stderr, " Error: t_sink (=%d) >= L[0] (=%d),\n t_sink should be in [0, L[0]), did you forget to mod(t_sink, L[0]) ?\n", t_sink, L[0]);
+       exit(EXIT_FAILURE);
+     }
+
 //   sscanf(qcd_getParam("<t_src>",params,params_len),"%d",&t_src);
 //   if(myid==0) printf("process %i: Got source time slice: %d\n",myid, t_src);
       

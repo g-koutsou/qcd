@@ -162,6 +162,12 @@ int main(int argc,char* argv[])
    sscanf(qcd_getParam("<t_sink>",params,params_len),"%d",&t_sink);
    if(myid==0) printf("Got sink time slice: %d\n",t_sink);
   
+   if(t_sink >= L[0])
+     {
+       if(myid==0) fprintf(stderr, " Error: t_sink (=%d) >= L[0] (=%d),\n t_sink should be in [0, L[0]), did you forget to mod(t_sink, L[0]) ?\n", t_sink, L[0]);
+       exit(EXIT_FAILURE);
+     }
+
    strcpy(prop_name,qcd_getParam("<propagator>",params,params_len));
    if(myid==0) printf("Got propagator file name: %s\n",prop_name);
    strcpy(bprop_name,qcd_getParam("<seq_prop>",params,params_len));
@@ -363,6 +369,19 @@ int main(int argc,char* argv[])
          block_aD[mu][i]= (qcd_complex_16) {0,0};
 //         block_tD[mu][i]= (qcd_complex_16) {0,0};
          block_d1[mu][i]= (qcd_complex_16) {0,0};
+      }
+
+      /* 
+	 Dirty fix to flip sign in case the
+	 three-point function crosses the
+	 end of the lattice.
+	 
+	 A better fix would be to ask for "t_src" and "source-sink separation"
+	 in the input parameters, and work it out from there.
+      */
+      double sign = +1;
+      if(t_sink < x_src[0]) {
+	sign = -1;
       }
 
       lt = ((t+x_src[0])%geo.L[0]) - geo.Pos[0]*geo.lL[0];
@@ -710,8 +729,8 @@ int main(int argc,char* argv[])
       if(myid==0) 
 	for(int j=0; j<numOfMom; j++)
 	  {
-	    fprintf(fp_corrloc_s,"%i %+i %+i %+i %+e %+e\n",t,mom[j][0],mom[j][1],mom[j][2],corr_master[0][j].re,corr_master[0][j].im);
-	    fprintf(fp_corrloc_p,"%i %+i %+i %+i %+e %+e\n",t,mom[j][0],mom[j][1],mom[j][2],corr_master[1][j].re,corr_master[1][j].im);
+	    fprintf(fp_corrloc_s,"%i %+i %+i %+i %+e %+e\n",t,mom[j][0],mom[j][1],mom[j][2],sign*corr_master[0][j].re,sign*corr_master[0][j].im);
+	    fprintf(fp_corrloc_p,"%i %+i %+i %+i %+e %+e\n",t,mom[j][0],mom[j][1],mom[j][2],sign*corr_master[1][j].re,sign*corr_master[1][j].im);
 	  }
       
       for(mu=0; mu<4; mu++)
@@ -748,11 +767,11 @@ int main(int argc,char* argv[])
 	   for(int j=0; j<numOfMom; j++)
 	     {
 	       fprintf(fp_corrnoe_v,"%i %+i %+i %+i %+e %+e %i\n",t,mom[j][0],mom[j][1],mom[j][2],
-		       corr_master[0][j].re*0.25,corr_master[0][j].im*0.25,mu);
+		       sign*corr_master[0][j].re*0.25,sign*corr_master[0][j].im*0.25,mu);
 	       fprintf(fp_corrloc_v,"%i %+i %+i %+i %+e %+e %i\n",t,mom[j][0],mom[j][1],mom[j][2],
-		       corr_master[1][j].re,corr_master[1][j].im,mu);
+		       sign*corr_master[1][j].re,sign*corr_master[1][j].im,mu);
 	       fprintf(fp_corrloc_a,"%i %+i %+i %+i %+e %+e %i\n",t,mom[j][0],mom[j][1],mom[j][2],
-		       corr_master[2][j].re,corr_master[2][j].im,mu);
+		       sign*corr_master[2][j].re,sign*corr_master[2][j].im,mu);
 	     }
       }//end mu loop
 
@@ -793,16 +812,16 @@ int main(int argc,char* argv[])
 	   for(int j=0; j<numOfMom; j++)
 	     {
                fprintf(fp_corr_vD,"%i %+i %+i %+i %+e %+e %i %i\n",t,mom[j][0],mom[j][1],mom[j][2],
-		       corr_master[0][j].re*0.125,corr_master[0][j].im*0.125,mu,nu);
+		       sign*corr_master[0][j].re*0.125,sign*corr_master[0][j].im*0.125,mu,nu);
                fprintf(fp_corr_aD,"%i %+i %+i %+i %+e %+e %i %i\n",t,mom[j][0],mom[j][1],mom[j][2],
-		       corr_master[1][j].re*0.125,corr_master[1][j].im*0.125,mu,nu);
+		       sign*corr_master[1][j].re*0.125,sign*corr_master[1][j].im*0.125,mu,nu);
             }   
 
 	 if(myid==0)
 	   if(mu != nu)
 	     for(int j=0; j<numOfMom; j++)
 	       fprintf(fp_corr_d1,"%i %+i %+i %+i %+e %+e %i %i\n",t,mom[j][0],mom[j][1],mom[j][2],
-		       corr_master[2][j].re*0.125,corr_master[2][j].im*0.125,mu,nu);
+		       sign*corr_master[2][j].re*0.125,sign*corr_master[2][j].im*0.125,mu,nu);
 	 
       }//end mu/nu loop    
 
