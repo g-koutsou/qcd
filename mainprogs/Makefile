@@ -16,7 +16,8 @@ TARGETS=b_minus_Dx\
 	zfac\
 	rms\
 	source_block\
-	twop_all
+	twop_all\
+	threep_moments
 
 LIBDIR = ../lib
 CFLAGS += -I./ -I../include
