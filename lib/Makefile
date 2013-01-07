@@ -14,7 +14,10 @@ SOURCES=\
 	qcd_observables\
 	qcd_smearing\
 	qcd_wilson\
-	qcd_stochastic
+	qcd_stochastic\
+	qcd_contract_2pt\
+	qcd_contract_2pt_pr\
+	qcd_particle_data
 
 include $(wildcard *.d)
 

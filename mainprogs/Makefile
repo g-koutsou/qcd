@@ -15,7 +15,8 @@ TARGETS=b_minus_Dx\
 	disc_oneend\
 	zfac\
 	rms\
-	source_block
+	source_block\
+	twop_all
 
 LIBDIR = ../lib
 CFLAGS += -I./ -I../include
