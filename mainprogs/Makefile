@@ -33,5 +33,6 @@ all: ${addsuffix .exe, $(TARGETS)}
 $(LIB): 
 	cd $(LIBDIR) && $(MAKE)
 
-cleanall: clean
+clean:
+cleanall: 
 	$(RM) ${addsuffix .exe, $(TARGETS)} && cd $(LIBDIR) && $(MAKE) cleanall
