@@ -1043,7 +1043,7 @@ int qcd_getVectorLime(char *fname, qcd_vector *v)
 	      lime_data = (char * )malloc(lime_data_size);
 	      limeReaderReadData((void *)lime_data,&lime_data_size, limereader);
 	      sscanf(qcd_getParam("<precision>",lime_data, lime_data_size),"%i",&isDouble);    
-	      printf("got precision: %i\n",isDouble);
+	      //printf("got precision: %i\n",isDouble);
 	      free(lime_data);
 	      
 	      next_rec_is_prop = 1;
