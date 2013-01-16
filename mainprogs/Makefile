@@ -17,6 +17,7 @@ TARGETS=b_minus_Dx\
 	rms\
 	source_block\
 	twop_all\
+	twop-nucleons\
 	threep-block
 
 LIBDIR = ../lib
