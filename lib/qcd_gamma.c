@@ -13,6 +13,8 @@
 #include <math.h>
 #include <mpi.h>
 #include <qcd.h>
+
+
  
 const qcd_uint_2 qcd_EPS[6][3]=
   {
@@ -404,7 +406,22 @@ const qcd_complex_16 qcd_ONE_MINUS_GAMMA[6][4][4]=
     }
   }; 
 
- 
+const qcd_complex_16 qcd_BAR_C[4][4]=
+    {
+      { {.re=0.0,.im=0.0},{.re=1.0,.im=0.0},{.re=0.0,.im=0.0},{.re=0.0,.im=0.0} },
+      { {.re=-1.0,.im=0.0},{.re=0.0,.im=0.0},{.re=0.0,.im=0.0},{.re=0.0,.im=0.0} },
+      { {.re=0.0,.im=0.0},{.re=0.0,.im=0.0},{.re=0.0,.im=0.0},{.re=-1.0,.im=0.0} },
+      { {.re=0.0,.im=0.0},{.re=0.0,.im=0.0},{.re=1.0,.im=0.0},{.re=0.0,.im=0.0} }
+    };
+
+
+const qcd_complex_16 qcd_C[4][4]=
+    {
+      { {.re=0.0,.im=0.0},{.re=1.0,.im=0.0},{.re=0.0,.im=0.0},{.re=0.0,.im=0.0} },
+      { {.re=-1.0,.im=0.0},{.re=0.0,.im=0.0},{.re=0.0,.im=0.0},{.re=0.0,.im=0.0} },
+      { {.re=0.0,.im=0.0},{.re=0.0,.im=0.0},{.re=0.0,.im=0.0},{.re=-1.0,.im=0.0} },
+      { {.re=0.0,.im=0.0},{.re=0.0,.im=0.0},{.re=1.0,.im=0.0},{.re=0.0,.im=0.0} }
+    };
  
  
 void qcd_gamma5Vector(qcd_vector *v)

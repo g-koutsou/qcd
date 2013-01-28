@@ -19,6 +19,8 @@ extern const qcd_complex_16 qcd_G5GAMMA[8][4][4];
 extern const qcd_complex_16 qcd_BAR_G5GAMMA[8][4][4];
 extern const qcd_complex_16 qcd_ONE_PLUS_GAMMA[6][4][4];
 extern const qcd_complex_16 qcd_ONE_MINUS_GAMMA[6][4][4];
+extern const qcd_complex_16 qcd_C[4][4];
+extern const qcd_complex_16 qcd_BAR_C[4][4];
 
 /* prototypes */
 void qcd_gamma5Vector(qcd_vector *v);  
