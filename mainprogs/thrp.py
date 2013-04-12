@@ -3,7 +3,7 @@ import os, sys, getopt, re, struct
 import itertools, time
 import scipy, scipy.fftpack
 
-default_mom_list = "mom-list"
+default_mom_list = "./mom-list"
 default_suppress_idx = False
 
 class Usage(Exception):
@@ -23,8 +23,9 @@ def main(argv=None):
             if o in ["-h", "--help"]:
                 print(" Usage: %s [OPTIONS] FILE" % argv[0], file=sys.stderr)
                 print(" Options:", file=sys.stderr)
-                print("  -f, --mom-file\t\t: Momentum list file", file=sys.stderr)
-                print("  -n, --no-idx\t\t: Suppress output of last index (e.g. for scalar, pseudo-scalar where there is only a single entry", file=sys.stderr)
+                print("  -f, --mom-file\t: Momentum list file (default: %s)" % default_mom_list,
+                      file=sys.stderr)
+                print("  -n, --no-idx\t\t: Suppress output of last index \n\t\t\t  (e.g. for scalar, pseudo-scalar where there is only a single entry)", file=sys.stderr)
                 print("  -h, --help\t\t: This help message", file=sys.stderr)
                 print 
                 return 2
