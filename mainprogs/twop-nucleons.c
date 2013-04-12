@@ -586,7 +586,7 @@ main(int argc,char* argv[])
 		      corr[m + it*n_mom][chan][isosp][mu*4 + 1].re, corr[m + it*n_mom][chan][isosp][mu*4 + 1].im,
 		      corr[m + it*n_mom][chan][isosp][mu*4 + 2].re, corr[m + it*n_mom][chan][isosp][mu*4 + 2].im,
 		      corr[m + it*n_mom][chan][isosp][mu*4 + 3].re, corr[m + it*n_mom][chan][isosp][mu*4 + 3].im,
-		      isosp == 0 ? "ppn" : "pnn",
+		      isosp == 0 ? "ppm" : "pmm",
 		      chan_tag[chan]);
 	    }
     fclose(fp);
