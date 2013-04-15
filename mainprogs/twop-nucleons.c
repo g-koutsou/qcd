@@ -304,17 +304,17 @@ main(int argc,char* argv[])
 
   //################################################################################
   // gaussian smearing of propagators (only the time-slices that will be used)
-  for(int mu=0;mu<4;mu++)
-    for(int c1=0;c1<3;c1++) {
+  for(qcd_uint_2 mu=0;mu<4;mu++)
+    for(qcd_uint_2 c1=0;c1<3;c1++) {
       qcd_copyVectorPropagator(&vec,&uprop,mu,c1);
       for(int i=0; i<nsmear; i++) {
-	qcd_gaussIteration3dAll(&vec,&uAPE,alpha,i==0);
+	qcd_gaussIteration3dAll(&vec,&uAPE,alpha,(qcd_uint_2)(i==0));
       }
       qcd_copyPropagatorVector(&uprop,&vec,mu,c1);
 
       qcd_copyVectorPropagator(&vec,&dprop,mu,c1);
       for(int i=0; i<nsmear; i++) {
-	qcd_gaussIteration3dAll(&vec,&uAPE,alpha,i==0);
+	qcd_gaussIteration3dAll(&vec,&uAPE,alpha,(qcd_uint_2)(i==0));
       }
       qcd_copyPropagatorVector(&dprop,&vec,mu,c1);
     }
@@ -376,8 +376,8 @@ main(int argc,char* argv[])
     for(int isosp=0; isosp<2; isosp++) {
 #pragma omp parallel for
       for(int v3=0; v3<geo.lV3; v3++) {
-	int v = lt + v3*geo.lL[0];
-	int iv = v3 + it*geo.lV3;
+	int v = lt + v3*(int)geo.lL[0];
+	int iv = v3 + it*(int)geo.lV3;
 	qcd_complex_16 (*y)[NS][NC][NC] = q1[isosp]->D[v];
 	qcd_complex_16 (*x)[NS][NC][NC] = q2[isosp]->D[v];
 	qcd_complex_16 z[NS][NS][NC][NC];
@@ -544,7 +544,7 @@ main(int argc,char* argv[])
       for(int lx=0; lx<geo.lL[1]; lx++)
 	for(int ly=0; ly<geo.lL[2]; ly++)
 	  for(int lz=0; lz<geo.lL[3]; lz++) {
-	    int v3 = qcd_LEXIC0(lx,ly,lz,geo.lL);
+	    unsigned long int v3 = qcd_LEXIC0(lx,ly,lz,geo.lL);
 	    int x = lx + geo.Pos[1]*geo.lL[1] - x_src[1];
 	    int y = ly + geo.Pos[2]*geo.lL[2] - x_src[2];
 	    int z = lz + geo.Pos[3]*geo.lL[3] - x_src[3];
@@ -561,7 +561,7 @@ main(int argc,char* argv[])
 							qcd_CMUL(block[v3+it*geo.lV3][chan][isosp][mu], phase));
 	  }
     }
-    MPI_Reduce(corr_p, ((double *)corr+2*it*n_mom*2*4*16), 2*n_mom*2*4*16, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(corr_p, &corr[n_mom*it][0][0][0].re, 2*n_mom*2*4*16, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
   }//end t-loop
             
   if(myid==0) {
@@ -603,4 +603,5 @@ main(int argc,char* argv[])
   qcd_destroyPropagator(&dprop);
   qcd_destroyGeometry(&geo);
   MPI_Finalize();
+  return 0;
 }//end main
