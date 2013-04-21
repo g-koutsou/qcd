@@ -1,7 +1,7 @@
 AR=ar
 RANLIB=ranlib
 CC=mpicc
-CFLAGS=-O2 -Winline -std=gnu99 -Wall -I./ -I$(HOME)/mit-install/include -fopenmp
+CFLAGS=-O2 -DINLINE=__inline__ -Winline -std=gnu99 -Wall -I./ -I$(HOME)/mit-install/include -fopenmp
 LDFLAGS=-L$(HOME)/mit-install/lib
 LIBS=-fopenmp -llime -lgsl -lgslcblas -lxml2 -lm
 
