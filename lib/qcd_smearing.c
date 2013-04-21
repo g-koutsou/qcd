@@ -23,87 +23,86 @@
  */
 int qcd_gaussIteration3d(qcd_vector *v, qcd_gaugeField *u, qcd_real_8 alpha, qcd_uint_4 t)
 {
-   qcd_uint_8 i,j;
-   qcd_uint_2 nu;
-   qcd_uint_4 x,y,z,tt=0;
-   qcd_real_8 nrm = 1.0/(1.0 + alpha*6.0);
-   qcd_vector v2;
-   qcd_real_8 *uu;
-   qcd_real_8 *psi;
-   qcd_real_8 upsi[24];
-   qcd_real_8 udaggerpsi[24];
-   qcd_real_8 *total;
-
-   if(!v->initialized)
-   {
+  qcd_real_8 nrm = 1.0/(1.0 + alpha*6.0);
+  if(!v->initialized)
+    {
       fprintf(stderr,"Error in qcd_gaussIteration3d! Vector mus be properly initialized\n");
       return(1);
-   }
-   if(qcd_initVector(&v2, v->geo))
-   {
-     fprintf(stderr,"process %i: Error in qcd_gaussIteration3d! Could not initialize vector", v->geo->myid);
-     return(1);
-   }   
+    }
 
-   //start communication (4d comm is in principle too much, but hey...
-   qcd_communicateVectorPMGaugeP(v,u);
+  qcd_vector v2;
+  if(qcd_initVector(&v2, v->geo))
+    {
+      fprintf(stderr,"process %i: Error in qcd_gaussIteration3d! Could not initialize vector", v->geo->myid);
+      return(1);
+    }   
 
-   //smear inner points:   
-   qcd_zeroVector(&v2);
+  //start communication (4d comm is in principle too much, but hey...
+  qcd_communicateVectorPMGaugeP(v,u);
 
-   if(v->geo->lL[1]>2 && v->geo->lL[2]>2 && v->geo->lL[3]>2 
-      && t>=v->geo->Pos[0]*v->geo->lL[0] && t<(v->geo->Pos[0]+1)*v->geo->lL[0])
-   { 
-      tt=t-v->geo->Pos[0]*v->geo->lL[0];
-      for(z=1;z<v->geo->lL[3]-1;z++)
-      for(y=1;y<v->geo->lL[2]-1;y++)
-      for(x=1;x<v->geo->lL[1]-1;x++)
+  //smear inner points:   
+  qcd_zeroVector(&v2);
+
+  if(v->geo->lL[1]>2 && v->geo->lL[2]>2 && v->geo->lL[3]>2 
+     && t>=v->geo->Pos[0]*v->geo->lL[0] && t<(v->geo->Pos[0]+1)*v->geo->lL[0])
+    { 
+      int tt=t-v->geo->Pos[0]*v->geo->lL[0];
+      for(int z=1;z<v->geo->lL[3]-1;z++)
+	for(int y=1;y<v->geo->lL[2]-1;y++)
+	  for(int x=1;x<v->geo->lL[1]-1;x++)
+	    {
+	      int i=qcd_LEXIC(tt,x,y,z,v->geo->lL);
+	      for(int nu=1;nu<4;nu++)
+		{
+		  qcd_real_8 upsi[24];
+		  qcd_real_8 udaggerpsi[24];
+
+		  qcd_real_8 *uu  = (qcd_real_8*) &(u->D[i][nu][0][0].re);
+		  qcd_real_8 *psi = (qcd_real_8*) &(v->D[v->geo->plus[i][nu]][0][0].re);
+		  qcd_APPLY_U(uu,upsi,psi);
+
+		  uu  = (qcd_real_8*) &(u->D[v->geo->minus[i][nu]][nu][0][0].re);
+		  psi = (qcd_real_8*) &(v->D[v->geo->minus[i][nu]][0][0].re); 
+		  qcd_APPLY_U_DAGGER(uu,udaggerpsi,psi);
+	    
+		  qcd_real_8 *total = (qcd_real_8*) &(v2.D[i][0][0].re);
+		  qcd_SUM_UP_HOPP(total,upsi,udaggerpsi);
+		}
+	    }//end inner-point loop
+    }//end inner-points condition
+
+  qcd_waitall(v->geo);
+
+  //now boundary points
+  if(t>=v->geo->Pos[0]*v->geo->lL[0] && t<(v->geo->Pos[0]+1)*v->geo->lL[0])
+    for(int j=0; j<v->geo->edge0Points; j++)
       {
-         i=qcd_LEXIC(tt,x,y,z,v->geo->lL);
-         for(nu=1;nu<4;nu++)
-         {
-             uu  = (qcd_real_8*) &(u->D[i][nu][0][0].re);
-             psi = (qcd_real_8*) &(v->D[v->geo->plus[i][nu]][0][0].re);
-             qcd_APPLY_U(uu,upsi,psi);
+	int tt=t-v->geo->Pos[0]*v->geo->lL[0];
+	int i=v->geo->edge0[j]*v->geo->lL[0]+tt; // works only with present lexic
+	for(int nu=1;nu<4;nu++)
+	  {
+	    qcd_real_8 upsi[24];
+	    qcd_real_8 udaggerpsi[24];
 
-             uu  = (qcd_real_8*) &(u->D[v->geo->minus[i][nu]][nu][0][0].re);
-             psi = (qcd_real_8*) &(v->D[v->geo->minus[i][nu]][0][0].re); 
-             qcd_APPLY_U_DAGGER(uu,udaggerpsi,psi);
-
-             total = (qcd_real_8*) &(v2.D[i][0][0].re);
-             qcd_SUM_UP_HOPP(total,upsi,udaggerpsi);
-         }
-      }//end inner-point loop
-   }//end inner-points condition
-
-   qcd_waitall(v->geo);
-
-   //now boundary points
-   if(t>=v->geo->Pos[0]*v->geo->lL[0] && t<(v->geo->Pos[0]+1)*v->geo->lL[0])
-   for(j=0; j<v->geo->edge0Points; j++)
-   {
-      i=v->geo->edge0[j]*v->geo->lL[0]+tt; // works only with present lexic
-      for(nu=1;nu<4;nu++)
-      {
-         uu  = (qcd_real_8*) &(u->D[i][nu][0][0].re);
-         psi = (qcd_real_8*) &(v->D[v->geo->plus[i][nu]][0][0].re);
-         qcd_APPLY_U(uu,upsi,psi);
-
-         uu  = (qcd_real_8*) &(u->D[v->geo->minus[i][nu]][nu][0][0].re);
-         psi = (qcd_real_8*) &(v->D[v->geo->minus[i][nu]][0][0].re); 
-         qcd_APPLY_U_DAGGER(uu,udaggerpsi,psi);
-
-         total = (qcd_real_8*) &(v2.D[i][0][0].re);
-         qcd_SUM_UP_HOPP(total,upsi,udaggerpsi);
-      }           
-   }//end boundaries loop                  
+	    qcd_real_8 *uu  = (qcd_real_8*) &(u->D[i][nu][0][0].re);
+	    qcd_real_8 *psi = (qcd_real_8*) &(v->D[v->geo->plus[i][nu]][0][0].re);
+	    qcd_APPLY_U(uu,upsi,psi);
+	 
+	    uu  = (qcd_real_8*) &(u->D[v->geo->minus[i][nu]][nu][0][0].re);
+	    psi = (qcd_real_8*) &(v->D[v->geo->minus[i][nu]][0][0].re); 
+	    qcd_APPLY_U_DAGGER(uu,udaggerpsi,psi);
+	 
+	    qcd_real_8 *total = (qcd_real_8*) &(v2.D[i][0][0].re);
+	    qcd_SUM_UP_HOPP(total,upsi,udaggerpsi);
+	  }           
+      }//end boundaries loop                  
    
-   qcd_scaleVector3d(&v2,alpha,t);
-   qcd_addVector(v,v,&v2);
-   qcd_scaleVector3d(v,nrm,t); 
+  qcd_scaleVector3d(&v2,alpha,t);
+  qcd_addVector(v,v,&v2);
+  qcd_scaleVector3d(v,nrm,t); 
 
-   qcd_destroyVector(&v2);
-   return 0;
+  qcd_destroyVector(&v2);
+  return 0;
 } 
 
 
@@ -115,80 +114,80 @@ int qcd_gaussIteration3d(qcd_vector *v, qcd_gaugeField *u, qcd_real_8 alpha, qcd
  */
 int qcd_gaussIteration3dAll(qcd_vector *v, qcd_gaugeField *u, qcd_real_8 alpha, qcd_uint_2 gaugeCom)
 {
-   qcd_uint_8 i,j;
-   qcd_uint_2 nu; 
-   qcd_uint_4 x,y,z,tt;
    qcd_real_8 nrm = 1.0/(1.0 + alpha*6.0);
-   qcd_vector v2;
-   qcd_real_8 *uu;
-   qcd_real_8 *psi;
-   qcd_real_8 upsi[24];
-   qcd_real_8 udaggerpsi[24];
-   qcd_real_8 *total;
 
    if(!v->initialized)
-   {
-      fprintf(stderr,"Error in qcd_gaussIteration3dAll! Vector mus be properly initialized\n");
-      return(1);
-   }
+     {
+       fprintf(stderr,"Error in qcd_gaussIteration3dAll! Vector mus be properly initialized\n");
+       return(1);
+     }
+
+   qcd_vector v2;
    if(qcd_initVector(&v2, v->geo))
-   {
-     fprintf(stderr,"process %i: Error in qcd_gaussIteration3dAll! Could not initialize vector", v->geo->myid);
-     return(1);
-   }   
-
+     {
+       fprintf(stderr,"process %i: Error in qcd_gaussIteration3dAll! Could not initialize vector", v->geo->myid);
+       return(1);
+     }   
+   
    if(gaugeCom)
-      qcd_communicateVectorPMGaugeP(v,u);
+     qcd_communicateVectorPMGaugeP(v,u);
    else
-      qcd_communicateVectorPM(v);
-
+     qcd_communicateVectorPM(v);
+   
    //smear inner points:   
    qcd_zeroVector(&v2);
 
    if(v->geo->lL[1]>2 && v->geo->lL[2]>2 && v->geo->lL[3]>2)
-   {
-      for(z=1;z<v->geo->lL[3]-1;z++)
-      for(y=1;y<v->geo->lL[2]-1;y++)
-      for(x=1;x<v->geo->lL[1]-1;x++)
-      for(tt=0;tt<v->geo->lL[0];tt++)
-      {
-         i=qcd_LEXIC(tt,x,y,z,v->geo->lL);
-         for(nu=1;nu<4;nu++)
-         {
-             uu  = (qcd_real_8*) &(u->D[i][nu][0][0].re);
-             psi = (qcd_real_8*) &(v->D[v->geo->plus[i][nu]][0][0].re);
-             qcd_APPLY_U(uu,upsi,psi);
-
-             uu  = (qcd_real_8*) &(u->D[v->geo->minus[i][nu]][nu][0][0].re);
-             psi = (qcd_real_8*) &(v->D[v->geo->minus[i][nu]][0][0].re); 
-             qcd_APPLY_U_DAGGER(uu,udaggerpsi,psi);
-
-             total = (qcd_real_8*) &(v2.D[i][0][0].re);
-             qcd_SUM_UP_HOPP(total,upsi,udaggerpsi);
-         }
-      }//end inner-point loop
-   }//end inner-points condition
+     {
+       for(int z=1;z<v->geo->lL[3]-1;z++)
+	 for(int y=1;y<v->geo->lL[2]-1;y++)
+	   for(int x=1;x<v->geo->lL[1]-1;x++) {
+#pragma omp parallel for
+	     for(int tt=0;tt<v->geo->lL[0];tt++)
+	       {
+		 int i=qcd_LEXIC(tt,x,y,z,v->geo->lL);
+		 for(int nu=1;nu<4;nu++)
+		   {
+		     qcd_real_8 upsi[24];
+		     qcd_real_8 udaggerpsi[24];
+		     qcd_real_8 *uu  = (qcd_real_8*) &(u->D[i][nu][0][0].re);
+		     qcd_real_8 *psi = (qcd_real_8*) &(v->D[v->geo->plus[i][nu]][0][0].re);
+		     qcd_APPLY_U(uu,upsi,psi);
+		     
+		     uu  = (qcd_real_8*) &(u->D[v->geo->minus[i][nu]][nu][0][0].re);
+		     psi = (qcd_real_8*) &(v->D[v->geo->minus[i][nu]][0][0].re); 
+		     qcd_APPLY_U_DAGGER(uu,udaggerpsi,psi);
+		     
+		     qcd_real_8 *total = (qcd_real_8*) &(v2.D[i][0][0].re);
+		     qcd_SUM_UP_HOPP(total,upsi,udaggerpsi);
+		   }
+	       }//end inner-point loop
+	   }
+     }//end inner-points condition
    qcd_waitall(v->geo);
-
+   
    //now boundary points
-   for(j=0; j<v->geo->edge0Points; j++)
-   for(tt=0; tt<v->geo->lL[0]; tt++)
-   {
-      i=v->geo->edge0[j]*v->geo->lL[0]+tt; // works only with present lexic
-      for(nu=1;nu<4;nu++)
-      {
-         uu  = (qcd_real_8*) &(u->D[i][nu][0][0].re);
-         psi = (qcd_real_8*) &(v->D[v->geo->plus[i][nu]][0][0].re);
-         qcd_APPLY_U(uu,upsi,psi);
-
-         uu  = (qcd_real_8*) &(u->D[v->geo->minus[i][nu]][nu][0][0].re);
-         psi = (qcd_real_8*) &(v->D[v->geo->minus[i][nu]][0][0].re); 
-         qcd_APPLY_U_DAGGER(uu,udaggerpsi,psi);
-
-         total = (qcd_real_8*) &(v2.D[i][0][0].re);
-         qcd_SUM_UP_HOPP(total,upsi,udaggerpsi);
-      }           
-   }//end boundaries loop                  
+   for(int j=0; j<v->geo->edge0Points; j++)
+#pragma omp parallel for
+     for(int tt=0; tt<v->geo->lL[0]; tt++)
+       {
+	 int i=v->geo->edge0[j]*v->geo->lL[0]+tt; // works only with present lexic
+	 for(int nu=1;nu<4;nu++)
+	   {
+	     qcd_real_8 upsi[24];
+	     qcd_real_8 udaggerpsi[24];
+	     qcd_real_8 *uu  = (qcd_real_8*) &(u->D[i][nu][0][0].re);
+	     qcd_real_8 *psi = (qcd_real_8*) &(v->D[v->geo->plus[i][nu]][0][0].re);
+	     qcd_APPLY_U(uu,upsi,psi);
+	     
+	     uu  = (qcd_real_8*) &(u->D[v->geo->minus[i][nu]][nu][0][0].re);
+	     psi = (qcd_real_8*) &(v->D[v->geo->minus[i][nu]][0][0].re); 
+	     qcd_APPLY_U_DAGGER(uu,udaggerpsi,psi);
+	     
+	     qcd_real_8 *total = (qcd_real_8*) &(v2.D[i][0][0].re);
+	     qcd_SUM_UP_HOPP(total,upsi,udaggerpsi);
+	   }           
+       }//end boundaries loop                  
 
    qcd_scaleVector(&v2,alpha);
    qcd_addVector(v,v,&v2);
