@@ -326,8 +326,7 @@ main(int argc,char* argv[])
 	}
 	qcd_copyPropagatorVector(&dprop,&vec,mu,c1);
       }
-    qcd_destroyVector(&vec);
-    qcd_destroyGaugeField(&uAPE);
+
     t0 = MPI_Wtime()-t0;
     if(myid==0)
       printf("propagators smeared in %g sec\n", t0);
@@ -348,9 +347,6 @@ main(int argc,char* argv[])
       
       qcd_propagator *q1[2] = {&uprop, &dprop};
       qcd_propagator *q2[2] = {&dprop, &uprop};
-      
-      if(myid==0)
-	printf("t = %3d\n",t);
       
       for(int isosp=0; isosp<2; isosp++) {
 #pragma omp parallel for
@@ -584,6 +580,8 @@ main(int argc,char* argv[])
   
   free(block);
   free(mom);
+  qcd_destroyVector(&vec);
+  qcd_destroyGaugeField(&uAPE);
   qcd_destroyPropagator(&uprop);
   qcd_destroyPropagator(&dprop);
   qcd_destroyGeometry(&geo);
