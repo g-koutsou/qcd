@@ -39,7 +39,7 @@ int main(int argc,char* argv[])
    FILE *fp_corrloc_p;      
    FILE *fp_corrloc_v;      
    FILE *fp_corrloc_a;      
-//   FILE *fp_corrloc_t;   
+   FILE *fp_corrloc_t;   
    FILE *fp_corr_vD;
    FILE *fp_corr_aD;
 //   FILE *fp_corr_tD;
@@ -54,7 +54,7 @@ int main(int argc,char* argv[])
    char corrloc_v_name[qcd_MAX_STRING_LENGTH];  // name of output file name local vector current
    char corrnoe_v_name[qcd_MAX_STRING_LENGTH];  // name of output file name noether vector current
    char corrloc_a_name[qcd_MAX_STRING_LENGTH];  // name of output file name local axial current
-//   char corrloc_t_name[qcd_MAX_STRING_LENGTH];// name of output file name local tensor current
+   char corrloc_t_name[qcd_MAX_STRING_LENGTH];// name of output file name local tensor current
    char corr_vD_name[qcd_MAX_STRING_LENGTH];    // name of output file name one derivative vector
    char corr_aD_name[qcd_MAX_STRING_LENGTH];    // name of output file name one derivative axial
 //   char corr_tD_name[qcd_MAX_STRING_LENGTH];  // name of output file name one derivative tensor
@@ -79,11 +79,14 @@ int main(int argc,char* argv[])
    qcd_complex_16 *block_p;			// to store the blocks (pseudo-scalar)
    qcd_complex_16 *block_s;			// to store the blocks (scalar)
    qcd_complex_16 **block_n, **block_l;         // to store the blocks (local & noether vector)
-   qcd_complex_16 **block_a/*,  **block_t */;   // (local axial & local tensor)
+   qcd_complex_16 **block_a,  **block_t;        // (local axial & local tensor)
    qcd_complex_16 **block_vD, **block_aD;       // (one derivative vector & axial)
    qcd_complex_16 /* **block_tD ,*/ **block_d1; // (one derivative tensor & antisym. vector)
    
    qcd_complex_16 g5sigmu0[5][4][4];            // gamma_5 * [gamma_mu, gamma_0] *1/2
+   qcd_complex_16 g5sigmu1[5][4][4];            // gamma_5 * [gamma_mu, gamma_1] *1/2
+   qcd_complex_16 g5sigmu2[5][4][4];            // gamma_5 * [gamma_mu, gamma_2] *1/2
+   qcd_complex_16 g5sigmu3[5][4][4];            // gamma_5 * [gamma_mu, gamma_3] *1/2
    
    qcd_int_4 (*mom)[3];                         // momenta-list
 
@@ -106,17 +109,45 @@ int main(int argc,char* argv[])
    for(nu=0; nu<4; nu++)
    {           
       g5sigmu0[i][mu][nu]= (qcd_complex_16){0,0};
+      g5sigmu1[i][mu][nu]= (qcd_complex_16){0,0};
+      g5sigmu2[i][mu][nu]= (qcd_complex_16){0,0};
+      g5sigmu3[i][mu][nu]= (qcd_complex_16){0,0};
       for(ku=0; ku<4; ku++)
       for(lu=0; lu<4; lu++)
       {
-         g5sigmu0[i][mu][nu] = qcd_CADD(g5sigmu0[i][mu][nu],qcd_CMUL(qcd_CMUL(qcd_GAMMA[5][mu][ku],
-                                                                              qcd_GAMMA[i][ku][lu]),
-                                                                     qcd_GAMMA[0][lu][nu]));
-         g5sigmu0[i][mu][nu] = qcd_CSUB(g5sigmu0[i][mu][nu],qcd_CMUL(qcd_CMUL(qcd_GAMMA[5][mu][ku],
-                                                                              qcd_GAMMA[0][ku][lu]),
-                                                                     qcd_GAMMA[i][lu][nu]));
+	/* 0 */
+	g5sigmu0[i][mu][nu] = qcd_CADD(g5sigmu0[i][mu][nu],qcd_CMUL(qcd_CMUL(qcd_GAMMA[5][mu][ku],
+									     qcd_GAMMA[i][ku][lu]),
+								    qcd_GAMMA[0][lu][nu]));
+	g5sigmu0[i][mu][nu] = qcd_CSUB(g5sigmu0[i][mu][nu],qcd_CMUL(qcd_CMUL(qcd_GAMMA[5][mu][ku],
+									     qcd_GAMMA[0][ku][lu]),
+								    qcd_GAMMA[i][lu][nu]));
+	/* 1 */
+	g5sigmu1[i][mu][nu] = qcd_CADD(g5sigmu1[i][mu][nu],qcd_CMUL(qcd_CMUL(qcd_GAMMA[5][mu][ku],
+									     qcd_GAMMA[i][ku][lu]),
+								    qcd_GAMMA[1][lu][nu]));
+	g5sigmu1[i][mu][nu] = qcd_CSUB(g5sigmu1[i][mu][nu],qcd_CMUL(qcd_CMUL(qcd_GAMMA[5][mu][ku],
+									     qcd_GAMMA[1][ku][lu]),
+								    qcd_GAMMA[i][lu][nu]));
+	/* 2 */
+	g5sigmu2[i][mu][nu] = qcd_CADD(g5sigmu2[i][mu][nu],qcd_CMUL(qcd_CMUL(qcd_GAMMA[5][mu][ku],
+									     qcd_GAMMA[i][ku][lu]),
+								    qcd_GAMMA[2][lu][nu]));
+	g5sigmu2[i][mu][nu] = qcd_CSUB(g5sigmu2[i][mu][nu],qcd_CMUL(qcd_CMUL(qcd_GAMMA[5][mu][ku],
+									     qcd_GAMMA[2][ku][lu]),
+								    qcd_GAMMA[i][lu][nu]));
+	/* 3 */
+	g5sigmu3[i][mu][nu] = qcd_CADD(g5sigmu3[i][mu][nu],qcd_CMUL(qcd_CMUL(qcd_GAMMA[5][mu][ku],
+									     qcd_GAMMA[i][ku][lu]),
+								    qcd_GAMMA[3][lu][nu]));
+	g5sigmu3[i][mu][nu] = qcd_CSUB(g5sigmu3[i][mu][nu],qcd_CMUL(qcd_CMUL(qcd_GAMMA[5][mu][ku],
+									     qcd_GAMMA[3][ku][lu]),
+								    qcd_GAMMA[i][lu][nu]));
       }
       g5sigmu0[i][mu][nu] = qcd_CSCALE(g5sigmu0[i][mu][nu],0.5);
+      g5sigmu1[i][mu][nu] = qcd_CSCALE(g5sigmu1[i][mu][nu],0.5);
+      g5sigmu2[i][mu][nu] = qcd_CSCALE(g5sigmu2[i][mu][nu],0.5);
+      g5sigmu3[i][mu][nu] = qcd_CSCALE(g5sigmu3[i][mu][nu],0.5);
    }
    
    
@@ -191,8 +222,8 @@ int main(int argc,char* argv[])
    strcpy(corrloc_a_name,qcd_getParam("<corr_name_a_local>",params,params_len));
    if(myid==0) printf("Got output file name: %s\n",corrloc_a_name);
    
-/*   strcpy(corrloc_t_name,qcd_getParam("<corr_name_t_local>",params,params_len));
-   if(myid==0) printf("Got output file name: %s\n",corrloc_t_name); */
+  strcpy(corrloc_t_name,qcd_getParam("<corr_name_t_local>",params,params_len));
+   if(myid==0) printf("Got output file name: %s\n",corrloc_t_name);
    
    strcpy(corr_vD_name,qcd_getParam("<corr_name_vD>",params,params_len));
    if(myid==0) printf("Got output file name: %s\n",corr_vD_name);
@@ -225,7 +256,7 @@ int main(int argc,char* argv[])
    block_n = (qcd_complex_16**)malloc(4*sizeof(*block_n));
    block_l = (qcd_complex_16**)malloc(4*sizeof(*block_l));
    block_a = (qcd_complex_16**)malloc(4*sizeof(*block_a));
-//   block_t = (qcd_complex_16**)malloc(4*sizeof(*block_t));
+   block_t = (qcd_complex_16**)malloc(16*sizeof(*block_t));
    block_vD = (qcd_complex_16**)malloc(16*sizeof(*block_vD));
    block_aD = (qcd_complex_16**)malloc(16*sizeof(*block_aD));
 //   block_tD = (qcd_complex_16**)malloc(16*sizeof(*block_tD));
@@ -252,14 +283,7 @@ int main(int argc,char* argv[])
       {
          fprintf(stderr,"process %i: out of memmory (for local axial block)\n",myid);
          ierr++;
-      }   
-/*      
-      block_t[i] = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
-      if(block_t[i]==NULL)
-      {
-         fprintf(stderr,"process %i: out of memmory (for local tensor block)\n",myid);
-         ierr++;
-      }         */
+      }        
    }
    for(i=0; i<16; i++)
    {
@@ -275,9 +299,17 @@ int main(int argc,char* argv[])
          fprintf(stderr,"process %i: out of memmory (for aD block)\n",myid);
          ierr++;
       }
+
+      block_t[i] = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
+      if(block_t[i]==NULL)
+      {
+         fprintf(stderr,"process %i: out of memmory (for local tensor block)\n",myid);
+         ierr++;
+      }
+
 /*      
       block_tD[i] = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
-      if(block_t[i]==NULL)
+      if(block_tD[i]==NULL)
       {
          fprintf(stderr,"process %i: out of memmory (for tD block)\n",myid);
          ierr++;
@@ -360,7 +392,6 @@ int main(int argc,char* argv[])
          block_a[mu][i]= (qcd_complex_16) {0,0};
 	 block_s[i] = (qcd_complex_16) {0,0};
 	 block_p[i] = (qcd_complex_16) {0,0};
-//         block_t[mu][i]= (qcd_complex_16) {0,0};
       }
       for(mu=0; mu<16; mu++)
       for(i=0; i<geo.lV3; i++)   //set blocks to zero
@@ -369,6 +400,7 @@ int main(int argc,char* argv[])
          block_aD[mu][i]= (qcd_complex_16) {0,0};
 //         block_tD[mu][i]= (qcd_complex_16) {0,0};
          block_d1[mu][i]= (qcd_complex_16) {0,0};
+         block_t[mu][i]= (qcd_complex_16) {0,0};
       }
 
       /* 
@@ -518,13 +550,30 @@ int main(int argc,char* argv[])
                                                                      qcd_G5GAMMA[mu][id1][id3]));
                }
                /*********** local tensor current ***********/     
-               /*
+               
                for(mu=0; mu<4; mu++)
-               if(qcd_NORM(g5sigmu0[mu][id1][id3])>1e-4)
-               {
-                  block_t[mu][j] = qcd_CADD(block_t[mu][j], qcd_CMUL(backfor,
-                                                             g5sigmu0[mu][id1][id3]));
-               } */                        
+		 {
+		   if(qcd_NORM(g5sigmu0[mu][id1][id3])>1e-4)
+		     {
+		       block_t[0*4 + mu][j] = qcd_CADD(block_t[0*4 + mu][j], qcd_CMUL(backfor,
+										      g5sigmu0[mu][id1][id3]));
+		     }                        
+		   if(qcd_NORM(g5sigmu1[mu][id1][id3])>1e-4)
+		     {
+		       block_t[1*4 + mu][j] = qcd_CADD(block_t[1*4 + mu][j], qcd_CMUL(backfor,
+										      g5sigmu1[mu][id1][id3]));
+		     }                        
+		   if(qcd_NORM(g5sigmu2[mu][id1][id3])>1e-4)
+		     {
+		       block_t[2*4 + mu][j] = qcd_CADD(block_t[2*4 + mu][j], qcd_CMUL(backfor,
+										      g5sigmu2[mu][id1][id3]));
+		     }                        
+		   if(qcd_NORM(g5sigmu3[mu][id1][id3])>1e-4)
+		     {
+		       block_t[3*4 + mu][j] = qcd_CADD(block_t[3*4 + mu][j], qcd_CMUL(backfor,
+										      g5sigmu3[mu][id1][id3]));
+		     }                        
+		 }
             }//end id1,id3 loop
             for(id1=0; id1<4; id1++)
             for(id3=0; id3<4; id3++)
@@ -622,14 +671,13 @@ int main(int argc,char* argv[])
                k=1;
             }   
             printf("%s opened\n",corrloc_a_name); fflush(stdout);
-/*            
+           
             fp_corrloc_t = fopen(corrloc_t_name,"w");
             if(fp_corrloc_t==NULL)
             {
                printf("failed to open %s for writing\n",corrloc_t_name); fflush(stdout);
                k=1;
             }
-*/
 
             printf("opening %s\n",corr_vD_name); fflush(stdout);
             fp_corr_vD = fopen(corr_vD_name,"w");   
@@ -741,7 +789,6 @@ int main(int argc,char* argv[])
 	    corr[0][j] = (qcd_complex_16) {0,0};
             corr[1][j] = (qcd_complex_16) {0,0};
             corr[2][j] = (qcd_complex_16) {0,0};
-            //corr[3] = (qcd_complex_16) {0,0};
             
             if(lt>=0 && lt<geo.lL[0])  //inside the local lattice, otherwise nothing to calculate
             for(lx=0; lx<geo.lL[1]; lx++)
@@ -775,7 +822,41 @@ int main(int argc,char* argv[])
 	     }
       }//end mu loop
 
-      
+
+      for(mu=0; mu<4; mu++)
+      for(nu=mu+1; nu<4; nu++)
+      {
+#pragma omp parallel for private(lx,ly,lz,v,x,y,z,tmp)
+         for(j=0; j<numOfMom; j++)
+         {
+	    corr[0][j] = (qcd_complex_16) {0,0};
+            
+            if(lt>=0 && lt<geo.lL[0])  //inside the local lattice, otherwise nothing to calculate
+            for(lx=0; lx<geo.lL[1]; lx++)
+            for(ly=0; ly<geo.lL[2]; ly++)
+            for(lz=0; lz<geo.lL[3]; lz++)
+            {
+               v = qcd_LEXIC0(lx,ly,lz,geo.lL);
+               x=lx+geo.Pos[1]*geo.lL[1] - x_src[1];
+               y=ly+geo.Pos[2]*geo.lL[2] - x_src[2];
+               z=lz+geo.Pos[3]*geo.lL[3] - x_src[3];
+               tmp = (((double) mom[j][0]*x)/geo.L[1] + ((double) mom[j][1]*y)/geo.L[2] + ((double) mom[j][2]*z)/geo.L[3])*2*M_PI;
+               qcd_complex_16 C2=(qcd_complex_16) {cos(tmp), sin(tmp)};
+               corr[0][j]=qcd_CADD(corr[0][j], qcd_CMUL(block_t[mu*4+nu][v],C2));
+            }
+         }
+	 
+	 for(int j=0; j<1; j++)   
+	   MPI_Reduce(&(corr[j][0].re), &(corr_master[j][0].re), numOfMom*2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	 
+	 if(myid==0) 
+	   for(int j=0; j<numOfMom; j++)
+	     {
+               fprintf(fp_corrloc_t,"%i %+i %+i %+i %+e %+e %i %i\n",t,mom[j][0],mom[j][1],mom[j][2],
+		       sign*corr_master[0][j].re,sign*corr_master[0][j].im,mu,nu);
+	     }   
+      }
+
       for(mu=0; mu<4; mu++)
       for(nu=0; nu<=mu; nu++)
       {
@@ -785,7 +866,7 @@ int main(int argc,char* argv[])
 	    corr[0][j] = (qcd_complex_16) {0,0};
             corr[1][j] = (qcd_complex_16) {0,0};
             corr[2][j] = (qcd_complex_16) {0,0};
-            //corr[3] = (qcd_complex_16) {0,0};
+            //corr[3][j] = (qcd_complex_16) {0,0};
             
             if(lt>=0 && lt<geo.lL[0])  //inside the local lattice, otherwise nothing to calculate
             for(lx=0; lx<geo.lL[1]; lx++)
@@ -801,7 +882,7 @@ int main(int argc,char* argv[])
                corr[0][j]=qcd_CADD(corr[0][j], qcd_CMUL(block_vD[mu*4+nu][v],C2));
                corr[1][j]=qcd_CADD(corr[1][j], qcd_CMUL(block_aD[mu*4+nu][v],C2));
                corr[2][j]=qcd_CADD(corr[2][j], qcd_CMUL(block_d1[mu*4+nu][v],C2));
-               //corr[3]=qcd_CADD(corr[3], qcd_CMUL(block_t[mu][v],C2));
+               //corr[3][j]=qcd_CADD(corr[3][j], qcd_CMUL(block_t[mu][v],C2));
             }
          }
 	 
@@ -835,7 +916,7 @@ int main(int argc,char* argv[])
          fclose(fp_corr_vD);
          fclose(fp_corr_aD);
          fclose(fp_corr_d1);
-         //fclose(fp_corrloc_t);
+         fclose(fp_corrloc_t);
 
 	 for(int j=0; j<4; j++)
 	   {
@@ -848,16 +929,6 @@ int main(int argc,char* argv[])
 
    }//end t-loop   
          
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
    //#####################################################################   
    // clean up
    if(myid==0) printf("cleaning up...\n");
@@ -866,7 +937,7 @@ int main(int argc,char* argv[])
       free(block_n[i]);
       free(block_l[i]);
       free(block_a[i]);
-//      free(block_t[i]);
+      free(block_t[i]);
    }
    free(block_n);
    free(block_l);
