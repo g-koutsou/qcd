@@ -38,7 +38,7 @@ q = qr + I*qi
 for x0 in range(NS):
     for x1 in range(x0+1, NS):
         x = scipy.zeros([NS,NS,NC,NC], dtype=type(Symbol("x")))
-        buf += "__inline__ void\n"
+        buf += "INLINE void\n"
         buf += ("prop_contract_%d%d(qcd_complex_16 C[NS][NS][NC][NC], qcd_complex_16 A[NS][NS][NC][NC], qcd_complex_16 B[NS][NS][NC][NC])\n{\n" 
                  % (x0, x1))
         for col0 in eps:

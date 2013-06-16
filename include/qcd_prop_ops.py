@@ -75,7 +75,7 @@ for NC in [3]:
         doc = elem["doc"]
         mat = elem["mat"]
         body += "/* multiply prop by %s from the left */\n" % doc
-        body += "__inline__ void\n"
+        body += "INLINE void\n"
         body += "prop_%s_G(qcd_complex_16 out[NS][NS][NC][NC], qcd_complex_16 in[NS][NS][NC][NC])\n{\n" % name
         for c0 in range(NC):
             for c1 in range(NC):
@@ -94,7 +94,7 @@ for NC in [3]:
         doc = elem["doc"]
         mat = gamma_t * elem["mat"].H * gamma_t
         body += "/* multiply prop by \bar{%s} from the right */\n" % doc
-        body += "__inline__ void\n"
+        body += "INLINE void\n"
         body += "prop_G_%s(qcd_complex_16 out[NS][NS][NC][NC], qcd_complex_16 in[NS][NS][NC][NC])\n{\n" % name
         for c0 in range(NC):
             for c1 in range(NC):
@@ -113,7 +113,7 @@ for NC in [3]:
         doc = elem["doc"]
         mat = elem["mat"]
         body += "/* multiply prop by %s from the left */\n" % doc
-        body += "__inline__ void\n"
+        body += "INLINE void\n"
         body += "prop_%s_G(qcd_complex_16 out[NS][NS][NC][NC], qcd_complex_16 in[NS][NS][NC][NC])\n{\n" % name
         for c0 in range(NC):
             for c1 in range(NC):
@@ -132,7 +132,7 @@ for NC in [3]:
         doc = elem["doc"]
         mat = elem["mat"]
         body += "/* multiply prop by %s from the right */\n" % doc
-        body += "__inline__ void\n"
+        body += "INLINE void\n"
         body += "prop_G_%s(qcd_complex_16 out[NS][NS][NC][NC], qcd_complex_16 in[NS][NS][NC][NC])\n{\n" % name
         for c0 in range(NC):
             for c1 in range(NC):
@@ -166,7 +166,7 @@ for NC in [3]:
     p = sy.Matrix(NS*NC, NS*NC, lambda i, j: pr[j+i*NS*NC] + pi[j+i*NS*NC]*I)
     q = sy.Matrix(NS*NC, NS*NC, lambda i, j: qr[j+i*NS*NC] + qi[j+i*NS*NC]*I)
     
-    body += "__inline__ void\n"
+    body += "INLINE void\n"
     body += "prop_G_G(qcd_complex_16 C[NS][NS][NC][NC], qcd_complex_16 A[NS][NS][NC][NC], qcd_complex_16 B[NS][NS][NC][NC])\n{\n" 
     for csp0 in range(NC*NS):
         for csp1 in range(NC*NS):
@@ -181,12 +181,34 @@ for NC in [3]:
     lines = [(str(x[0]).replace(" + ", " \n\t+").replace(" - ", " \n\t-"),
     str(x[1]).replace(" + ", " \n\t+").replace(" - ", " \n\t-")) for x in lines]
     
-    lines = [("\n  C[%d][%d][%d][%d].re = \n\t%s;\n" % (i, j, k, l, lines[(l + j*NC) + (i + k*NC)*NS*NC][0]),
-              "\n  C[%d][%d][%d][%d].im = \n\t%s;\n" % (i, j, k, l, lines[(l + j*NC) + (i + k*NC)*NS*NC][1])) 
-             for i,j,k,l in itertools.product(range(NS), range(NS), range(NC), range(NC))]
+    lines = [("\n  C[%d][%d][%d][%d].re = \n\t%s;\n" % (sp0, sp1, c0, c1, lines[(c1 + sp1*NC) + (c0 + sp0*NC)*NS*NC][0]),
+              "\n  C[%d][%d][%d][%d].im = \n\t%s;\n" % (sp0, sp1, c0, c1, lines[(c1 + sp1*NC) + (c0 + sp0*NC)*NS*NC][1])) 
+             for sp0,sp1,c0,c1 in itertools.product(range(NS), range(NS), range(NC), range(NC))]
     
     body += "".join([x[0] + x[1] for x in lines])
     body += "\n  return;\n}\n\n"
+
+
+    #
+    ### G^\dagger
+    #
+    p = sy.Matrix(NS*NC, NS*NC, lambda i, j: pr[j+i*NS*NC] + pi[j+i*NS*NC]*I)
+    x = sy.zeros((NS*NC,NS*NC))
+    body += "INLINE void\n"
+    body += "prop_G_dag(qcd_complex_16 B[NS][NS][NC][NC], qcd_complex_16 A[NS][NS][NC][NC])\n{\n" 
+    for csp0 in range(NC*NS):
+        for csp1 in range(NC*NS):
+            x[csp0, csp1] = p[csp1, csp0].conjugate()
+
+    lines = [x[i, j].expand().as_real_imag() for i, j in itertools.product(range(NS*NC), range(NS*NC))]
+    lines = [(str(x[0]), str(x[1])) for x in lines]
+    lines = [("\n  B[%d][%d][%d][%d].re = %s;" % (sp0, sp1, c0, c1, lines[(c1 + sp1*NC) + (c0 + sp0*NC)*NS*NC][0]),
+              "\n  B[%d][%d][%d][%d].im = %s;" % (sp0, sp1, c0, c1, lines[(c1 + sp1*NC) + (c0 + sp0*NC)*NS*NC][1]))
+             for sp0,sp1,c0,c1 in itertools.product(range(NS), range(NS), range(NC), range(NC))]
+    
+    body += "".join([x[0] + x[1] for x in lines])
+    body += "\n  return;\n}\n\n"
+
     body += "#endif /* NC == %d */\n" % NC
 
 body += "/* END python generated segment */\n"

@@ -1,8 +1,7 @@
 #ifndef _QCD_PROP_CONTRACT_H
 #define _QCD_PROP_CONTRACT_H 1
 
-INLINE 
-void
+INLINE void
 prop_contract_01(qcd_complex_16 C[NS][NS][NC][NC], qcd_complex_16 A[NS][NS][NC][NC], qcd_complex_16 B[NS][NS][NC][NC])
 {
 
@@ -9801,8 +9800,7 @@ prop_contract_01(qcd_complex_16 C[NS][NS][NC][NC], qcd_complex_16 A[NS][NS][NC][
   return;
 }
 
-INLINE 
-void
+INLINE void
 prop_contract_02(qcd_complex_16 C[NS][NS][NC][NC], qcd_complex_16 A[NS][NS][NC][NC], qcd_complex_16 B[NS][NS][NC][NC])
 {
 
@@ -19601,8 +19599,7 @@ prop_contract_02(qcd_complex_16 C[NS][NS][NC][NC], qcd_complex_16 A[NS][NS][NC][
   return;
 }
 
-INLINE 
-void
+INLINE void
 prop_contract_03(qcd_complex_16 C[NS][NS][NC][NC], qcd_complex_16 A[NS][NS][NC][NC], qcd_complex_16 B[NS][NS][NC][NC])
 {
 
@@ -29401,8 +29398,7 @@ prop_contract_03(qcd_complex_16 C[NS][NS][NC][NC], qcd_complex_16 A[NS][NS][NC][
   return;
 }
 
-INLINE 
-void
+INLINE void
 prop_contract_12(qcd_complex_16 C[NS][NS][NC][NC], qcd_complex_16 A[NS][NS][NC][NC], qcd_complex_16 B[NS][NS][NC][NC])
 {
 
@@ -39201,8 +39197,7 @@ prop_contract_12(qcd_complex_16 C[NS][NS][NC][NC], qcd_complex_16 A[NS][NS][NC][
   return;
 }
 
-INLINE 
-void
+INLINE void
 prop_contract_13(qcd_complex_16 C[NS][NS][NC][NC], qcd_complex_16 A[NS][NS][NC][NC], qcd_complex_16 B[NS][NS][NC][NC])
 {
 
@@ -49001,8 +48996,7 @@ prop_contract_13(qcd_complex_16 C[NS][NS][NC][NC], qcd_complex_16 A[NS][NS][NC][
   return;
 }
 
-INLINE 
-void
+INLINE void
 prop_contract_23(qcd_complex_16 C[NS][NS][NC][NC], qcd_complex_16 A[NS][NS][NC][NC], qcd_complex_16 B[NS][NS][NC][NC])
 {
 
