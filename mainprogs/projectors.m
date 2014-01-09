@@ -1,3 +1,12 @@
+function printgamma(fid,g)
+fprintf(fid,'    {\n');
+fprintf(fid,'      { {.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f} },\n',real(g(1,1)),imag(g(1,1)),real(g(1,2)),imag(g(1,2)),real(g(1,3)),imag(g(1,3)),real(g(1,4)),imag(g(1,4)));
+fprintf(fid,'      { {.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f} },\n',real(g(2,1)),imag(g(2,1)),real(g(2,2)),imag(g(2,2)),real(g(2,3)),imag(g(2,3)),real(g(2,4)),imag(g(2,4)));
+fprintf(fid,'      { {.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f} },\n',real(g(3,1)),imag(g(3,1)),real(g(3,2)),imag(g(3,2)),real(g(3,3)),imag(g(3,3)),real(g(3,4)),imag(g(3,4)));
+fprintf(fid,'      { {.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f} }\n',real(g(4,1)),imag(g(4,1)),real(g(4,2)),imag(g(4,2)),real(g(4,3)),imag(g(4,3)),real(g(4,4)),imag(g(4,4)));
+fprintf(fid,'    }');
+endfunction
+
 function projectors(filename)
 
 %to change conventions, edit from here %%%%%%%%%
@@ -41,14 +50,13 @@ one = eye(4);
        
 g5 = g1*g2*g3*g4;
 
-
 Proj1  = 0.5*(one+i*g5) * 0.25*((one+g0)*(one-i*g5*g3)).' *(one+i*g5);
 Proj2  = 0.5*(one+i*g5) * 0.25*((one+g0)*(one-i*g5*(g1+g2+g3))).' *(one+i*g5);
 Proj3  = 0.5*(one+i*g5) * 0.25*((one+g0)*(i*g5*(g1+g2+g3))).' *(one+i*g5);
-Proj4  = 0.5*(one+i*g5) * 0.25*((one+g0)*(i*g5*g3)).' *(one+i*g5);
+Proj4  = 0.5*(one+i*g5) * 0.25*((one+g0)*(i*g5*g1)).' *(one+i*g5);
+Proj5  = 0.5*(one+i*g5) * 0.25*((one+g0)*(i*g5*g2)).' *(one+i*g5);
+Proj6  = 0.5*(one+i*g5) * 0.25*((one+g0)*(i*g5*g3)).' *(one+i*g5);
 
-Proj5  = one;
-Proj6  = one;
 Proj7  = one;
 Proj8  = one;
 Proj9  = one;
@@ -68,6 +76,9 @@ Proj19 = one;
 Proj20 = 0.5*(one+i*g5) * 0.5*(one+(g1+g2+g3)).' *(one+i*g5);
 Proj21 = 0.5*(one+i*g5) * 0.25*(one).' *(one+i*g5);
 
+Proj22  = 0.25*((one+g0)*(i*g5*g1));
+Proj23  = 0.25*((one+g0)*(i*g5*g2));
+Proj24  = 0.25*((one+g0)*(i*g5*g3));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -82,7 +93,7 @@ fprintf(fid,"/* projectors.h\n * collection of projector matrices\n * ETMC conve
 
 fprintf("\n// transposed projectors, rotated to TM basis\n\n");
 
-fprintf(fid,'qcd_complex_16 PROJECTOR[22][4][4]=\n  {\n');
+fprintf(fid,'qcd_complex_16 PROJECTOR[25][4][4]=\n  {\n');
 printgamma(fid,one);fprintf(fid,',\n\n');
 printgamma(fid,Proj1);fprintf(fid,',\n\n');
 printgamma(fid,Proj2);fprintf(fid,',\n\n');
@@ -104,17 +115,12 @@ printgamma(fid,Proj17);fprintf(fid,',\n\n');
 printgamma(fid,Proj18);fprintf(fid,',\n\n');
 printgamma(fid,Proj19);fprintf(fid,',\n\n');
 printgamma(fid,Proj20);fprintf(fid,',\n\n');
-printgamma(fid,Proj21);fprintf(fid,'\n');
+printgamma(fid,Proj21);fprintf(fid,',\n\n');
+printgamma(fid,Proj22);fprintf(fid,',\n\n');
+printgamma(fid,Proj23);fprintf(fid,',\n\n');
+printgamma(fid,Proj24);fprintf(fid,'\n');
 fprintf(fid,'  };\n\n');
 
 fclose(fid);
-return;
+endfunction
 
-function printgamma(fid,g)
-fprintf(fid,'    {\n');
-fprintf(fid,'      { {.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f} },\n',real(g(1,1)),imag(g(1,1)),real(g(1,2)),imag(g(1,2)),real(g(1,3)),imag(g(1,3)),real(g(1,4)),imag(g(1,4)));
-fprintf(fid,'      { {.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f} },\n',real(g(2,1)),imag(g(2,1)),real(g(2,2)),imag(g(2,2)),real(g(2,3)),imag(g(2,3)),real(g(2,4)),imag(g(2,4)));
-fprintf(fid,'      { {.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f} },\n',real(g(3,1)),imag(g(3,1)),real(g(3,2)),imag(g(3,2)),real(g(3,3)),imag(g(3,3)),real(g(3,4)),imag(g(3,4)));
-fprintf(fid,'      { {.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f},{.re=%f,.im=%f} }\n',real(g(4,1)),imag(g(4,1)),real(g(4,2)),imag(g(4,2)),real(g(4,3)),imag(g(4,3)),real(g(4,4)),imag(g(4,4)));
-fprintf(fid,'    }');
-return;
