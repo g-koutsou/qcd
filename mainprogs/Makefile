@@ -19,7 +19,8 @@ TARGETS=b_minus_Dx\
 	twop_all\
 	twop-nucleons\
 	twop-hadr\
-	threep-block
+	threep-block\
+        zfac_NEW_format
 
 LIBDIR = ../lib
 CFLAGS += -I./ -I../include

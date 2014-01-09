@@ -1,140 +1,4 @@
 
-tests/qcd_communication.c,68
-int qcd_communicateVectorPMGaugeP(14,324
-void qcd_waitall(52,2014
-
-tests/qcd_init.c,299
-void qcd_antilexic(9,166
-int qcd_initGeometry(18,394
-void qcd_destroyGeometry(249,10210
-int qcd_initVector(269,10719
-void qcd_destroyVector(324,12218
-int qcd_initPropagator(337,12433
-void qcd_destroyPropagator(392,13950
-int qcd_initGaugeField(405,14185
-void qcd_destroyGaugeField(459,15648
-
-tests/test_gaugefix.c,17
-int main(10,131
-
-tests/qcd_dirac.c,30
-void qcd_applyWilsonTM(8,127
-
-tests/timingTest.c,17
-int main(10,158
-
-tests/test.c,63
-void qcd_swap_8(5,58
-void dbyte_swap(26,449
-int main(41,889
-
-tests/test_smearing.c,17
-int main(16,276
-
-tests/qcd_io.c,307
-int qcd_isBigEndian(17,295
-     char C[C20,329
-     int  R 21,345
-void qcd_swap_8(34,539
-void qcd_swap_4(56,931
-char* qcd_getParams(75,1222
-char* qcd_getParam(107,1745
-int qcd_getGaugeLime(126,2049
-int qcd_getGaugeField(315,8079
-int qcd_getPropagatorCMI(336,8570
-int qcd_getPropagator(445,11886
-
-tests/test_communication.c,17
-int main(15,250
-
-tests/qcd_smearing.c,65
-#define qcd_SUM_UP_HOPP(8,133
-int qcd_gaussIteration3d(42,1056
-
-tests/qcd_blas.c,476
-void qcd_zeroVector(11,196
-void qcd_setVector(16,338
-void qcd_copyVector(36,827
-void qcd_copyGaugeField(41,1014
-void qcd_copyVectorPropagator(46,1225
-void qcd_copyVectorPropagator2(56,1503
-void qcd_mulVectorC(67,1783
-void qcd_scaleVector(87,2250
-void qcd_scaleVector3d(98,2440
-void qcd_subVector(119,3001
-void qcd_subGaugeField(129,3306
-void qcd_addVector(151,3947
-void qcd_addVector3d(163,4293
-double qcd_normVector(184,4951
-double qcd_normGaugeField(201,5364
-
-tests/test_blas.c,17
-int main(15,250
-
-tests/test_wilson.c,15
-int main(8,93
-
-tests/qcd_wilson.c,501
-#define qcd_ONE_PLUS_GAMMA0(14,311
-#define qcd_ONE_PLUS_GAMMA1(44,1024
-#define qcd_ONE_PLUS_GAMMA2(74,1734
-#define qcd_ONE_PLUS_GAMMA3(104,2458
-#define qcd_ONE_MINUS_GAMMA0(135,3193
-#define qcd_ONE_MINUS_GAMMA1(165,3903
-#define qcd_ONE_MINUS_GAMMA2(196,4614
-#define qcd_ONE_MINUS_GAMMA3(226,5331
-#define qcd_MASSTERMS(256,6055
-#define qcd_APPLY_U(286,6993
-#define qcd_APPLY_U_DAGGER(316,9760
-#define qcd_SUM_OP(347,12539
-#define qcd_PHASE_MUL(374,14560
-int qcd_applyWilsonTMOp(419,16067
-
-include/qcd_rng.h,25
-#define _QCD_RNG_H 2,19
-
-include/qcd_gaugeFixing.h,132
-#define H_QCD_GAUGEFIXING 9,160
-#define qcd_LANDAU_GAUGE_FIXING_PRECISION 11,189
-#define qcd_LANDAU_GAUGE_FIXING_MAX_ITER 12,239
-
-include/qcd_observables.h,33
-#define H_QCD_OBSERVABLES 9,160
-
-include/qcd_wilson.h,1068
-#define H_QCD_WILSON 9,145
-#define qcd_ONE_PLUS_GAMMA0(17,344
-#define qcd_ONE_PLUS_GAMMA0_HALFSPINOR(47,1057
-#define qcd_ONE_PLUS_GAMMA1(63,1480
-#define qcd_ONE_PLUS_GAMMA1_HALFSPINOR(93,2190
-#define qcd_ONE_PLUS_GAMMA2(109,2613
-#define qcd_ONE_PLUS_GAMMA2_HALFSPINOR(139,3336
-#define qcd_ONE_PLUS_GAMMA3(155,3761
-#define qcd_ONE_PLUS_GAMMA3_HALFSPINOR(185,4495
-#define qcd_ONE_MINUS_GAMMA0(202,4919
-#define qcd_ONE_MINUS_GAMMA0_HALFSPINOR(232,5629
-#define qcd_ONE_MINUS_GAMMA1(248,6050
-#define qcd_ONE_MINUS_GAMMA1_HALFSPINOR(279,6760
-#define qcd_ONE_MINUS_GAMMA2(296,7181
-#define qcd_ONE_MINUS_GAMMA2_HALFSPINOR(327,7902
-#define qcd_ONE_MINUS_GAMMA3(343,8326
-#define qcd_ONE_MINUS_GAMMA3_HALFSPINOR(373,9047
-#define qcd_MASSTERMS(389,9468
-#define qcd_APPLY_U(419,10406
-#define qcd_APPLY_U_HALFSPINOR(449,13173
-#define qcd_APPLY_U_DAGGER(465,14537
-#define qcd_APPLY_U_DAGGER_HALFSPINOR(495,17311
-#define qcd_SUM_OP(512,18687
-#define qcd_SUM_OP_HALFSPINORS(539,20708
-#define qcd_PHASE_MUL(566,22741
-#define qcd_PHASE_MUL_HALFSPINOR(605,24120
-
-include/qcd_communication.h,35
-#define H_QCD_COMMUNICATION 9,166
-
-include/qcd_stochastic.h,35
-#define _H_QCD_COMMUNICATION 2,29
-
 include/qcd.h,3379
 #define H_QCD 10,162
 #define qcd_MAX_STRING_LENGTH 16,203
@@ -265,12 +129,22 @@ include/qcd_blas.h,777
 #define qcd_ADJOINTMUL3x3(164,12343
 #define qcd_SU3TRACER(224,17481
 
+include/qcd_communication.h,35
+#define H_QCD_COMMUNICATION 9,166
+
 include/qcd_gamma.h,27
 #define H_QCD_GAMMA 9,154
 
-include/qcd_smearing.h,62
-#define H_QCD_SMEARING 9,151
-#define qcd_SUM_UP_HOPP(11,177
+include/qcd_gamma_down.h,64
+qcd_complex_16 qcd_GAMMA_OPERATORS[qcd_GAMMA_OPERATORS21,1583
+
+include/qcd_gamma_up.h,64
+qcd_complex_16 qcd_GAMMA_OPERATORS[qcd_GAMMA_OPERATORS21,1583
+
+include/qcd_gaugeFixing.h,132
+#define H_QCD_GAUGEFIXING 9,160
+#define qcd_LANDAU_GAUGE_FIXING_PRECISION 11,189
+#define qcd_LANDAU_GAUGE_FIXING_MAX_ITER 12,239
 
 include/qcd_io.h,202
 #define H_QCD_IO 9,133
@@ -281,134 +155,106 @@ include/qcd_io.h,202
 #define qcd_PROP_LIME 16,263
 #define qcd_SOURCE_LIME 17,287
 
-mainprogs/source_idris.c,17
-int main(20,286
+include/qcd_observables.h,33
+#define H_QCD_OBSERVABLES 9,160
 
-mainprogs/twop.c,17
-int main(21,295
+include/qcd_particle_data.h,36
+#define H_QCD_PARTICLE_DATA 10,195
 
-mainprogs/seq_source_dd_idris.c,18
-int main(42,1014
+include/qcd_prop_contract.h,215
+#define _QCD_PROP_CONTRACT_H 2,29
+prop_contract_01(5,73
+prop_contract_02(9804,347836
+prop_contract_03(19603,695599
+prop_contract_12(29402,1043362
+prop_contract_13(39201,1391125
+prop_contract_23(49000,1738888
 
-mainprogs/rms.c,17
-int main(17,280
+include/qcd_prop_ops.h,1063
+#define _QCD_PROP_OPS_H 2,24
+prop_gamma_x_G(8,158
+prop_gamma_y_G(313,12711
+prop_gamma_z_G(618,25264
+prop_gamma_t_G(923,37817
+prop_gamma_5_G(1228,50370
+prop_C_G(1533,62916
+prop_Cg5_G(1838,75464
+prop_Cgx_G(2143,88014
+prop_Cgy_G(2448,100564
+prop_Cgz_G(2753,113114
+prop_Cgt_G(3058,125664
+prop_G_gamma_x(3363,138219
+prop_G_gamma_y(3668,150778
+prop_G_gamma_z(3973,163337
+prop_G_gamma_t(4278,175896
+prop_G_gamma_5(4583,188455
+prop_G_C(4888,201007
+prop_G_Cg5(5193,213561
+prop_G_Cgx(5498,226117
+prop_G_Cgy(5803,238673
+prop_G_Cgz(6108,251229
+prop_G_Cgt(6413,263785
+prop_ProjTp_G(6718,276351
+prop_ProjTm_G(7023,297560
+prop_ProjXp_G(7328,318769
+prop_ProjXm_G(7633,339978
+prop_ProjYp_G(7938,361187
+prop_ProjYm_G(8243,382396
+prop_ProjZp_G(8548,403605
+prop_ProjZm_G(8853,424814
+prop_G_ProjTp(9158,446024
+prop_G_ProjTm(9463,467234
+prop_G_ProjXp(9768,488444
+prop_G_ProjXm(10073,509654
+prop_G_ProjYp(10378,530864
+prop_G_ProjYm(10683,552074
+prop_G_ProjZp(10988,573284
+prop_G_ProjZm(11293,594494
+prop_G_G(11597,615640
+prop_G_dag(19092,878147
 
-mainprogs/invert.c,41
-qcd_int_4 gcr(20,310
-int main(117,3198
+include/qcd_prop_ops.tmpl.h,30
+#define _QCD_PROP_OPS_H 2,24
 
-mainprogs/threep.c,17
-int main(23,340
+include/qcd_rng.h,25
+#define _QCD_RNG_H 2,19
 
-mainprogs/seq_source_uu.c,18
-int main(43,1055
+include/qcd_smearing.h,62
+#define H_QCD_SMEARING 9,151
+#define qcd_SUM_UP_HOPP(11,177
 
-mainprogs/seq_source_uu_idris.c,18
-int main(43,1061
+include/qcd_stochastic.h,35
+#define _H_QCD_COMMUNICATION 2,29
 
-mainprogs/projectors.h,42
-qcd_complex_16 PROJECTOR[PROJECTOR8,139
+include/qcd_wilson.h,1068
+#define H_QCD_WILSON 9,145
+#define qcd_ONE_PLUS_GAMMA0(17,344
+#define qcd_ONE_PLUS_GAMMA0_HALFSPINOR(47,1057
+#define qcd_ONE_PLUS_GAMMA1(63,1480
+#define qcd_ONE_PLUS_GAMMA1_HALFSPINOR(93,2190
+#define qcd_ONE_PLUS_GAMMA2(109,2613
+#define qcd_ONE_PLUS_GAMMA2_HALFSPINOR(139,3336
+#define qcd_ONE_PLUS_GAMMA3(155,3761
+#define qcd_ONE_PLUS_GAMMA3_HALFSPINOR(185,4495
+#define qcd_ONE_MINUS_GAMMA0(202,4919
+#define qcd_ONE_MINUS_GAMMA0_HALFSPINOR(232,5629
+#define qcd_ONE_MINUS_GAMMA1(248,6050
+#define qcd_ONE_MINUS_GAMMA1_HALFSPINOR(279,6760
+#define qcd_ONE_MINUS_GAMMA2(296,7181
+#define qcd_ONE_MINUS_GAMMA2_HALFSPINOR(327,7902
+#define qcd_ONE_MINUS_GAMMA3(343,8326
+#define qcd_ONE_MINUS_GAMMA3_HALFSPINOR(373,9047
+#define qcd_MASSTERMS(389,9468
+#define qcd_APPLY_U(419,10406
+#define qcd_APPLY_U_HALFSPINOR(449,13173
+#define qcd_APPLY_U_DAGGER(465,14537
+#define qcd_APPLY_U_DAGGER_HALFSPINOR(495,17311
+#define qcd_SUM_OP(512,18687
+#define qcd_SUM_OP_HALFSPINORS(539,20708
+#define qcd_PHASE_MUL(566,22741
+#define qcd_PHASE_MUL_HALFSPINOR(605,24120
 
-mainprogs/zfac.c,17
-int main(28,664
-
-mainprogs/b_minus_Dx.c,17
-int main(21,335
-
-mainprogs/landau.c,17
-int main(20,289
-
-mainprogs/threep_idris.c,17
-int main(23,346
-
-mainprogs/disc_oneend.c,17
-int main(20,311
-
-mainprogs/source.c,81
-  POINT_SOURCE,18,287
-  NOISE_SOURCE19,303
-} src_type;20,318
-int main(22,332
-
-mainprogs/unit_gaugefield.c,15
-int main(8,93
-
-mainprogs/seq_source_dd.c,18
-int main(42,1008
-
-mainprogs/source_block.c,17
-int main(17,280
-
-lib/qcd_communication.c,388
-int qcd_communicateVectorPMGaugeP(20,435
-int qcd_communicateVectorPM(60,2192
-int qcd_communicateGaugeM(100,3643
-int qcd_communicateGaugeP(129,4547
-int qcd_communicateGaugePInverse(163,5601
-int qcd_communicateGaugePM(199,6699
-int qcd_communicateTransformationM(239,8227
-int qcd_communicatePropagatorP(269,9192
-int qcd_communicatePropagatorPM(302,10176
-void qcd_waitall(341,11559
-
-lib/qcd_init.c,458
-void qcd_antilexic(16,278
-int qcd_initGeometry(25,506
-void qcd_destroyGeometry(395,16205
-int qcd_initVector(418,16777
-void qcd_destroyVector(473,18276
-int qcd_initVector3d(486,18491
-void qcd_destroyVector3d(534,19816
-int qcd_initPropagator(546,20038
-void qcd_destroyPropagator(601,21555
-int qcd_initGaugeField(614,21790
-void qcd_destroyGaugeField(668,23253
-int qcd_initGaugeTransformation(679,23480
-void qcd_destroyGaugeTransformation(733,24977
-
-lib/qcd_rng.c,67
-qcd_rng_init(6,65
-qcd_rng_finalize(20,352
-qcd_get_rand_4(27,445
-
-lib/qcd_stochastic.c,25
-void qcd_z2Vector(8,112
-
-lib/qcd_io.c,865
-int qcd_isBigEndian(24,426
-     char C[C27,460
-     int  R 28,476
-void qcd_swap_8(42,684
-void qcd_swap_4(64,1076
-char* qcd_getParams(83,1367
-char* qcd_getParam(114,1862
-int qcd_getLimeMessage(132,2233
-int qcd_getGaugeLime(204,4350
-int qcd_getGaugeField(397,10592
-int qcd_writeGaugeLime(417,11151
-int qcd_writeGaugeField(573,17032
-int qcd_getPropagatorCMI(601,17706
-int qcd_getPropagatorLime(707,21006
-int qcd_getPropagatorHMC(775,22792
-int qcd_getPropagator(872,25735
-int qcd_getVectorCMI(900,26565
-int qcd_getVectorLime(976,28770
-int qcd_getVectorHMC(1191,35662
-int qcd_getVectorHMCV(1283,38379
-int qcd_getVector(1375,41077
-int qcd_writePropagatorCMI(1405,41885
-int qcd_writePropagatorHMCV(1515,45266
-int qcd_writePropagator(1650,49672
-int qcd_writeVectorCMI(1674,50327
-int qcd_writeVectorLime(1754,52653
-int qcd_writeVector(1937,59216
-
-lib/qcd_smearing.c,100
-int qcd_gaussIteration3d(24,379
-int qcd_gaussIteration3dAll(116,3214
-int qcd_apeSmear3d(209,5947
-
-lib/qcd_blas.c,1410
+lib/qcd_blas.c,1488
 void qcd_zero3x3(19,308
 void qcd_unit3x3(24,424
 void qcd_minusUnit3x3(33,608
@@ -429,51 +275,149 @@ void qcd_setVector(152,4047
 void qcd_copyVector(172,4536
 void qcd_copyGaugeField(177,4723
 void qcd_copyVectorPropagator(182,4934
-void qcd_copyPropagatorVector(192,5212
-void qcd_copyVectorPropagator2(202,5490
-void qcd_copyPropagatorVector2(213,5770
-void qcd_mulVectorC(225,6051
-void qcd_mulPropagatorC(236,6284
-void qcd_mulPropagatorC3d(249,6595
-void qcd_scaleVector(276,7281
-void qcd_scaleVector3d(287,7471
-void qcd_subVector(320,8343
-void qcd_subGaugeField(333,8713
-void qcd_addGaugeField(344,9067
-void qcd_scaleGaugeField(355,9398
-void qcd_addVector(378,9955
-void qcd_axpyVector(389,10300
-void qcd_addVector3d(409,10822
-qcd_complex_16 qcd_mulAdjointVectorVector(431,11481
-qcd_real_8 qcd_normVector(453,12073
-qcd_real_8 qcd_normGaugeField(470,12475
-void qcd_conjPropagator(491,12926
-void qcd_projectSU3(516,13807
-void qcd_projectSU33d(925,33473
-void qcd_projectSU33x3(1334,53109
-void qcd_randomGaugeField(1729,71190
+void qcd_copyPropagatorPropagator(192,5212
+void qcd_copyPropagatorVector(204,5576
+void qcd_copyVectorPropagator2(214,5854
+void qcd_copyPropagatorVector2(225,6134
+void qcd_mulVectorC(237,6415
+void qcd_mulVectorC3d(247,6647
+void qcd_mulPropagatorC(261,7012
+void qcd_mulPropagatorC3d(274,7323
+void qcd_scaleVector(301,8009
+void qcd_scaleVector3d(312,8199
+void qcd_subVector(345,9071
+void qcd_subGaugeField(358,9441
+void qcd_addGaugeField(369,9795
+void qcd_scaleGaugeField(380,10126
+void qcd_addVector(403,10683
+void qcd_axpyVector(414,11028
+void qcd_addVector3d(434,11550
+qcd_complex_16 qcd_mulAdjointVectorVector(456,12209
+qcd_real_8 qcd_normVector(478,12801
+qcd_real_8 qcd_normGaugeField(495,13203
+void qcd_conjPropagator(516,13654
+void qcd_projectSU3(541,14535
+void qcd_projectSU33d(950,34201
+void qcd_projectSU33x3(1359,53837
+void qcd_randomGaugeField(1754,71918
+
+lib/qcd_communication.c,388
+int qcd_communicateVectorPMGaugeP(20,435
+int qcd_communicateVectorPM(60,2192
+int qcd_communicateGaugeM(100,3643
+int qcd_communicateGaugeP(129,4547
+int qcd_communicateGaugePInverse(163,5601
+int qcd_communicateGaugePM(199,6699
+int qcd_communicateTransformationM(239,8227
+int qcd_communicatePropagatorP(269,9192
+int qcd_communicatePropagatorPM(302,10176
+void qcd_waitall(341,11559
+
+lib/qcd_contract_2pt.c,186
+int qcd_f1f2f1_2pt(17,253
+int qcd_pnextra_2pt(81,2418
+int qcd_f1f2f3_2pt(145,4443
+int qcd_f123f321_2pt(195,6017
+int qcd_lambdas_xis_2pt(267,9171
+void qcd_contractions2pt(382,13422
+
+lib/qcd_contract_2pt_pr.c,325
+int qcd_projector12_2pt(17,273
+int qcd_projector32_2pt(56,1662
+int qcd_f1f1f1_2pt_pr(96,3059
+int qcd_deltas_xistar_omegastar_2pt_pr(181,6157
+int qcd_f1f2f1_2pt_pr(281,10108
+int qcd_f1f2f3_2pt_pr(337,11998
+int qcd_sigmas4_2pt_pr(387,13608
+int qcd_sigmas2_xistar_2pt_pr(486,17730
+void qcd_contractions2pt_pr(598,22347
+
+lib/qcd_gamma.c,724
+const qcd_uint_2 qcd_EPS[qcd_EPS19,314
+const qcd_int_2 qcd_SGN_EPS[qcd_SGN_EPS29,433
+const qcd_complex_16 qcd_ONE[qcd_ONE34,497
+const qcd_complex_16 qcd_GAMMA[qcd_GAMMA52,989
+const qcd_complex_16 qcd_CGAMMA[qcd_CGAMMA111,3812
+const qcd_complex_16 qcd_BAR_CGAMMA[qcd_BAR_CGAMMA156,5940
+const qcd_complex_16 qcd_G5GAMMA[qcd_G5GAMMA201,8076
+const qcd_complex_16 qcd_BAR_G5GAMMA[qcd_BAR_G5GAMMA260,10903
+const qcd_complex_16 qcd_ONE_PLUS_GAMMA[qcd_ONE_PLUS_GAMMA319,13726
+const qcd_complex_16 qcd_ONE_MINUS_GAMMA[qcd_ONE_MINUS_GAMMA364,15864
+const qcd_complex_16 qcd_BAR_C[qcd_BAR_C409,18028
+const qcd_complex_16 qcd_C[qcd_C418,18414
+void qcd_gamma5Vector(427,18798
+void qcd_gamma5Propagator(442,19137
 
 lib/qcd_gaugeFixing.c,91
 void qcd_gluonField(20,369
 void qcd_localGluonField(48,1190
 int qcd_landauGauge(76,2152
 
+lib/qcd_init.c,458
+void qcd_antilexic(16,278
+int qcd_initGeometry(25,506
+void qcd_destroyGeometry(395,16205
+int qcd_initVector(418,16777
+void qcd_destroyVector(473,18276
+int qcd_initVector3d(486,18491
+void qcd_destroyVector3d(534,19816
+int qcd_initPropagator(546,20038
+void qcd_destroyPropagator(601,21555
+int qcd_initGaugeField(614,21790
+void qcd_destroyGaugeField(668,23253
+int qcd_initGaugeTransformation(679,23480
+void qcd_destroyGaugeTransformation(733,24977
+
+lib/qcd_io.c,865
+int qcd_isBigEndian(24,426
+     char C[C27,460
+     int  R 28,476
+void qcd_swap_8(42,684
+void qcd_swap_4(64,1076
+char* qcd_getParams(83,1367
+char* qcd_getParam(114,1862
+int qcd_getLimeMessage(132,2233
+int qcd_getGaugeLime(204,4350
+int qcd_getGaugeField(397,10592
+int qcd_writeGaugeLime(417,11151
+int qcd_writeGaugeField(573,17032
+int qcd_getPropagatorCMI(601,17705
+int qcd_getPropagatorLime(707,21005
+int qcd_getPropagatorHMC(776,22849
+int qcd_getPropagator(873,25792
+int qcd_getVectorCMI(901,26622
+int qcd_getVectorLime(977,28827
+int qcd_getVectorHMC(1192,35721
+int qcd_getVectorHMCV(1284,38438
+int qcd_getVector(1376,41136
+int qcd_writePropagatorCMI(1406,41944
+int qcd_writePropagatorHMCV(1516,45325
+int qcd_writePropagator(1651,49731
+int qcd_writeVectorCMI(1675,50386
+int qcd_writeVectorLime(1755,52712
+int qcd_writeVector(1938,59275
+
 lib/qcd_observables.c,42
 qcd_real_8 qcd_calculatePlaquette(15,247
 
-lib/qcd_gamma.c,628
-const qcd_uint_2 qcd_EPS[qcd_EPS17,312
-const qcd_int_2 qcd_SGN_EPS[qcd_SGN_EPS27,431
-const qcd_complex_16 qcd_ONE[qcd_ONE32,495
-const qcd_complex_16 qcd_GAMMA[qcd_GAMMA50,987
-const qcd_complex_16 qcd_CGAMMA[qcd_CGAMMA109,3810
-const qcd_complex_16 qcd_BAR_CGAMMA[qcd_BAR_CGAMMA154,5938
-const qcd_complex_16 qcd_G5GAMMA[qcd_G5GAMMA199,8074
-const qcd_complex_16 qcd_BAR_G5GAMMA[qcd_BAR_G5GAMMA258,10901
-const qcd_complex_16 qcd_ONE_PLUS_GAMMA[qcd_ONE_PLUS_GAMMA317,13724
-const qcd_complex_16 qcd_ONE_MINUS_GAMMA[qcd_ONE_MINUS_GAMMA362,15862
-void qcd_gamma5Vector(410,18032
-void qcd_gamma5Propagator(425,18371
+lib/qcd_particle_data.c,173
+char *particles_parts[particles_parts9,170
+ int particles_pnum[particles_pnum75,3007
+char *particle_names[particle_names143,5539
+int particles32[particles32208,6971
+
+lib/qcd_rng.c,67
+qcd_rng_init(6,65
+qcd_rng_finalize(20,352
+qcd_get_rand_4(27,445
+
+lib/qcd_smearing.c,100
+int qcd_gaussIteration3d(24,379
+int qcd_gaussIteration3dAll(115,3158
+int qcd_apeSmear3d(208,5963
+
+lib/qcd_stochastic.c,25
+void qcd_z2Vector(8,112
 
 lib/qcd_wilson.c,322
 void qcd_onePlusGamma(18,287
@@ -486,3 +430,189 @@ int qcd_applyWilsonTMOp(114,3154
 int qcd_applyWilsonTMOpNoScripts(347,12414
 int qcd_applyWilsonTMOpNoOptim(560,20197
 int qcd_applyQTMOp(781,28749
+
+mainprogs/b_minus_Dx.c,17
+int main(21,335
+
+mainprogs/disc_oneend.c,17
+int main(20,311
+
+mainprogs/invert.c,41
+qcd_int_4 gcr(20,310
+int main(117,3198
+
+mainprogs/landau.c,17
+int main(20,289
+
+mainprogs/projectors.h,42
+qcd_complex_16 PROJECTOR[PROJECTOR8,139
+
+mainprogs/rms.c,17
+int main(17,280
+
+mainprogs/seq_source_dd.c,18
+int main(42,1008
+
+mainprogs/seq_source_dd_idris.c,18
+int main(42,1014
+
+mainprogs/seq_source_uu.c,18
+int main(43,1055
+
+mainprogs/seq_source_uu_idris.c,18
+int main(43,1061
+
+mainprogs/source.c,81
+  POINT_SOURCE,18,287
+  NOISE_SOURCE19,303
+} src_type;20,318
+int main(22,332
+
+mainprogs/source_block.c,17
+int main(17,280
+
+mainprogs/source_idris.c,17
+int main(20,286
+
+mainprogs/threep-block.c,34
+writeBlock(20,347
+main(133,3827
+
+mainprogs/threep.c,17
+int main(23,346
+
+mainprogs/threep_idris.c,17
+int main(23,346
+
+mainprogs/threep_stoch.c,181
+#define Nmu 17,616
+#define Nic 18,630
+#define MAX_NUM_PHI 19,644
+#define N_op_local 20,669
+#define N_op_noether 21,691
+#define max(23,715
+#define min(24,749
+int main(26,784
+
+mainprogs/twop-nucleons.c,78
+#define NC 16,267
+#define NS 17,280
+#define MAX_STRING 24,377
+main(27,407
+
+mainprogs/twop.c,17
+int main(21,295
+
+mainprogs/twop_all.c,17
+int main(19,309
+
+mainprogs/unit_gaugefield.c,15
+int main(8,93
+
+mainprogs/zfac.c,17
+int main(28,664
+
+mainprogs/twop-hadr.c,103
+#define NC 16,267
+#define NS 17,280
+#define N_MESONS 23,376
+#define MAX_STRING 24,449
+main(27,479
+
+mainprogs/zfac_NEW_format.c,17
+int main(27,663
+
+tests/qcd_blas.c,476
+void qcd_zeroVector(11,196
+void qcd_setVector(16,338
+void qcd_copyVector(36,827
+void qcd_copyGaugeField(41,1014
+void qcd_copyVectorPropagator(46,1225
+void qcd_copyVectorPropagator2(56,1503
+void qcd_mulVectorC(67,1783
+void qcd_scaleVector(87,2250
+void qcd_scaleVector3d(98,2440
+void qcd_subVector(119,3001
+void qcd_subGaugeField(129,3306
+void qcd_addVector(151,3947
+void qcd_addVector3d(163,4293
+double qcd_normVector(184,4951
+double qcd_normGaugeField(201,5364
+
+tests/qcd_communication.c,68
+int qcd_communicateVectorPMGaugeP(14,324
+void qcd_waitall(52,2014
+
+tests/qcd_dirac.c,30
+void qcd_applyWilsonTM(8,127
+
+tests/qcd_init.c,299
+void qcd_antilexic(9,166
+int qcd_initGeometry(18,394
+void qcd_destroyGeometry(249,10210
+int qcd_initVector(269,10719
+void qcd_destroyVector(324,12218
+int qcd_initPropagator(337,12433
+void qcd_destroyPropagator(392,13950
+int qcd_initGaugeField(405,14185
+void qcd_destroyGaugeField(459,15648
+
+tests/qcd_io.c,307
+int qcd_isBigEndian(17,295
+     char C[C20,329
+     int  R 21,345
+void qcd_swap_8(34,539
+void qcd_swap_4(56,931
+char* qcd_getParams(75,1222
+char* qcd_getParam(107,1745
+int qcd_getGaugeLime(126,2049
+int qcd_getGaugeField(315,8079
+int qcd_getPropagatorCMI(336,8570
+int qcd_getPropagator(445,11886
+
+tests/qcd_smearing.c,65
+#define qcd_SUM_UP_HOPP(8,133
+int qcd_gaussIteration3d(42,1056
+
+tests/qcd_wilson.c,501
+#define qcd_ONE_PLUS_GAMMA0(14,311
+#define qcd_ONE_PLUS_GAMMA1(44,1024
+#define qcd_ONE_PLUS_GAMMA2(74,1734
+#define qcd_ONE_PLUS_GAMMA3(104,2458
+#define qcd_ONE_MINUS_GAMMA0(135,3193
+#define qcd_ONE_MINUS_GAMMA1(165,3903
+#define qcd_ONE_MINUS_GAMMA2(196,4614
+#define qcd_ONE_MINUS_GAMMA3(226,5331
+#define qcd_MASSTERMS(256,6055
+#define qcd_APPLY_U(286,6993
+#define qcd_APPLY_U_DAGGER(316,9760
+#define qcd_SUM_OP(347,12539
+#define qcd_PHASE_MUL(374,14560
+int qcd_applyWilsonTMOp(419,16067
+
+tests/test.c,63
+void qcd_swap_8(5,58
+void dbyte_swap(26,449
+int main(41,889
+
+tests/test_blas.c,17
+int main(15,250
+
+tests/test_communication.c,17
+int main(15,250
+
+tests/test_gaugefix.c,17
+int main(10,131
+
+tests/test_smearing.c,17
+int main(16,276
+
+tests/test_wilson.c,15
+int main(8,93
+
+tests/timingTest.c,17
+int main(10,158
+
+include/qcd_contract_2pt_pr.h,0
+
+include/qcd_contract_2pt.h,0
