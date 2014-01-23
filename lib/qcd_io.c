@@ -39,7 +39,7 @@ int qcd_isBigEndian()
   big endian and little endian
   8 byte words.
 */
-void qcd_swap_8(double *Rd, int N)
+void qcd_swap_8(double *Rd, size_t N)
 {
    register char *i,*j,*k;
    char swap;
@@ -61,7 +61,7 @@ void qcd_swap_8(double *Rd, int N)
 }
 
 
-void qcd_swap_4(float *Rd, int N)
+void qcd_swap_4(float *Rd, size_t N)
 {
   register char *i,*j,*k;
   char swap;
@@ -318,7 +318,7 @@ int qcd_getGaugeLime(char *fname, qcd_gaugeField *u)
       }
       MPI_File_read_all(mpifid, buffer, 4*3*3*2*u->geo->lV, MPI_DOUBLE, &status);
       if(!qcd_isBigEndian())      
-         qcd_swap_8((double*) buffer,2*4*3*3*u->geo->lV);
+	qcd_swap_8((double*) buffer,(size_t)(2*4*3*3)*(size_t)u->geo->lV);
       i=0;
       for(t=0; t<u->geo->lL[0];t++)
       for(z=0; z<u->geo->lL[3];z++)
@@ -370,7 +370,7 @@ int qcd_getGaugeLime(char *fname, qcd_gaugeField *u)
       }
       MPI_File_read_all(mpifid, buffer, 4*3*3*2*u->geo->lV, MPI_FLOAT, &status);
       if(!qcd_isBigEndian())      
-         qcd_swap_4((float*) buffer,2*4*3*3*u->geo->lV3);
+	qcd_swap_4((float*) buffer,(size_t)(2*4*3*3)*(size_t)u->geo->lV3);
       
       for(t=0; t<u->geo->lL[0];t++)
       for(z=0; z<u->geo->lL[3];z++)
@@ -558,7 +558,7 @@ int qcd_writeGaugeLime(char *fname, qcd_gaugeField *u, char *message)
       i+=144;
    }
    if(!qcd_isBigEndian())
-      qcd_swap_8((double*) buffer,2*4*3*3*u->geo->lV);
+     qcd_swap_8((double*) buffer,(size_t)(2*4*3*3)*(size_t)u->geo->lV);
    
    MPI_File_write_all(mpifid, buffer, 4*3*3*2*u->geo->lV, MPI_DOUBLE, &status);
 
@@ -683,7 +683,7 @@ int qcd_getPropagatorCMI(char *fname, qcd_propagator *p)
          MPI_File_set_view(mpifid, 0, MPI_FLOAT, subblock, "native", MPI_INFO_NULL);
          MPI_File_read_all(mpifid, buffer, 4*3*2*p->geo->lV, MPI_FLOAT, &status);
          if(!qcd_isBigEndian())      
-            qcd_swap_4(buffer,2*4*3*p->geo->lV);
+	   qcd_swap_4(buffer,(size_t)(2*4*3)*(size_t)p->geo->lV);
          MPI_File_close(&mpifid);         
          //reshuffle data
          l=0;
@@ -844,7 +844,7 @@ int qcd_getPropagatorHMC(char *fname, qcd_propagator *p)
 
    MPI_File_read_all(mpifid, buffer, 4*3*4*3*2*p->geo->lV, MPI_DOUBLE, &status);
    if(!qcd_isBigEndian())      
-      qcd_swap_8(buffer,4*3*4*3*2*p->geo->lV);
+     qcd_swap_8(buffer,(size_t)(4*3*4*3*2)*(size_t)p->geo->lV);
    l=0;
    //reshuffle data
    for(nu=0; nu<4; nu++)
@@ -954,7 +954,7 @@ int qcd_getVectorCMI(char *fname, qcd_uint_2 nu, qcd_uint_2 c2, qcd_vector *v)
    MPI_File_set_view(mpifid, 0, MPI_FLOAT, subblock, "native", MPI_INFO_NULL);
    MPI_File_read_all(mpifid, buffer, 4*3*2*v->geo->lV, MPI_FLOAT, &status);
    if(!qcd_isBigEndian())      
-      qcd_swap_4(buffer,2*4*3*v->geo->lV);
+     qcd_swap_4(buffer,(size_t)(2*4*3)*(size_t)v->geo->lV);
    MPI_File_close(&mpifid);
    //reshuffle data
    l=0;
@@ -1110,7 +1110,7 @@ int qcd_getVectorLime(char *fname, qcd_vector *v)
       }
       MPI_File_read_all(mpifid, buffer, 4*3*2*v->geo->lV, MPI_DOUBLE, &status);
       if(!qcd_isBigEndian())      
-	qcd_swap_8((double*) buffer,2*4*3*v->geo->lV);
+	qcd_swap_8((double*) buffer,(size_t)(2*4*3)*(size_t)v->geo->lV);
       i=0;
       for(t=0; t<v->geo->lL[0];t++)
       for(z=0; z<v->geo->lL[3];z++)
@@ -1165,7 +1165,7 @@ int qcd_getVectorLime(char *fname, qcd_vector *v)
       MPI_File_read_all(mpifid, buffer, 4*3*2*v->geo->lV, MPI_FLOAT, &status);
 
       if(!qcd_isBigEndian())
-         qcd_swap_4((float*) buffer,2*4*3*v->geo->lV);
+	qcd_swap_4((float*) buffer,(size_t)(2*4*3)*(size_t)v->geo->lV);
 
       i=0;
       for(t=0; t<v->geo->lL[0];t++)
@@ -1259,7 +1259,7 @@ int qcd_getVectorHMC(char *fname, qcd_uint_2 nu, qcd_uint_2 c2, qcd_vector *v)
 
    MPI_File_read_at_all(mpifid, (MPI_Offset) (nu*3+c2)*4*3*2*v->geo->lV, buffer, 4*3*2*v->geo->lV, MPI_DOUBLE, &status);
    if(!qcd_isBigEndian())      
-      qcd_swap_8(buffer,4*3*2*v->geo->lV);
+     qcd_swap_8(buffer,(size_t)(4*3*2)*(size_t)v->geo->lV);
    l=0;
    //reshuffle data
    for(x=0; x<v->geo->lL[1]; x++)
@@ -1351,7 +1351,7 @@ int qcd_getVectorHMCV(char *fname, qcd_uint_2 nu, qcd_uint_2 c2, qcd_vector *v)
 
    MPI_File_read_at_all(mpifid, (MPI_Offset) 0, buffer, 4*3*2*v->geo->lV, MPI_DOUBLE, &status);
    if(!qcd_isBigEndian())      
-      qcd_swap_8(buffer,4*3*2*v->geo->lV);
+     qcd_swap_8(buffer,(size_t)(4*3*2)*(size_t)v->geo->lV);
    l=0;
    //reshuffle data
    for(x=0; x<v->geo->lL[1]; x++)
@@ -1500,7 +1500,7 @@ int qcd_writePropagatorCMI(char *fname, qcd_propagator *p)
             buffer[l++] = p->D[qcd_LEXIC(t,x,y,z,p->geo->lL)][mu][nu][c1][c2].im;
          }
          if(!qcd_isBigEndian())      
-            qcd_swap_4(buffer,2*4*3*p->geo->lV);
+	   qcd_swap_4(buffer,(size_t)(2*4*3)*(size_t)p->geo->lV);
          
          MPI_File_write_all(mpifid, buffer, 4*3*2*p->geo->lV, MPI_FLOAT, &status);
          MPI_File_close(&mpifid);         
@@ -1636,7 +1636,7 @@ int qcd_writePropagatorHMCV(char *fname, qcd_propagator *p)
             buffer[l++] = p->D[qcd_LEXIC(t,x,y,z,p->geo->lL)][mu][nu][c1][c2].im;
          }
          if(!qcd_isBigEndian())      
-            qcd_swap_8(buffer,2*4*3*p->geo->lV);
+	   qcd_swap_8(buffer,(size_t)(2*4*3)*(size_t)p->geo->lV);
          
          MPI_File_write_all(mpifid, buffer, 4*3*2*p->geo->lV, MPI_DOUBLE, &status);
          MPI_File_close(&mpifid);
@@ -1738,7 +1738,7 @@ int qcd_writeVectorCMI(char *fname, qcd_uint_2 nu, qcd_uint_2 c2, qcd_vector *v)
       buffer[l++] = v->D[qcd_LEXIC(t,x,y,z,v->geo->lL)][mu][c1].im;
    }
    if(!qcd_isBigEndian())      
-      qcd_swap_4(buffer,2*4*3*v->geo->lV);
+     qcd_swap_4(buffer,(size_t)(2*4*3)*(size_t)v->geo->lV);
 
    MPI_File_write_all(mpifid, buffer, 4*3*2*v->geo->lV, MPI_FLOAT, &status);
    MPI_File_close(&mpifid);         
@@ -1923,7 +1923,7 @@ int qcd_writeVectorLime(char *fname, int type, qcd_vector *v)
 	   i+=2;
 	 }
    if(!qcd_isBigEndian())
-      qcd_swap_8((double*) buffer,2*4*3*v->geo->lV);
+     qcd_swap_8((double*) buffer,(size_t)(2*4*3)*(size_t)v->geo->lV);
    
    MPI_File_write_all(mpifid, buffer, 4*3*2*v->geo->lV, MPI_DOUBLE, &status);
 

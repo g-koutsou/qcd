@@ -19,8 +19,8 @@
  
 /* prototypes */ 
 int qcd_isBigEndian(void);
-void qcd_swap_8(double *Rd, int N);
-void qcd_swap_4(float *Rd, int N);
+void qcd_swap_8(double *Rd, size_t N);
+void qcd_swap_4(float *Rd, size_t N);
 char* qcd_getParams(char* fname,int *len);
 char* qcd_getParam(char token[],char* params,int len);
 int qcd_getGaugeLime(char *fname, qcd_gaugeField *u);
