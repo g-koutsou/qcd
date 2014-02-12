@@ -20,6 +20,7 @@ TARGETS=b_minus_Dx\
 	twop-nucleons\
 	twop-hadr\
 	threep-block\
+	twop-block\
         zfac_NEW_format
 
 LIBDIR = ../lib
