@@ -220,14 +220,6 @@ main(int argc,char* argv[])
   if(myid==0) 
     printf("Got sink time slice: %d\n",t_sink);
   
-  if(t_sink >= L[0]) {
-    if(myid==0) 
-      fprintf(stderr, 
-	      " Error: t_sink (=%d) >= L[0] (=%d),\n t_sink should be in [0, L[0]), did you forget to mod(t_sink, L[0]) ?\n", 
-	      t_sink, L[0]);
-    MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
-  }
-   
   char prop_name[qcd_MAX_STRING_LENGTH];
   strcpy(prop_name,qcd_getParam("<propagator>",params,params_len));
   if(myid==0) 
@@ -456,19 +448,7 @@ main(int argc,char* argv[])
     if(myid==0) 
       printf("t = %2d\n", t);
         
-    /* 
-       Dirty fix to flip sign in case the
-       three-point function crosses the
-       end of the lattice.
-       
-       A better fix would be to ask for "t_src" and "source-sink separation"
-       in the input parameters, and work it out from there.
-    */
     double sign = +1;
-    if(t_sink < x_src[0]) {
-      sign = -1;
-    }
-    
     /* 
        This should just evaluate to lt = (t+x_src[0])%geo.L[0], since we've guaranteed
        that there is only 1 process along t-axis (P[0] = 1) 
