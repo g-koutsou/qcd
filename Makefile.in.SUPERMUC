@@ -1,0 +1,6 @@
+AR=ar
+RANLIB=ranlib
+CC=mpicc -std=c99 -DINLINE="static inline"
+CFLAGS=-O3 -openmp -I/lrz/sys/libraries/gsl/1.16/include -I$(HOME)/install/include -I./
+LDFLAGS=-L$(HOME)/install/lib/ -L/lrz/sys/libraries/gsl/1.16/lib/ -openmp
+LIBS=-llime -lgslcblas -lgsl -lm -openmp
