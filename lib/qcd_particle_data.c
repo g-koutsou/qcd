@@ -204,6 +204,13 @@ char *particle_names[53] = {
     "omegastar_ccplus_extra"
 };
 
+char *meson_names[4] = {
+	"dummy",
+    "pion",
+    "kaon",
+    "Dmeson"
+};
+
 //------------------------------------------------------------------
 int particles32[53] = {0,
 						0,0,0,0,0,0,0,0,

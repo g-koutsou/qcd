@@ -21,6 +21,19 @@ int qcd_f1f2f1_2pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 cg
   qcd_uint_2 a,b,c,ap,bp,cp,al,be,ga,alp,bep,gap,cc1,cc2;
   qcd_uint_4 lx,ly,lz,v,v3;
   int lv3 = geo->lL[1]*geo->lL[2]*geo->lL[3];
+
+#pragma omp parallel for private(lz,ly,lx,v,ga,gap,ctr2,al,be,bep,alp,cc1,a,b,c,cc2,ap,bp,cp)
+	  for(v3=0; v3<lv3; v3++) {
+	  /* for(lx=0; lx<geo->lL[1]; lx++) */
+	  /*   for(ly=0; ly<geo->lL[2]; ly++) */
+	  /*     for(lz=0; lz<geo->lL[3]; lz++){ */
+	    //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
+	    //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+	    lz = v3 % geo->lL[3];
+	    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
+	    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
+	    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+
   
   for(ga =0; ga <4; ga ++) 
   for(gap=0; gap<4; gap++){         
@@ -41,17 +54,7 @@ int qcd_f1f2f1_2pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 cg
 	  bp=qcd_EPS[cc2][1];
 	  cp=qcd_EPS[cc2][2];
           
-#pragma omp parallel for private(lz,ly,lx,v)
-	  for(v3=0; v3<lv3; v3++) {
-	  /* for(lx=0; lx<geo->lL[1]; lx++) */
-	  /*   for(ly=0; ly<geo->lL[2]; ly++) */
-	  /*     for(lz=0; lz<geo->lL[3]; lz++){ */
-	    //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
-	    //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-	    lz = v3 % geo->lL[3];
-	    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-	    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-	    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+
 		
 		block[ga][gap][v3] = qcd_CADD(block[ga][gap][v3],qcd_CSCALE(
 									    qcd_CMUL(cgcg_val[ctr2],
@@ -85,6 +88,19 @@ int qcd_pnextra_2pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 c
   qcd_uint_2 a,b,c,ap,bp,cp,al,be,ga,alp,bep,gap,cc1,cc2,de,dep;
   qcd_uint_4 lx,ly,lz,v,v3;
   qcd_complex_16 term;
+  int lv3 = geo->lL[1]*geo->lL[2]*geo->lL[3];
+
+#pragma omp parallel for private(lz,ly,lx,v,de,dep,ga,gap,ctr2,al,be,bep,alp,cc1,a,b,c,cc2,ap,bp,cp)
+	  for(v3=0; v3<lv3; v3++) {
+	  /* for(lx=0; lx<geo->lL[1]; lx++) */
+	  /*   for(ly=0; ly<geo->lL[2]; ly++) */
+	  /*     for(lz=0; lz<geo->lL[3]; lz++){ */
+	    //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
+	    //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+	    lz = v3 % geo->lL[3];
+	    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
+	    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
+	    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
   
   for(de =0; de <4; de ++) 
   for(dep=0; dep<4; dep++){
@@ -109,12 +125,8 @@ int qcd_pnextra_2pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 c
           cp=qcd_EPS[cc2][2];
  
 		  term = qcd_CSCALE( qcd_CMUL(qcd_GAMMA[5][de][ga],qcd_GAMMA[5][gap][dep]),-qcd_SGN_EPS[cc1]*qcd_SGN_EPS[cc2] );
-                
-	      for(lx=0; lx<geo->lL[1]; lx++)
-          for(ly=0; ly<geo->lL[2]; ly++)
-          for(lz=0; lz<geo->lL[3]; lz++){
-	        v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
-            v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+
+
 
 	    block[de][dep][v3] = qcd_CADD(block[de][dep][v3],qcd_CMUL(
 					     qcd_CMUL(cgcg_val[ctr2],
@@ -148,6 +160,19 @@ int qcd_f1f2f3_2pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 cg
   qcd_int_4 ctr2;
   qcd_uint_2 a,b,c,ap,bp,cp,al,be,ga,alp,bep,gap,cc1,cc2;
   qcd_uint_4 lx,ly,lz,v,v3;
+  int lv3 = geo->lL[1]*geo->lL[2]*geo->lL[3];
+
+#pragma omp parallel for private(lz,ly,lx,v,ga,gap,ctr2,al,be,bep,alp,cc1,a,b,c,cc2,ap,bp,cp)
+	  for(v3=0; v3<lv3; v3++) {
+	  // for(lx=0; lx<geo->lL[1]; lx++) 
+	  //   for(ly=0; ly<geo->lL[2]; ly++) 
+	  //     for(lz=0; lz<geo->lL[3]; lz++){ 
+	    //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
+	    //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+	    lz = v3 % geo->lL[3];
+	    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
+	    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
+	    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
 	
  for(ga =0; ga <4; ga ++) 
   for(gap=0; gap<4; gap++){        
@@ -166,13 +191,7 @@ int qcd_f1f2f3_2pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 cg
 		for(cc2=0;cc2<6;cc2++){          
 		  ap=qcd_EPS[cc2][0];
           bp=qcd_EPS[cc2][1];
-          cp=qcd_EPS[cc2][2];
-                
-		  for(lx=0; lx<geo->lL[1]; lx++)
-          for(ly=0; ly<geo->lL[2]; ly++)
-          for(lz=0; lz<geo->lL[3]; lz++){
-			v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
-            v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+          cp=qcd_EPS[cc2][2];         	
 
 	    block[ga][gap][v3] = qcd_CADD(block[ga][gap][v3],qcd_CSCALE(
 					     qcd_CMUL(cgcg_val[ctr2],
@@ -198,12 +217,21 @@ int qcd_f123f321_2pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 
   qcd_int_4 ctr2;
   qcd_uint_2 a,b,c,ap,bp,cp,al,be,ga,alp,bep,gap,cc1,cc2;
   qcd_uint_4 lx,ly,lz,v,v3;
+  int lv3 = geo->lL[1]*geo->lL[2]*geo->lL[3];
 
-  for(lx=0; lx<geo->lL[1]; lx++)
-    for(ly=0; ly<geo->lL[2]; ly++)
-      for(lz=0; lz<geo->lL[3]; lz++){
-	v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
-	v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+
+#pragma omp parallel for private(lz,ly,lx,v,ga,gap,ctr2,al,be,bep,alp,cc1,a,b,c,cc2,ap,bp,cp)
+	  for(v3=0; v3<lv3; v3++) {
+	  /* for(lx=0; lx<geo->lL[1]; lx++) */
+	  /*   for(ly=0; ly<geo->lL[2]; ly++) */
+	  /*     for(lz=0; lz<geo->lL[3]; lz++){ */
+	    //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
+	    //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+	    lz = v3 % geo->lL[3];
+	    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
+	    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
+	    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+		
 	
   for(ga =0; ga <4; ga ++) 
   for(gap=0; gap<4; gap++){         
@@ -215,12 +243,12 @@ int qcd_f123f321_2pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 
       alp= cgcg_ind[ctr2][3];                              
             
       for(cc1=0;cc1<6;cc1++){
-	a=qcd_EPS[cc1][0];
+		a=qcd_EPS[cc1][0];
         b=qcd_EPS[cc1][1];
         c=qcd_EPS[cc1][2];
 			
 	for(cc2=0;cc2<6;cc2++){          
-	  ap=qcd_EPS[cc2][0];
+		  ap=qcd_EPS[cc2][0];
           bp=qcd_EPS[cc2][1];
           cp=qcd_EPS[cc2][2];
   
@@ -270,12 +298,19 @@ int qcd_lambdas_xis_2pt(qcd_int_4 ctr, qcd_int_2 cg5cg5_ind[16*16][4],qcd_comple
   qcd_int_4 ctr2;
   qcd_uint_2 a,b,c,ap,bp,cp,al,be,ga,alp,bep,gap,cc1,cc2;
   qcd_uint_4 lx,ly,lz,v,v3;
+  int lv3 = geo->lL[1]*geo->lL[2]*geo->lL[3];
 
-  for(lx=0; lx<geo->lL[1]; lx++)
-    for(ly=0; ly<geo->lL[2]; ly++)
-      for(lz=0; lz<geo->lL[3]; lz++){
-        v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
-        v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+#pragma omp parallel for private(lz,ly,lx,v,ga,gap,ctr2,al,be,bep,alp,cc1,a,b,c,cc2,ap,bp,cp)
+	  for(v3=0; v3<lv3; v3++) {
+	  /* for(lx=0; lx<geo->lL[1]; lx++) */
+	  /*   for(ly=0; ly<geo->lL[2]; ly++) */
+	  /*     for(lz=0; lz<geo->lL[3]; lz++){ */
+	    //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
+	    //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+	    lz = v3 % geo->lL[3];
+	    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
+	    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
+	    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
 
 	
   for(ga =0; ga <4; ga ++) 

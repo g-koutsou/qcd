@@ -12,6 +12,7 @@
 extern char *particles_parts[53][4];
 extern int particles_pnum[53][4];
 extern char *particle_names[53];
+extern char *meson_names[4];
 extern int particles32[53];
 
 #endif
