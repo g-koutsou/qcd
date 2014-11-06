@@ -7,6 +7,7 @@ TARGETS=b_minus_Dx\
 	seq_source_dd_idris\
 	seq_source_uu\
 	seq_source_uu_idris\
+	seq_source_fix_curr\
 	source\
 	source_idris\
 	threep\
@@ -16,12 +17,14 @@ TARGETS=b_minus_Dx\
 	zfac\
 	rms\
 	source_block\
-	twop_all\
+	threep_all_opt\
+	twop_all_opt\
 	twop-nucleons\
 	twop-hadr\
 	threep-block\
 	twop-block\
         zfac_NEW_format
+
 
 LIBDIR = ../lib
 CFLAGS += -I./ -I../include

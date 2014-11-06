@@ -167,9 +167,12 @@ struct {
 #include <qcd_observables.h>
 #include <qcd_stochastic.h>
 #include <qcd_rng.h>
+#include <qcd_particle_data.h>
+#include <qcd_contract_3pt_all.h>
 #include <qcd_contract_2pt.h>
 #include <qcd_contract_2pt_pr.h>
-#include <qcd_particle_data.h>
+#include <qcd_currents_udsc.h>
+#include <qcd_smearing_opt.h>
 
 /* prototypes for qcd_init.c*/
 void qcd_antilexic(qcd_uint_2 x[], qcd_uint_8 l, const qcd_uint_2 dim[]);
