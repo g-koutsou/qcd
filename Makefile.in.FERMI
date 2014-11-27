@@ -1,0 +1,7 @@
+AR=ar
+RANLIB=ranlib
+CC=mpixlc_r -DINLINE=""
+CFLAGS=-O3 -qstrict -I./ -I$(HOME)/install/include/ -I$(GSL_LIB)/../include -qsmp=omp -qthreaded
+LDFLAGS=-L$(HOME)/install/lib -L$(GSL_LIB)/
+LIBS=-llime -lgslcblas -lgsl -lm -qsmp=omp -qthreaded
+
