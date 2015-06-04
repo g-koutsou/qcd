@@ -25,5 +25,6 @@ extern const qcd_complex_16 qcd_BAR_C[4][4];
 /* prototypes */
 void qcd_gamma5Vector(qcd_vector *v);  
 void qcd_gamma5Propagator(qcd_propagator *p);
+void qcd_Propagatorgamma5(qcd_propagator *p);
 
 #endif
