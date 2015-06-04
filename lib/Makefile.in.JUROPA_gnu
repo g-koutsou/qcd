@@ -1,0 +1,6 @@
+AR=ar
+RANLIB=ranlib
+CC=mpicc -std=c99
+CFLAGS=-O3 -fopenmp -m64 -override-limits -I./ -I$(HOME)/install_gnu/include -DINLINE="static inline"
+LDFLAGS=-L$(HOME)/install_gnu/lib
+LIBS=-llime -lgslcblas -lgsl -lm
