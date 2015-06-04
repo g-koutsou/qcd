@@ -1,7 +1,7 @@
 AR=ar
 RANLIB=ranlib
 CC=mpicc
-CFLAGS=-O0 -DINLINE="" -Winline -std=gnu99 -Wall -I./ -I$(HOME)/build/lime-1.3.2/include -fopenmp
+CFLAGS=-O2 -DINLINE="static inline" -Winline -std=gnu99 -Wall -I./ -I$(HOME)/build/lime-1.3.2/include -fopenmp
 LDFLAGS=-L$(HOME)/build/lime-1.3.2/lib
 LIBS=-fopenmp -llime -lgsl -lgslcblas -lxml2 -lm
 
