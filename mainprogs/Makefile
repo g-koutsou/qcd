@@ -4,10 +4,10 @@ TARGETS=b_minus_Dx\
 	invert\
 	landau\
 	seq_source_dd\
-	seq_source_dd_multiple_sink\
+	seq_source_dd_multiple_tsink\
 	seq_source_dd_idris\
 	seq_source_uu\
-	seq_source_uu_multiple_sink\
+	seq_source_uu_multiple_tsink\
 	seq_source_uu_idris\
 	seq_source_fix_curr\
 	source\
