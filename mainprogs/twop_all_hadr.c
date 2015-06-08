@@ -1,4 +1,4 @@
-/* twop_opt.c
+/* twop_all_hadr.c
  *
  * reads forward propagators
  * and creates two point functions for the 40 baryons
@@ -7,6 +7,7 @@
  *
  * April 2012
  *
+ * Mods: June 2015, Added contractions for pseudoscalar, scalar, vector and axial vector mesons
  ****************************************/
  
 /* SAMPLE INPUT FILE
@@ -91,7 +92,7 @@ int main(int argc,char* argv[])
   qcd_complex_16 z1, z2;                       // temp variables
   qcd_complex_16 C, C2;   
   qcd_complex_16 ***bcorr12[16],***bcorr32[16][3],bcorrsum12,bcorrsum32[3];
-  qcd_complex_16 **mcorrp[3],**mcorra[3],mcorrsum[6];
+  qcd_complex_16 **mcorrp[10],**mcorra[10],mcorrsum[20];
   qcd_real_8 plaq;
   qcd_int_4 ctr, ctr2;
   qcd_int_2 cg5cg5_ind[16*16][4];
@@ -100,7 +101,9 @@ int main(int argc,char* argv[])
    
   qcd_complex_16 *block12[4][4],*block32[4][4],*blocknp[4][4];                       // to store the block (2pt function before FT)
   qcd_complex_16 *udblock,*dublock,*sdblock,*sublock,*cdblock,*cublock;          // for mesons
-
+  qcd_complex_16 *a0ublock,*rho1ublock,*rho2ublock,*rho3ublock,*a11ublock,*a12ublock,*a13ublock; // for mesons
+  qcd_complex_16 *a0dblock,*rho1dblock,*rho2dblock,*rho3dblock,*a11dblock,*a12dblock,*a13dblock; // for mesons
+  qcd_complex_16 a0Gamma,rhoGamma[3],a1Gamma[3];
 
   qcd_int_4 (*mom)[3];                         // momenta-list
 
@@ -316,7 +319,22 @@ int main(int argc,char* argv[])
   sdblock = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
   cublock = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));	
   cdblock = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
-  
+
+  a0ublock   = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
+  a0dblock   = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
+  rho1ublock = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
+  rho1dblock = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
+  rho2ublock = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16)); 
+  rho2dblock = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
+  rho3ublock = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
+  rho3dblock = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
+  a11ublock  = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
+  a11dblock  = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
+  a12ublock  = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
+  a12dblock  = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
+  a13ublock  = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
+  a13dblock  = (qcd_complex_16*) malloc(geo.lV3*sizeof(qcd_complex_16));
+
   MPI_Allreduce(&j, &k, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
   if(k>0)
     {
@@ -416,7 +434,7 @@ int main(int argc,char* argv[])
   //-allocate memory for correlators
 
   if(mesyes){
-    for(i=0;i<3;i++){	
+    for(i=0;i<10;i++){	
       mcorrp[i]   = malloc(tslices*sizeof(qcd_complex_16*));
       mcorra[i]   = malloc(tslices*sizeof(qcd_complex_16*));
 			
@@ -755,15 +773,31 @@ int main(int argc,char* argv[])
       
 	if(myid==0) printf("mesons t=%i\n",t);
 	for(v3=0; v3<geo.lV3; v3++){
-	  udblock[v3]= (qcd_complex_16) {0,0};   // set blocks to zero
-	  dublock[v3]= (qcd_complex_16) {0,0};   // set blocks to zero
-	  sublock[v3]= (qcd_complex_16) {0,0};   // set blocks to zero
-	  sdblock[v3]= (qcd_complex_16) {0,0};   // set blocks to zero
-	  cublock[v3]= (qcd_complex_16) {0,0};   // set blocks to zero
-	  cdblock[v3]= (qcd_complex_16) {0,0};   // set blocks to zero
+	  // set blocks to zero
+	  udblock[v3] = (qcd_complex_16) {0,0};
+	  dublock[v3] = (qcd_complex_16) {0,0};
+	  sublock[v3] = (qcd_complex_16) {0,0};
+	  sdblock[v3] = (qcd_complex_16) {0,0};
+	  cublock[v3] = (qcd_complex_16) {0,0};
+	  cdblock[v3] = (qcd_complex_16) {0,0};
+
+	  a0ublock[v3]   = (qcd_complex_16) {0,0};
+	  a0dblock[v3]   = (qcd_complex_16) {0,0};
+	  rho1ublock[v3] = (qcd_complex_16) {0,0};
+	  rho1dblock[v3] = (qcd_complex_16) {0,0};
+	  rho2ublock[v3] = (qcd_complex_16) {0,0}; 
+	  rho2dblock[v3] = (qcd_complex_16) {0,0};
+	  rho3ublock[v3] = (qcd_complex_16) {0,0};
+	  rho3dblock[v3] = (qcd_complex_16) {0,0};
+	  a11ublock[v3]  = (qcd_complex_16) {0,0};
+	  a11dblock[v3]  = (qcd_complex_16) {0,0};
+	  a12ublock[v3]  = (qcd_complex_16) {0,0};
+	  a12dblock[v3]  = (qcd_complex_16) {0,0};
+	  a13ublock[v3]  = (qcd_complex_16) {0,0};
+	  a13dblock[v3]  = (qcd_complex_16) {0,0};
 	}
 
-#pragma omp parallel for private(lz,ly,lx,v,mu,nu,c1,c2)
+#pragma omp parallel for private(lz,ly,lx,v,mu,nu,c1,c2,ku,lu,c3p)
 	for(v3=0; v3<lv3; v3++) {
 	  lz = v3 % geo.lL[3];
 	  ly = ((v3 - lz)/geo.lL[3]) % geo.lL[2];
@@ -785,6 +819,37 @@ int main(int argc,char* argv[])
 		  //-Dmeson
 		  cublock[v3] = qcd_CSUB( cublock[v3],qcd_CMUL(cprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(uprop_pb.D[v][mu][nu][c1][c2])) ); // D+ , c-dbar
 		  cdblock[v3] = qcd_CSUB( cdblock[v3],qcd_CMUL(cprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(dprop_pb.D[v][mu][nu][c1][c2])) ); // D0 , c-ubar
+
+		  for(ku=0;ku<4;ku++){
+		    for(lu=0;lu<4;lu++){
+		      a0Gamma = qcd_CMUL(qcd_GAMMA[5][ku][mu],qcd_GAMMA[5][nu][lu]);
+		      for(c3p=1;c3p<=3;c3p++){
+			rhoGamma[c3p-1] = qcd_CMUL(qcd_G5GAMMA[c3p][ku][mu],qcd_BAR_G5GAMMA[c3p][nu][lu]);
+			a1Gamma[c3p-1]  = qcd_CMUL(qcd_GAMMA[c3p][ku][mu],qcd_GAMMA[c3p][nu][lu]);
+		      }
+
+		      //-a0 scalar meson
+		      a0ublock[v3] = qcd_CSUB(a0ublock[v3], qcd_CMUL(a0Gamma,qcd_CMUL(uprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(uprop_pb.D[v][ku][lu][c1][c2]))));
+		      a0dblock[v3] = qcd_CSUB(a0dblock[v3], qcd_CMUL(a0Gamma,qcd_CMUL(dprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(dprop_pb.D[v][ku][lu][c1][c2]))));
+
+		      //-rho vector meson
+		      rho1ublock[v3] = qcd_CSUB(rho1ublock[v3], qcd_CMUL(rhoGamma[0],qcd_CMUL(uprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(uprop_pb.D[v][ku][lu][c1][c2]))));
+		      rho1dblock[v3] = qcd_CSUB(rho1dblock[v3], qcd_CMUL(rhoGamma[0],qcd_CMUL(dprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(dprop_pb.D[v][ku][lu][c1][c2]))));
+		      rho2ublock[v3] = qcd_CSUB(rho2ublock[v3], qcd_CMUL(rhoGamma[1],qcd_CMUL(uprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(uprop_pb.D[v][ku][lu][c1][c2]))));
+		      rho2dblock[v3] = qcd_CSUB(rho2dblock[v3], qcd_CMUL(rhoGamma[1],qcd_CMUL(dprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(dprop_pb.D[v][ku][lu][c1][c2]))));
+		      rho3ublock[v3] = qcd_CSUB(rho3ublock[v3], qcd_CMUL(rhoGamma[2],qcd_CMUL(uprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(uprop_pb.D[v][ku][lu][c1][c2]))));
+		      rho3dblock[v3] = qcd_CSUB(rho3dblock[v3], qcd_CMUL(rhoGamma[2],qcd_CMUL(dprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(dprop_pb.D[v][ku][lu][c1][c2]))));
+
+		      //-a1 axial vector meson
+		      a11ublock[v3] = qcd_CSUB(a11ublock[v3], qcd_CMUL(a1Gamma[0],qcd_CMUL(uprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(uprop_pb.D[v][ku][lu][c1][c2]))));
+		      a11dblock[v3] = qcd_CSUB(a11dblock[v3], qcd_CMUL(a1Gamma[0],qcd_CMUL(dprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(dprop_pb.D[v][ku][lu][c1][c2]))));
+		      a12ublock[v3] = qcd_CSUB(a12ublock[v3], qcd_CMUL(a1Gamma[1],qcd_CMUL(uprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(uprop_pb.D[v][ku][lu][c1][c2]))));
+		      a12dblock[v3] = qcd_CSUB(a12dblock[v3], qcd_CMUL(a1Gamma[1],qcd_CMUL(dprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(dprop_pb.D[v][ku][lu][c1][c2]))));
+		      a13ublock[v3] = qcd_CSUB(a13ublock[v3], qcd_CMUL(a1Gamma[2],qcd_CMUL(uprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(uprop_pb.D[v][ku][lu][c1][c2]))));
+		      a13dblock[v3] = qcd_CSUB(a13dblock[v3], qcd_CMUL(a1Gamma[2],qcd_CMUL(dprop_pb.D[v][mu][nu][c1][c2],qcd_CONJ(dprop_pb.D[v][ku][lu][c1][c2]))));		      
+		    }//-lu
+		  }//-ku
+
 		}}//-color c1,c2
 	    }}//-dirac mu,nu
 	}//-space       
@@ -793,7 +858,7 @@ int main(int argc,char* argv[])
          
         for(j=0; j<nmom; j++){
          			 
-	  for(i=0;i<6;i++) mcorrsum[i] = (qcd_complex_16) {0,0};
+	  for(i=0;i<20;i++) mcorrsum[i] = (qcd_complex_16) {0,0};
 			           
 	  for(lx=0; lx<geo.lL[1]; lx++)
             for(ly=0; ly<geo.lL[2]; ly++)
@@ -804,19 +869,47 @@ int main(int argc,char* argv[])
 		z=lz+geo.Pos[3]*geo.lL[3] - x_src[3];
 		tmp = (((double) mom[j][0]*x)/geo.L[1] + ((double) mom[j][1]*y)/geo.L[2] + ((double) mom[j][2]*z)/geo.L[3])*2*M_PI;
 		C2=(qcd_complex_16) {cos(tmp), -sin(tmp)}; //TABULATE FOR LARGE SPEEDUP!!!
-		mcorrsum[0] = qcd_CADD(mcorrsum[0], qcd_CMUL(udblock[v3],C2)); // pi+
-		mcorrsum[1] = qcd_CADD(mcorrsum[1], qcd_CMUL(dublock[v3],C2)); // pi-
-		mcorrsum[2] = qcd_CADD(mcorrsum[2], qcd_CMUL(sdblock[v3],C2)); // K-
-		mcorrsum[3] = qcd_CADD(mcorrsum[3], qcd_CMUL(sublock[v3],C2)); // K0
-		mcorrsum[4] = qcd_CADD(mcorrsum[4], qcd_CMUL(cublock[v3],C2)); // D+
-		mcorrsum[5] = qcd_CADD(mcorrsum[5], qcd_CMUL(cdblock[v3],C2)); // D0                                             
+		mcorrsum[0]  = qcd_CADD(mcorrsum[0],  qcd_CMUL(udblock[v3],C2)); // pi+
+		mcorrsum[1]  = qcd_CADD(mcorrsum[1],  qcd_CMUL(dublock[v3],C2)); // pi-
+		mcorrsum[2]  = qcd_CADD(mcorrsum[2],  qcd_CMUL(sdblock[v3],C2)); // K-
+		mcorrsum[3]  = qcd_CADD(mcorrsum[3],  qcd_CMUL(sublock[v3],C2)); // K0
+		mcorrsum[4]  = qcd_CADD(mcorrsum[4],  qcd_CMUL(cublock[v3],C2)); // D+
+		mcorrsum[5]  = qcd_CADD(mcorrsum[5],  qcd_CMUL(cdblock[v3],C2)); // D0                                             
+		mcorrsum[6]  = qcd_CADD(mcorrsum[6],  qcd_CMUL(a0ublock[v3],C2)); // a0+
+		mcorrsum[7]  = qcd_CADD(mcorrsum[7],  qcd_CMUL(a0dblock[v3],C2)); // a0-
+		mcorrsum[8]  = qcd_CADD(mcorrsum[8],  qcd_CMUL(rho1ublock[v3],C2)); // rho1+  
+		mcorrsum[9]  = qcd_CADD(mcorrsum[9],  qcd_CMUL(rho1dblock[v3],C2)); // rho1- 
+		mcorrsum[10] = qcd_CADD(mcorrsum[10], qcd_CMUL(rho2ublock[v3],C2)); // rho2+ 
+		mcorrsum[11] = qcd_CADD(mcorrsum[11], qcd_CMUL(rho2dblock[v3],C2)); // rho2- 
+		mcorrsum[12] = qcd_CADD(mcorrsum[12], qcd_CMUL(rho3ublock[v3],C2)); // rho3+ 
+		mcorrsum[13] = qcd_CADD(mcorrsum[13], qcd_CMUL(rho3dblock[v3],C2)); // rho3- 
+		mcorrsum[14] = qcd_CADD(mcorrsum[14], qcd_CMUL(a11ublock[v3],C2)); // a11+	 
+		mcorrsum[15] = qcd_CADD(mcorrsum[15], qcd_CMUL(a11dblock[v3],C2)); // a11-	 
+		mcorrsum[16] = qcd_CADD(mcorrsum[16], qcd_CMUL(a12ublock[v3],C2)); // a12+	 
+		mcorrsum[17] = qcd_CADD(mcorrsum[17], qcd_CMUL(a12dblock[v3],C2)); // a12-	 
+		mcorrsum[18] = qcd_CADD(mcorrsum[18], qcd_CMUL(a13ublock[v3],C2)); // a13+	 
+		mcorrsum[19] = qcd_CADD(mcorrsum[19], qcd_CMUL(a13dblock[v3],C2)); // a13-   
 	      }
-	  MPI_Reduce(&(mcorrsum[0].re), &(mcorrp[0][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-	  MPI_Reduce(&(mcorrsum[1].re), &(mcorra[0][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);    
-	  MPI_Reduce(&(mcorrsum[2].re), &(mcorrp[1][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-	  MPI_Reduce(&(mcorrsum[3].re), &(mcorra[1][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-	  MPI_Reduce(&(mcorrsum[4].re), &(mcorrp[2][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-	  MPI_Reduce(&(mcorrsum[5].re), &(mcorra[2][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);                      
+	  MPI_Reduce(&(mcorrsum[0].re),  &(mcorrp[0][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	  MPI_Reduce(&(mcorrsum[1].re),  &(mcorra[0][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);    
+	  MPI_Reduce(&(mcorrsum[2].re),  &(mcorrp[1][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	  MPI_Reduce(&(mcorrsum[3].re),  &(mcorra[1][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	  MPI_Reduce(&(mcorrsum[4].re),  &(mcorrp[2][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	  MPI_Reduce(&(mcorrsum[5].re),  &(mcorra[2][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);                      
+	  MPI_Reduce(&(mcorrsum[6].re),  &(mcorrp[3][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	  MPI_Reduce(&(mcorrsum[7].re),  &(mcorra[3][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);    
+	  MPI_Reduce(&(mcorrsum[8].re),  &(mcorrp[4][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	  MPI_Reduce(&(mcorrsum[9].re),  &(mcorra[4][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	  MPI_Reduce(&(mcorrsum[10].re), &(mcorrp[5][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	  MPI_Reduce(&(mcorrsum[11].re), &(mcorra[5][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);                      
+	  MPI_Reduce(&(mcorrsum[12].re), &(mcorrp[6][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	  MPI_Reduce(&(mcorrsum[13].re), &(mcorra[6][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);    
+	  MPI_Reduce(&(mcorrsum[14].re), &(mcorrp[7][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	  MPI_Reduce(&(mcorrsum[15].re), &(mcorra[7][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	  MPI_Reduce(&(mcorrsum[16].re), &(mcorrp[8][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	  MPI_Reduce(&(mcorrsum[17].re), &(mcorra[8][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);                      
+	  MPI_Reduce(&(mcorrsum[18].re), &(mcorrp[9][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	  MPI_Reduce(&(mcorrsum[19].re), &(mcorra[9][t][j].re), 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);    
         }//-j
          
       }//end lt inside local block condition  
@@ -930,7 +1023,7 @@ int main(int argc,char* argv[])
 
   if(mesyes){
     if(myid==0){
-      for(i=0;i<3;i++){
+      for(i=0;i<10;i++){
 	for(j=0;j<nmom;j++){
 	  for(t=t_start;t<=t_stop;t++){
 	    fprintf(fp_corr_mes,"%s %+i %+i %+i %i \t%+e %+e\t%+e %+e\n",meson_names[i+1],mom[j][0],mom[j][1],mom[j][2],t,
@@ -1009,15 +1102,29 @@ int main(int argc,char* argv[])
   free(cublock);
   free(cdblock);
 
-
+  free(a0ublock);
+  free(a0dblock);
+  free(rho1ublock);
+  free(rho1dblock);
+  free(rho2ublock); 
+  free(rho2dblock);
+  free(rho3ublock);
+  free(rho3dblock);
+  free(a11ublock);
+  free(a11dblock);
+  free(a12ublock);
+  free(a12dblock);
+  free(a13ublock);
+  free(a13dblock);
+ 
   if(mesyes){
-    for(i=0;i<3;i++){	
+    for(i=0;i<10;i++){	
       for(j=0;j<tslices;j++){
 	free(mcorrp[i][j]);
 	free(mcorra[i][j]);		
       }				
     }	
-    for(i=0;i<3;i++){
+    for(i=0;i<10;i++){
       free(mcorrp[i]);
       free(mcorra[i]);
     }

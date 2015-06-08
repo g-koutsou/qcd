@@ -227,11 +227,18 @@ char *particle_names[61] = {
   "xistarminus_extra22",
 };
 
-char *meson_names[4] = {
+char *meson_names[11] = {
   "dummy",
   "pion",
   "kaon",
-  "Dmeson"
+  "Dmeson",
+  "a0",
+  "rho_1",
+  "rho_2",
+  "rho_3",
+  "a1_1",
+  "a1_2",
+  "a1_3"
 };
 
 //------------------------------------------------------------------

@@ -20,7 +20,7 @@ TARGETS=b_minus_Dx\
 	rms\
 	source_block\
 	threep_all_opt\
-	twop_all_opt\
+	twop_all_hadr\
 	twop-nucleons\
 	twop-hadr\
 	threep-block\
