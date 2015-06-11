@@ -227,7 +227,7 @@ char *particle_names[61] = {
   "xistarminus_extra22",
 };
 
-char *meson_names[11] = {
+char *meson_names[20] = {
   "dummy",
   "pion",
   "kaon",
@@ -238,7 +238,16 @@ char *meson_names[11] = {
   "rho_3",
   "a1_1",
   "a1_2",
-  "a1_3"
+  "a1_3",
+  "Kstar_1",
+  "Kstar_2",
+  "Kstar_3",
+  "Dstar_1",
+  "Dstar_2",
+  "Dstar_3",
+  "K1_1",
+  "K1_2",
+  "K1_3"
 };
 
 //------------------------------------------------------------------
