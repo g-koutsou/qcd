@@ -1,0 +1,6 @@
+AR=ar
+RANLIB=ranlib
+CC=mpicc -std=c99
+CFLAGS=-O3 -I$(HOME)/install/include -qopenmp -fp-model strict -I./ -I$(HOME)/install/include/ -DINLINE="static inline"
+LDFLAGS=-L$(HOME)/install/lib
+LIBS=-llime -lgslcblas -lgsl -lxml2 -lm -openmp
