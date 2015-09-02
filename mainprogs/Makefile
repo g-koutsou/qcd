@@ -19,13 +19,14 @@ TARGETS=b_minus_Dx\
 	zfac\
 	rms\
 	source_block\
-	threep_all_opt\
+	threep_all_baryon\
 	twop_all_hadr\
 	twop-nucleons\
 	twop-hadr\
 	threep-block\
 	twop-block\
-        zfac_NEW_format
+        zfac_NEW_format\
+	test_projectors
 
 
 LIBDIR = ../lib

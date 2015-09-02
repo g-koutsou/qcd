@@ -44,9 +44,10 @@ int qcd_projector_3pt_spin12(qcd_complex_16 *block[5], qcd_complex_16 *block_pr[
 int qcd_projector_pr32_3pt_spin32(qcd_complex_16 *block[5], qcd_complex_16 *block_pr[9][4][4], 
 				  qcd_complex_16 gamma12[4][4], qcd_complex_16 gamma13[4][4], qcd_complex_16 gamma23[4][4], qcd_geometry *geo){
 	
-  qcd_uint_2 al,be,ga,j,i,prid,proj;
+  qcd_uint_2 al,be,ga,de,j,i,k,i1,i2,prid,proj;
   qcd_uint_4 lx,ly,lz,v,v3;
   qcd_complex_16 Pr32[9][4][4],delta;
+  qcd_complex_16 Fin_proj[5][4][4][3][3];
   qcd_real_8 fac = 1.0/3.0;
   qcd_complex_16 cfac;
 
@@ -70,7 +71,6 @@ int qcd_projector_pr32_3pt_spin32(qcd_complex_16 *block[5], qcd_complex_16 *bloc
     Pr32[8][al][al] = qcd_CSUB(delta,cfac); // Pr_33
   }
 
-
   // Define the rest elements
   delta = (qcd_complex_16) {0.0,0.0};
   for(al=0;al<4;al++){
@@ -85,38 +85,85 @@ int qcd_projector_pr32_3pt_spin32(qcd_complex_16 *block[5], qcd_complex_16 *bloc
     }
   }
 
+  /* //- Print the projector to 3/2 */
+  /* for(i=0;i<3;i++){ */
+  /*   for(j=0;j<3;j++){ */
+  /*     for(al=0;al<4;al++){ */
+  /* 	for(be=0;be<4;be++){ */
+  /* 	  i1 = j+3*i; */
+  /* 	  printf("Pr %d %d %d %d = %lf %lf\n",al+1,be+1,i+1,j+1,Pr32[i1][al][be].re,Pr32[i1][al][be].im); */
+  /* 	} */
+  /*     } */
+  /*   } */
+  /* } */
 
-/*   for(j=0;j<9;j++){ */
-/*     for(al=0;al<4;al++){ */
-/*       for(be=0;be<4;be++){ */
-/* 	printf("Pr %d %d %d = %lf %lf\n",j,al,be,Pr32[j][al][be].re,Pr32[j][al][be].im); */
-/*       } */
-/*     } */
-/*   } */
 
+  //- Print the unprojected 3pt-function
+  /* v3=0; */
+  /* for(i=0;i<3;i++){ */
+  /*   for(j=0;j<3;j++){ */
+  /*     for(al=0;al<4;al++){ */
+  /* 	for(be=0;be<4;be++){ */
+  /* 	  i1 = j+3*i; */
+  /* 	  printf("Rank %d: 3pt_unproj[v=%d] %d %d %d %d = %+e %+e\n",geo->myid,v3,al+1,be+1,i+1,j+1,block_pr[i1][al][be][v3].re,block_pr[i1][al][be][v3].im); */
+  /* 	} */
+  /*     } */
+  /*   } */
+  /* } */
 
+  //-Define the projector 
   for(prid=0;prid<5;prid++){
     proj = projlist[prid];
 
+    for(al=0;al<4;al++){
+      for(de=0;de<4;de++){
+  	for(k=0;k<3;k++){
+  	  for(j=0;j<3;j++){
+  	    Fin_proj[prid][al][de][k][j] = (qcd_complex_16) {0.0,0.0};
+
+  	    for(i=0;i<3;i++){
+  	      i1 = i+3*k;
+  	      i2 = j+3*i;
+  	      for(be=0;be<4;be++){
+  		for(ga=0;ga<4;ga++){
+
+  		  Fin_proj[prid][al][de][k][j] = qcd_CADD(Fin_proj[prid][al][de][k][j],qcd_CMUL(Pr32[i1][al][be],qcd_CMUL(PROJECTOR[proj][be][ga],Pr32[i2][ga][de])));
+
+  		}//-ga
+  	      }//-be
+  	    }//-i
+  	  }//-j
+  	}//-k
+      }//-de
+    }//-al
+  }//-prid
+
+  //-Project
+  for(prid=0;prid<5;prid++){
+    proj = projlist[prid];
     for(lx=0; lx<geo->lL[1]; lx++)
       for(ly=0; ly<geo->lL[2]; ly++)
 	for(lz=0; lz<geo->lL[3]; lz++){
 	    v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
 
-	    for(j=0;j<9;j++){
-	      i = ( (j < 8) ? (j*3)%8 : j );
+	    for(k=0;k<3;k++){
+	      for(j=0;j<3;j++){
+		i2 = k+j*3;
+		for(al=0;al<4;al++){
+		  for(de=0;de<4;de++){
+		    block[prid][v3] = qcd_CADD(block[prid][v3],qcd_CMUL(Fin_proj[prid][al][de][k][j],block_pr[i2][de][al][v3]));
+		  }//-de
+		}//-al
+	      }//-k
+	    }//-j
+	}//-volume	
+  }//-prid	    
 
-	      for(al=0;al<4;al++){
-		for(be=0;be<4;be++){
-		  for(ga=0;ga<4;ga++){
-
-		    block[prid][v3] = qcd_CADD(block[prid][v3],qcd_CMUL(Pr32[j][al][be],qcd_CMUL(PROJECTOR[proj][be][ga],block_pr[i][ga][al][v3])));
-		  }
-		}
-	      }
-	    }
-	}
-  }		    
+  //- Print the projected 3pt-function
+  /* v3=0; */
+  /* printf("Rank %d: 3pt_g5g1[v=%d] = %+e %+e\n",geo->myid,v3,block[4][v3].re,block[4][v3].im); */
+  /* printf("Rank %d: 3pt_g5g2[v=%d] = %+e %+e\n",geo->myid,v3,block[3][v3].re,block[3][v3].im); */
+  /* printf("Rank %d: 3pt_g5g3[v=%d] = %+e %+e\n",geo->myid,v3,block[1][v3].re,block[1][v3].im); */
 
   return (1);
 } //-routine

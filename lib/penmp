@@ -1,0 +1,16 @@
+qcd_smearing.o: qcd_smearing.c \
+ /usr/local/software/jureca/Stage2/software/Toolchain/GCC/5.1.0/psmpi/5.1.4-1/include/mpi.h \
+ /usr/local/software/jureca/Stage2/software/Toolchain/GCC/5.1.0/psmpi/5.1.4-1/include/mpio.h \
+ /usr/local/software/jureca/Stage2/software/Toolchain/GCC/5.1.0/psmpi/5.1.4-1/include/mpi.h \
+ ../include/qcd.h /homec/ecy00/ecy005/install/include/gsl/gsl_rng.h \
+ /homec/ecy00/ecy005/install/include/gsl/gsl_types.h \
+ /homec/ecy00/ecy005/install/include/gsl/gsl_errno.h \
+ /homec/ecy00/ecy005/install/include/gsl/gsl_inline.h \
+ ../include/qcd_gamma.h ../include/qcd_communication.h \
+ ../include/qcd_blas.h ../include/qcd_io.h ../include/qcd_smearing.h \
+ ../include/qcd_gaugeFixing.h ../include/qcd_wilson.h \
+ ../include/qcd_observables.h ../include/qcd_stochastic.h \
+ ../include/qcd_rng.h ../include/qcd_particle_data.h \
+ ../include/qcd_contract_3pt_all.h ../include/qcd_contract_2pt.h \
+ ../include/qcd_contract_2pt_pr.h ../include/qcd_currents_udsc.h \
+ ../include/qcd_smearing_opt.h
