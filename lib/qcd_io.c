@@ -370,7 +370,7 @@ int qcd_getGaugeLime(char *fname, qcd_gaugeField *u)
       }
       MPI_File_read_all(mpifid, buffer, 4*3*3*2*u->geo->lV, MPI_FLOAT, &status);
       if(!qcd_isBigEndian())      
-	qcd_swap_4((float*) buffer,(size_t)(2*4*3*3)*(size_t)u->geo->lV3);
+	qcd_swap_4((float*) buffer,(size_t)(2*4*3*3)*(size_t)u->geo->lV);
       
       for(t=0; t<u->geo->lL[0];t++)
       for(z=0; z<u->geo->lL[3];z++)
