@@ -1,0 +1,6 @@
+AR=ar
+RANLIB=ranlib
+CC=cc -std=c99
+CFLAGS=-O3 -openmp -unroll-aggressive -opt-prefetch -finline-functions -I./ -I$(HOME)/install/include/
+LDFLAGS=-L$(HOME)/install/lib
+LIBS=-llime -lgslcblas -lgsl -lxml2 -lm -openmp

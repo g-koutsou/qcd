@@ -270,3 +270,78 @@ int qcd_apeSmear3d(qcd_gaugeField *apeu, qcd_gaugeField *u, qcd_real_8 alpha)
    qcd_destroyPropagator(&edge);
    return(0);
 }//end qcd_apeSmear3d
+
+
+
+
+/* C. Kallidonis 
+ * perform 1 iteration of 4d APE-smearing 
+ * with parameter alpha.
+ *
+ * u -> SU3-projection( u + alpha * sum of staples)
+ */
+int qcd_apeSmear4d(qcd_gaugeField *apeu, qcd_gaugeField *u, qcd_real_8 alpha)
+{
+   qcd_propagator edge;
+   qcd_complex_16 stapleForward[3][3];
+   qcd_complex_16 stapleBackward[3][3];
+   qcd_uint_2 mu,nu,c1,c2;
+   qcd_uint_4 l;
+   qcd_complex_16 tmp[3][3];
+
+   qcd_initPropagator(&edge,u->geo); // store edges in a propagator-structure. 
+
+   /* since staples need next-to-nearest neighbors like U(x+mu-nu), this is done in 2 steps
+      a) communicate U & calculate edges U_mu(x)U_nu(x+mu)
+      b) communicate edges and put them together to staples.
+   */
+   
+   qcd_communicateGaugePM(u);
+   qcd_zeroGaugeField(apeu);   
+   qcd_waitall(u->geo);
+
+   for(mu=0; mu<4; mu++)
+   for(nu=0;nu<4; nu++)
+   if(mu!=nu)   
+   for(l=0;l<u->geo->lV;l++)
+   {
+      qcd_MUL3x3(edge.D[l][mu][nu], u->D[l][mu], u->D[u->geo->plus[l][mu]][nu]);
+   }
+   
+   qcd_communicatePropagatorP(&edge);
+
+   //the forward staple doesn't need the edges
+   for(mu=0; mu<4; mu++)
+   for(nu=0;nu<4; nu++)
+   if(mu!=nu)
+   for(l=0;l<u->geo->lV;l++)
+   {
+      qcd_MUL3x3(tmp, u->D[l][nu],u->D[u->geo->plus[l][nu]][mu]);
+      qcd_MULADJOINT3x3(stapleForward, tmp, u->D[u->geo->plus[l][mu]][nu]);
+      for(c1=0;c1<3;c1++)
+      for(c2=0;c2<3;c2++)
+         apeu->D[l][mu][c1][c2] = qcd_CADD(apeu->D[l][mu][c1][c2],stapleForward[c1][c2]);
+   }   
+   
+   qcd_waitall(u->geo);
+   
+   for(mu=0; mu<4; mu++)
+   for(nu=0;nu<4; nu++)
+   if(mu!=nu)
+   for(l=0;l<u->geo->lV;l++)
+   {
+      qcd_ADJOINTMUL3x3(stapleBackward, u->D[u->geo->minus[l][nu]][nu], edge.D[u->geo->minus[l][nu]][mu][nu]);
+      for(c1=0;c1<3;c1++)
+      for(c2=0;c2<3;c2++)
+         apeu->D[l][mu][c1][c2] = qcd_CADD(apeu->D[l][mu][c1][c2],stapleBackward[c1][c2]);
+   }
+   
+   
+   qcd_scaleGaugeField(apeu,alpha);
+   qcd_addGaugeField(apeu,u,apeu);
+   
+   qcd_projectSU3(apeu);
+   
+   qcd_destroyPropagator(&edge);
+   return(0);
+}//end qcd_apeSmear4d

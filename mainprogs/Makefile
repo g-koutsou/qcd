@@ -26,6 +26,7 @@ TARGETS=b_minus_Dx\
 	threep-block\
 	twop-block\
         zfac_NEW_format\
+	smear_APE4D\
 	test_projectors
 
 
