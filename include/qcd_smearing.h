@@ -39,5 +39,6 @@
 int qcd_gaussIteration3d(qcd_vector *v, qcd_gaugeField *u, qcd_real_8 alpha, qcd_uint_4 t);
 int qcd_gaussIteration3dAll(qcd_vector *v, qcd_gaugeField *u, qcd_real_8 alpha, qcd_uint_2 gaugeCom);
 int qcd_apeSmear3d(qcd_gaugeField *apeu, qcd_gaugeField *u, qcd_real_8 alpha);
+int qcd_apeSmear4d(qcd_gaugeField *apeu, qcd_gaugeField *u, qcd_real_8 alpha);
 
 #endif 

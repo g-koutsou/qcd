@@ -4,8 +4,10 @@ TARGETS=b_minus_Dx\
 	invert\
 	landau\
 	seq_source_dd\
+	seq_source_dd_multiple_tsink\
 	seq_source_dd_idris\
 	seq_source_uu\
+	seq_source_uu_multiple_tsink\
 	seq_source_uu_idris\
 	seq_source_fix_curr\
 	source\
@@ -17,13 +19,15 @@ TARGETS=b_minus_Dx\
 	zfac\
 	rms\
 	source_block\
-	threep_all_opt\
-	twop_all_opt\
+	threep_all_baryon\
+	twop_all_hadr\
 	twop-nucleons\
 	twop-hadr\
 	threep-block\
 	twop-block\
-        zfac_NEW_format
+        zfac_NEW_format\
+	smear_APE4D\
+	test_projectors
 
 
 LIBDIR = ../lib

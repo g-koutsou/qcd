@@ -9,10 +9,10 @@
 #ifndef H_QCD_PARTICLE_DATA
 #define H_QCD_PARTICLE_DATA 1
 
-extern char *particles_parts[53][4];
-extern int particles_pnum[53][4];
-extern char *particle_names[53];
-extern char *meson_names[4];
-extern int particles32[53];
+extern char *particles_parts[61][4];
+extern int particles_pnum[61][4];
+extern char *particle_names[61];
+extern char *meson_names[20];
+extern int particles32[61];
 
 #endif

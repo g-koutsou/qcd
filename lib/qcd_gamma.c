@@ -453,4 +453,20 @@ void qcd_gamma5Propagator(qcd_propagator *p)
       p->D[l][3][mu][c1][c2].re = -p->D[l][3][mu][c1][c2].re;
       p->D[l][3][mu][c1][c2].im = -p->D[l][3][mu][c1][c2].im;
    }
-}//end qcd_gamma5Vector 
+}//end qcd_gamma5Propagator
+
+void qcd_Propagatorgamma5(qcd_propagator *p)
+{
+   qcd_uint_8 l;
+   qcd_uint_2 c1,c2,mu;
+   for(l=0; l<p->geo->lV; l++)
+   for(mu=0; mu<4; mu++)
+   for(c1=0; c1<3; c1++)
+   for(c2=0; c2<3; c2++)
+   {
+      p->D[l][mu][2][c1][c2].re = -p->D[l][mu][2][c1][c2].re;
+      p->D[l][mu][2][c1][c2].im = -p->D[l][mu][2][c1][c2].im;
+      p->D[l][mu][3][c1][c2].re = -p->D[l][mu][3][c1][c2].re;
+      p->D[l][mu][3][c1][c2].im = -p->D[l][mu][3][c1][c2].im;
+   }
+}//end qcd_gamma5Propagator

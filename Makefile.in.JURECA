@@ -1,0 +1,6 @@
+AR=ar
+RANLIB=ranlib
+CC=mpicc -std=c99
+CFLAGS=-O3 -I$(HOME)/install_gnu/include -fopenmp -I./ -I$(HOME)/install_gnu/include -DINLINE="static inline"
+LDFLAGS=-L$(HOME)/install_gnu/lib
+LIBS=-llime -lgslcblas -lgsl -lxml2 -lm -openmp
