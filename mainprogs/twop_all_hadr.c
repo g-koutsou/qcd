@@ -838,11 +838,12 @@ int main(int argc,char* argv[])
 
 #pragma omp parallel for private(lz,ly,lx,v,mu,nu,c1,c2,ku,lu,c3p)
 	for(v3=0; v3<lv3; v3++) {
-	  lz = v3 % geo.lL[3];
-	  ly = ((v3 - lz)/geo.lL[3]) % geo.lL[2];
-	  lx = ((v3 - lz)/geo.lL[3] - ly) / geo.lL[2];
-	  v =  qcd_LEXIC(lt,lx,ly,lz,geo.lL);
-	
+/* 	  lz = v3 % geo.lL[3]; */
+/* 	  ly = ((v3 - lz)/geo.lL[3]) % geo.lL[2]; */
+/* 	  lx = ((v3 - lz)/geo.lL[3] - ly) / geo.lL[2]; */
+/*	  v =  qcd_LEXIC(lt,lx,ly,lz,geo.lL); */
+	  v = lt + v3*geo.lL[0];
+
 	  for(mu=0;mu<4;mu++){
 	    for(nu=0;nu<4;nu++){
 	      for(c1=0;c1<3;c1++){

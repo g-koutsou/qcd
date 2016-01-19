@@ -32,7 +32,7 @@ int qcd_projector_3pt_spin12(qcd_complex_16 *block[5], qcd_complex_16 *block_pr[
 	  
 	  for(ga =0; ga <4; ga ++) 
 	    for(gap=0; gap<4; gap++)	
-		block[prid][v3] = qcd_CADD( block[prid][v3],qcd_CMUL(PROJECTOR[proj][ga][gap],block_pr[8][gap][ga][v3]) );
+	      block[prid][v3] = qcd_CADD( block[prid][v3],qcd_CMUL(PROJECTOR[proj][ga][gap],block_pr[8][gap][ga][v3]) );
 
 	}//-space
   }//-prid
@@ -144,18 +144,18 @@ int qcd_projector_pr32_3pt_spin32(qcd_complex_16 *block[5], qcd_complex_16 *bloc
     for(lx=0; lx<geo->lL[1]; lx++)
       for(ly=0; ly<geo->lL[2]; ly++)
 	for(lz=0; lz<geo->lL[3]; lz++){
-	    v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
+	  v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
 
-	    for(k=0;k<3;k++){
-	      for(j=0;j<3;j++){
-		i2 = k+j*3;
-		for(al=0;al<4;al++){
-		  for(de=0;de<4;de++){
-		    block[prid][v3] = qcd_CADD(block[prid][v3],qcd_CMUL(Fin_proj[prid][al][de][k][j],block_pr[i2][de][al][v3]));
-		  }//-de
-		}//-al
-	      }//-k
-	    }//-j
+	  for(k=0;k<3;k++){
+	    for(j=0;j<3;j++){
+	      i2 = k+j*3;
+	      for(al=0;al<4;al++){
+		for(de=0;de<4;de++){
+		  block[prid][v3] = qcd_CADD(block[prid][v3],qcd_CMUL(Fin_proj[prid][al][de][k][j],block_pr[i2][de][al][v3]));
+		}//-de
+	      }//-al
+	    }//-k
+	  }//-j
 	}//-volume	
   }//-prid	    
 
@@ -203,10 +203,11 @@ int qcd_f1f1f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 cg
 	      /*     for(lz=0; lz<geo->lL[3]; lz++){ */
 	      //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
 	      //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-	      lz = v3 % geo->lL[3];
-	      ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-	      lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-	      v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+/* 	      lz = v3 % geo->lL[3]; */
+/* 	      ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/* 	      lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/* 	      v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+	      v = lt + v3*geo->lL[0];
 
 	      block[elem][ga][gap][v3] = qcd_CSUB(block[elem][ga][gap][v3],qcd_CSCALE(
 										      qcd_CMUL(cgcg_val[ctr2],
@@ -383,10 +384,11 @@ int qcd_f1f2f1_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16
 	      /*     for(lz=0; lz<geo->lL[3]; lz++){ */
 	      //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
 	      //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-	      lz = v3 % geo->lL[3];
-	      ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-	      lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-	      v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+/* 	      lz = v3 % geo->lL[3]; */
+/* 	      ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/* 	      lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/* 	      v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+	      v = lt + v3*geo->lL[0];
 
 	      block[elem][ga][gap][v3] = qcd_CADD(block[elem][ga][gap][v3],qcd_CSCALE(
 										      qcd_CMUL(cgcg_val[ctr2],
@@ -467,10 +469,11 @@ int qcd_pnextra_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_1
 		  /*     for(lz=0; lz<geo->lL[3]; lz++){ */
 		  //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
 		  //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-		  lz = v3 % geo->lL[3];
-		  ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-		  lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-		  v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+/* 		  lz = v3 % geo->lL[3]; */
+/* 		  ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/* 		  lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/* 		  v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+		  v = lt + v3*geo->lL[0];
 
 		  block[elem][de][dep][v3] = qcd_CADD(block[elem][de][dep][v3],qcd_CMUL(
 											qcd_CMUL(cgcg_val[ctr2],
@@ -545,10 +548,11 @@ int qcd_f1f2f1_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16
 	      /*     for(lz=0; lz<geo->lL[3]; lz++){ */
 	      //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
 	      //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-	      lz = v3 % geo->lL[3];
-	      ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-	      lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-	      v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+/* 	      lz = v3 % geo->lL[3]; */
+/* 	      ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/* 	      lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/* 	      v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+	      v = lt + v3*geo->lL[0];
 
 	      block[elem][ga][gap][v3] = qcd_CADD(block[elem][ga][gap][v3],qcd_CSCALE(
 										      qcd_CMUL(cgcg_val[ctr2],
@@ -616,10 +620,11 @@ int qcd_pnextra_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_1
 		  /*     for(lz=0; lz<geo->lL[3]; lz++){ */
 		  //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
 		  //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-		  lz = v3 % geo->lL[3];
-		  ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-		  lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-		  v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+/* 		  lz = v3 % geo->lL[3]; */
+/* 		  ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/* 		  lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/* 		  v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+		  v = lt + v3*geo->lL[0];
 
 		  block[elem][de][dep][v3] = qcd_CADD(block[elem][de][dep][v3],qcd_CMUL(
 											qcd_CMUL(cgcg_val[ctr2],
@@ -663,11 +668,11 @@ int qcd_deltas_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 	
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -812,7 +817,7 @@ int qcd_deltas_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16
 //======================================================================
 
 int qcd_xistar_extra11_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 cgcg_val[16*16], qcd_complex_16 *block[9][4][4],
-		      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf1, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
+			      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf1, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
 							
   qcd_int_4 ctr2;
   qcd_uint_2 a,b,c,ap,bp,cp,al,be,ga,alp,bep,gap,cc1,cc2;
@@ -826,11 +831,11 @@ int qcd_xistar_extra11_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_co
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 	
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -892,7 +897,7 @@ int qcd_xistar_extra11_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_co
 
 
 int qcd_xistar_extra12_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 cgcg_val[16*16], qcd_complex_16 *block[9][4][4],
-		      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf1, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
+			      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf1, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
 							
   qcd_int_4 ctr2;
   qcd_uint_2 a,b,c,ap,bp,cp,al,be,ga,alp,bep,gap,cc1,cc2;
@@ -906,11 +911,11 @@ int qcd_xistar_extra12_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_co
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 	
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -972,7 +977,7 @@ int qcd_xistar_extra12_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_co
 
 
 int qcd_xistar_extra21_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 cgcg_val[16*16], qcd_complex_16 *block[9][4][4],
-		      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf1, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
+			      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf1, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
 							
   qcd_int_4 ctr2;
   qcd_uint_2 a,b,c,ap,bp,cp,al,be,ga,alp,bep,gap,cc1,cc2;
@@ -986,11 +991,11 @@ int qcd_xistar_extra21_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_co
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 	
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -1051,7 +1056,7 @@ int qcd_xistar_extra21_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_co
 //======================================================================
 
 int qcd_xistar_extra22_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 cgcg_val[16*16], qcd_complex_16 *block[9][4][4],
-		      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf1, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
+			      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf1, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
 							
   qcd_int_4 ctr2;
   qcd_uint_2 a,b,c,ap,bp,cp,al,be,ga,alp,bep,gap,cc1,cc2;
@@ -1065,11 +1070,11 @@ int qcd_xistar_extra22_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_co
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 	
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -1144,11 +1149,11 @@ int qcd_deltas_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 	
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -1241,7 +1246,7 @@ int qcd_deltas_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16
 //======================================================================
 
 int qcd_xistar_extra11_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 cgcg_val[16*16], qcd_complex_16 *block[9][4][4],
-		      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf2, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
+			      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf2, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
 							
   qcd_int_4 ctr2;
   qcd_uint_2 a,b,c,ap,bp,cp,al,be,ga,alp,bep,gap,cc1,cc2;
@@ -1255,11 +1260,11 @@ int qcd_xistar_extra11_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_co
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 	
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -1307,7 +1312,7 @@ int qcd_xistar_extra11_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_co
 //======================================================================
 
 int qcd_xistar_extra12_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 cgcg_val[16*16], qcd_complex_16 *block[9][4][4],
-		      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf2, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
+			      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf2, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
 							
   qcd_int_4 ctr2;
   qcd_uint_2 a,b,c,ap,bp,cp,al,be,ga,alp,bep,gap,cc1,cc2;
@@ -1321,11 +1326,11 @@ int qcd_xistar_extra12_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_co
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 	
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -1373,7 +1378,7 @@ int qcd_xistar_extra12_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_co
 //======================================================================
 
 int qcd_xistar_extra21_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 cgcg_val[16*16], qcd_complex_16 *block[9][4][4],
-		      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf2, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
+			      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf2, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
 							
   qcd_int_4 ctr2;
   qcd_uint_2 a,b,c,ap,bp,cp,al,be,ga,alp,bep,gap,cc1,cc2;
@@ -1387,11 +1392,11 @@ int qcd_xistar_extra21_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_co
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 	
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -1439,7 +1444,7 @@ int qcd_xistar_extra21_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_co
 //======================================================================
 
 int qcd_xistar_extra22_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 cgcg_val[16*16], qcd_complex_16 *block[9][4][4],
-		      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf2, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
+			      qcd_propagator *propf1, qcd_propagator *propf2, qcd_propagator *seqpropf2, qcd_geometry *geo, qcd_uint_4 lt, qcd_uint_4 elem){
 							
   qcd_int_4 ctr2;
   qcd_uint_2 a,b,c,ap,bp,cp,al,be,ga,alp,bep,gap,cc1,cc2;
@@ -1453,11 +1458,11 @@ int qcd_xistar_extra22_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_co
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 	
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -1519,11 +1524,11 @@ int qcd_f123f321_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 	
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -1599,11 +1604,11 @@ int qcd_f123f321_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 	
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -1679,11 +1684,11 @@ int qcd_f123f321_f3_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 	
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -1777,10 +1782,11 @@ int qcd_f1f2f3_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_16 cg
 	      /*     for(lz=0; lz<geo->lL[3]; lz++){ */
 	      //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
 	      //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-	      lz = v3 % geo->lL[3];
-	      ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-	      lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-	      v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+/* 	      lz = v3 % geo->lL[3]; */
+/* 	      ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/* 	      lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/* 	      v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+	      v = lt + v3*geo->lL[0];
 
 	      block[elem][ga][gap][v3] = qcd_CADD(block[elem][ga][gap][v3],qcd_CSCALE(
 										      qcd_CMUL(cgcg_val[ctr2],
@@ -1814,11 +1820,11 @@ int qcd_sigmas4_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_1
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -1978,11 +1984,11 @@ int qcd_sigmas4_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_1
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);	
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);	 */
+    v = lt + v3*geo->lL[0];
 
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -2086,11 +2092,11 @@ int qcd_lambdas_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_1
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -2200,11 +2206,11 @@ int qcd_lambdas_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_1
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);	
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);	 */
+    v = lt + v3*geo->lL[0];
 
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -2314,11 +2320,11 @@ int qcd_lambdas_f3_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_1
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);	
-
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);	 */
+    v = lt + v3*geo->lL[0];
 
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){
@@ -2432,10 +2438,11 @@ int qcd_sigmas2_f1_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_1
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){         
@@ -2550,10 +2557,11 @@ int qcd_sigmas2_f2_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_1
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){         
@@ -2668,10 +2676,11 @@ int qcd_sigmas2_f3_3pt(qcd_int_4 ctr, qcd_int_2 cgcg_ind[16*16][4],qcd_complex_1
     /*     for(lz=0; lz<geo->lL[3]; lz++){ */
     //v3 = qcd_LEXIC0(lx,ly,lz,geo->lL);
     //qcd_LEXIC(lt,lx,ly,lz,geo->lL);
-    lz = v3 % geo->lL[3];
-    ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2];
-    lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2];
-    v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL);
+/*     lz = v3 % geo->lL[3]; */
+/*     ly = ((v3 - lz)/geo->lL[3]) % geo->lL[2]; */
+/*     lx = ((v3 - lz)/geo->lL[3] - ly) / geo->lL[2]; */
+/*     v =  qcd_LEXIC(lt,lx,ly,lz,geo->lL); */
+    v = lt + v3*geo->lL[0];
 
     for(ga =0; ga <4; ga ++) 
       for(gap=0; gap<4; gap++){         
