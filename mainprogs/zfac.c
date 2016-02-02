@@ -15,7 +15,7 @@
  *
  * Tomasz Korzec 2009
  ************************************************************************/
- 
+
  
 #include <stdlib.h>
 #include <stdio.h>
@@ -24,25 +24,154 @@
 #include <mpi.h>
 #include <qcd.h>
 
+/*
+ * Convenience wrapper function for shifting propagators
+ */
+qcd_propagator
+shiftProp(qcd_propagator p, int mu)
+{
+  qcd_propagator q;
+  int i = qcd_initPropagator(&q, p.geo);
+  if(i != 0) {
+    fprintf(stderr, " Error in qcd_initPropagator()\n");
+    exit(1);
+  }
+  if(mu < 4)
+    qcd_shiftPropagatorM(&q, &p, mu);
+  else
+    qcd_shiftPropagatorP(&q, &p, mu-4);
+
+  return q;
+}
+
+/*
+ * Convenience wrapper function for shifting gauge links
+ */
+qcd_gaugeField
+shiftLinks(qcd_gaugeField u, int mu)
+{
+  qcd_gaugeField v;
+  int i = qcd_initGaugeField(&v, u.geo);
+  if(i != 0) {
+    fprintf(stderr, " Error in qcd_initGaugeField()\n");
+    exit(1);
+  }
+  if(mu < 4)
+    qcd_shiftGaugeM(&v, &u, mu);
+  else
+    qcd_shiftGaugeP(&v, &u, mu-4);
+
+  return v;
+}
+
+/*
+ * Convenience function. Given a gauge field u, will return an array
+ * of two gauge fields g[2], with g[0] the original, and g[1]
+ * corresponding to:
+ *
+ * g[1].D[v][mu] = conj(g[0].D[v-mu][mu]), 
+ *
+ * in other words g[0] holds the forwards links, g[1] holds the
+ * backwards links.
+ *
+ */
+qcd_gaugeField *
+getGaugeFieldFwdBwd(qcd_gaugeField u)
+{
+  qcd_gaugeField *g = malloc(sizeof(qcd_gaugeField)*2);
+  qcd_initGaugeField(&g[0], u.geo);
+  qcd_initGaugeField(&g[1], u.geo);
+
+  qcd_copyGaugeField(&g[0], &u);
+  for(int mu=0; mu<4; mu++)
+    {
+      qcd_gaugeField v = shiftLinks(u, mu+4);
+      for(int l=0; l<u.geo->lV; l++)
+	{
+	  qcd_copy3x3(g[1].D[l][mu], v.D[l][mu]);
+	  qcd_dagger3x3(g[1].D[l][mu]);
+	}
+      qcd_destroyGaugeField(&v);
+    }
+  return g;
+}
+
+/*
+ * Convenience wrapper function for creating a field of links from a
+ * product of gauge fields:
+ *
+ * w[:V, :NC, :NC] = \sum_{col} u[:V, mu, :NC, col] * v[:V, nu, col, :NC]
+ *
+ * in other words, select the `mu` direction of u[] and the `nu`
+ * direction of v[] and take the product and put into w[].
+ */
+qcd_gaugeTransformation
+mulLinks(qcd_gaugeField u, qcd_gaugeField v, int mu, int nu)
+{
+  qcd_gaugeTransformation w;
+  qcd_initGaugeTransformation(&w, u.geo);
+  for(int l=0; l<u.geo->lV; l++)
+    qcd_MUL3x3(w.D[l], u.D[l][mu], v.D[l][nu]);
+      
+  return w;
+}
+
+/*
+ * Convenience function for scaling one time-slice of a propagator by
+ * a real number. Used for implementing boundary conditions.
+ */
+void
+scale_prop_tslice(qcd_propagator prop, int tslice, qcd_real_8 scale)
+{
+  qcd_geometry *geo = prop.geo;
+  /* Global time-slice of this process' starting time-slice */
+  int t0 = geo->Pos[0]*geo->lL[0];
+  /* Global time-slice of this process' ending time-slice */
+  int t1 = (geo->Pos[0]+1)*geo->lL[0];
+  /* If tslice to be scaled belongs to this process */
+  if(tslice >= t0 && tslice < t1)    
+    {
+      /* Local time-slice to be scaled */
+      int t = tslice % geo->lL[0];
+      for(int x=0; x<geo->lL[1]; x++)
+	for(int y=0; y<geo->lL[2]; y++)
+	  for(int z=0; z<geo->lL[3]; z++)
+	    {
+	      int i = qcd_LEXIC(t,x,y,z,geo->lL);
+	      for(int mu=0; mu<4; mu++)
+		for(int nu=0; nu<4; nu++)
+		  for(int c0=0; c0<3; c0++)
+		    for(int c1=0; c1<3; c1++)
+		      {
+			prop.D[i][mu][nu][c0][c1].re *= scale;
+			prop.D[i][mu][nu][c0][c1].im *= scale;
+		      }
+	    }
+    }
+  /* Ensuring all processes exit this function at the same time may be
+     useful in debugging */
+  MPI_Barrier(MPI_COMM_WORLD);
+  return;
+}
 
 int main(int argc,char* argv[])
 {
-   qcd_uint_2 mu,nu,rho,ku,lu,c1,c2;          // various loop variables
+   qcd_uint_2 mu,nu,rho,tau,ku,lu,c1,c2;          // various loop variables
    qcd_uint_4 i,j,k,lt,x,y,z,t,ip1,im1; 
    qcd_uint_2 id1,id2,id3,id4;
    qcd_uint_2 ic1,ic2,ic3,ic4;                    
    qcd_real_8 tmp;                            // general purpuse
    qcd_uint_2 xx[4];
-   int faciip1, faciim1;                      // factors related to b.c.
   
-   FILE *fp_vfun_v = NULL, *fp_vfun_a = NULL;   // output files
-   FILE *fp_vfun_s = NULL, *fp_vfun_p = NULL;
-   FILE *fp_vfun_t = NULL, *fp_vfun_vD = NULL, *fp_vfun_aD = NULL;
-   FILE *fp_vfun_tD = NULL, *fp_vfun_d1 = NULL;
-   FILE *fp_pprop = NULL;      
+   FILE *fp_vfun_v, *fp_vfun_a;   // output files
+   FILE *fp_vfun_s, *fp_vfun_p;
+   FILE *fp_vfun_t, *fp_vfun_vD, *fp_vfun_aD;
+   FILE *fp_vfun_tD, *fp_vfun_d1;
+   FILE *fp_vfun_vDD;
+   FILE *fp_pprop;      
   
    int params_len;               // needed to read inputfiles
-   char *params = NULL;                 // needed to read inputfiles
+   char *params;                 // needed to read inputfiles
 
    char gauge_name[qcd_MAX_STRING_LENGTH];      // name of gauge-configuration file
    char vfun_s_name[qcd_MAX_STRING_LENGTH];     // output file name, local scalar density vertex function
@@ -54,6 +183,7 @@ int main(int argc,char* argv[])
    char vfun_aD_name[qcd_MAX_STRING_LENGTH];    // output file name, 1 derivative axial operator vertex function
    char vfun_tD_name[qcd_MAX_STRING_LENGTH];    // output file name, 1 derivative tensor operator vertex function
    char vfun_d1_name[qcd_MAX_STRING_LENGTH];    // output file name, 1 derivative d1 operator vertex function
+   char vfun_vDD_name[qcd_MAX_STRING_LENGTH];    // output file name, 2nd derivative vector operator vertex function
    char pprop_name[qcd_MAX_STRING_LENGTH];      // name of output file, momentum propagator
    
    char param_name[qcd_MAX_STRING_LENGTH];      // name of parameter file
@@ -81,6 +211,7 @@ int main(int argc,char* argv[])
    qcd_complex_16 vfun_tD[64][4][4][3][3];      // vertex function 1 derivative tensor operator
    qcd_complex_16 vfun_d1[16][4][4][3][3];      // vertex function 1 derivative d1 operator
    qcd_complex_16 vfun_tmp[64][4][4][3][3];     // temp variable
+   qcd_complex_16 vfun_vDD[64][4][4][3][3];      // vertex function 2nd derivative vector operator
    
    qcd_complex_16 lxr, lDmur[4];
    
@@ -191,6 +322,9 @@ int main(int argc,char* argv[])
    strcpy(vfun_d1_name,qcd_getParam("<vertex_function_d1_name>",params,params_len));
    if(myid==0) printf("Got output file name: %s\n",vfun_d1_name);
 
+   strcpy(vfun_vDD_name,qcd_getParam("<vertex_function_vectorDD_name>",params,params_len));
+   if(myid==0) printf("Got output file name: %s\n",vfun_vDD_name);
+
    strcpy(pprop_name,qcd_getParam("<pprop_name>",params,params_len));
    if(myid==0) printf("Got output file name: %s\n",pprop_name);
          
@@ -230,7 +364,7 @@ int main(int argc,char* argv[])
    qcd_communicateGaugePM(&u);
    
    // load propagator
-   if(qcd_getPropagator(prop_name,qcd_PROP_CMI, &prop)) exit(EXIT_FAILURE);
+   if(qcd_getPropagator(prop_name,qcd_PROP_LIME, &prop)) exit(EXIT_FAILURE);
    if(myid==0) printf("propagator loaded\n");   
    
    //################################################################################
@@ -326,6 +460,7 @@ int main(int argc,char* argv[])
       if( (fp_vfun_aD=fopen(vfun_aD_name,"w"))==NULL) j++;
       if( (fp_vfun_tD=fopen(vfun_tD_name,"w"))==NULL) j++;
       if( (fp_vfun_d1=fopen(vfun_d1_name,"w"))==NULL) j++;
+      if( (fp_vfun_vDD=fopen(vfun_vDD_name,"w"))==NULL) j++;
       if( (fp_pprop=fopen(pprop_name,"w"))==NULL) j++;
       if(j>0) fprintf(stderr,"Error while opening output files for writing!\n");
    }
@@ -367,6 +502,142 @@ int main(int argc,char* argv[])
    memset(&(vfun_aD[0][0][0][0][0].re),0,16*4*4*3*3*sizeof(qcd_complex_16));
    memset(&(vfun_tD[0][0][0][0][0].re),0,64*4*4*3*3*sizeof(qcd_complex_16));
    memset(&(vfun_d1[0][0][0][0][0].re),0,16*4*4*3*3*sizeof(qcd_complex_16));
+   memset(&(vfun_vDD[0][0][0][0][0].re),0,64*4*4*3*3*sizeof(qcd_complex_16));
+
+   qcd_gaugeField *u_fb;
+   u_fb = getGaugeFieldFwdBwd(u);
+
+   /*
+    * The following loop initialises u_mu_nu[][][][], which holds
+    * products of two links, e.g:
+    *
+    * u_mu_nu[0|1][mu][0|1][nu].D[v][:NC][:NC] is the gauge field at site
+    * "v" in forward|backwards direction "mu" times the gauge field at site
+    * "v+|-\hat{mu}" pointing in the forward|backwards direction "nu".
+    *
+    * Therefore we define the eight "L" shapes eminating from site "v"
+    * in each plane, and for 4-dimensions we have six planes, so times
+    * eight "L"s, in total 48 "L"s eminating from each site. 
+    *
+    * Alternatively, one can reach the same number of "L"s, by
+    * considering the full size of u_mu_nu: 2*4*2*4 = 64, minus the
+    * elements mu == nu, which are 16: 2*4*2, leading again to 48.
+    *
+    * There is indeed a lot of redundancy, of at least a factor of
+    * two, however this makes implementing the second derivative far
+    * simpler.
+    */
+   qcd_gaugeTransformation u_mu_nu[2][4][2][4];
+   for(int mu=0; mu<4; mu++)
+     for(int dir_mu=0; dir_mu<2; dir_mu++)
+       {
+	 int m = dir_mu*4 + mu;
+	 qcd_gaugeField v = shiftLinks(u, m);
+	 qcd_gaugeField *v_fb = getGaugeFieldFwdBwd(v);
+	 qcd_destroyGaugeField(&v);
+	 for(int nu=0; nu<4; nu++)
+	   for(int dir_nu=0; dir_nu<2; dir_nu++)
+	     {
+	       if(mu == nu)
+		 continue;
+
+	       u_mu_nu[dir_mu][mu][dir_nu][nu] = mulLinks(u_fb[dir_mu], v_fb[dir_nu], mu, nu);
+	       qcd_communicateTransformationPM(&u_mu_nu[dir_mu][mu][dir_nu][nu]);
+	       qcd_waitall(u_mu_nu[dir_mu][mu][dir_nu][nu].geo);
+	     }
+	 qcd_destroyGaugeField(&v_fb[0]);	 
+	 qcd_destroyGaugeField(&v_fb[1]);	 
+       }
+   
+   if(myid==0)
+     printf("gauge field \"L\"s computed\n");
+
+   qcd_propagator lprop_mu[8];		/* left-prop shifted by mu */
+   qcd_propagator rprop_mu[8];		/* right-prop shifted by mu */
+   qcd_propagator lprop_mu_nu[8][8];	/* left-prop shifted by mu and nu */
+   qcd_propagator rprop_mu_nu[8][8];	/* right-prop shifted by mu and nu */
+
+   for(int mu=0; mu<4; mu++)
+     for(int dir_mu=0; dir_mu<2; dir_mu++)
+       {
+	 int m = mu + dir_mu*4;
+	 lprop_mu[m] = shiftProp(lprop, m);
+	 rprop_mu[m] = shiftProp(rprop, m);
+	 for(int nu=mu+1; nu<4; nu++)
+	   for(int dir_nu=0; dir_nu<2; dir_nu++)
+	     {
+	       /*
+		* 1. For the second deriv, we need no diagonal elements [mu][mu]
+		* 2. For the fermions, [mu][nu] is equivalent to [nu][mu]
+		*/
+	       int n = nu + dir_nu*4;
+	       lprop_mu_nu[m][n] = shiftProp(lprop_mu[m], n);
+	       rprop_mu_nu[m][n] = shiftProp(rprop_mu[m], n);
+	     }
+	 for(int nu=0; nu<mu; nu++)
+	   for(int dir_nu=0; dir_nu<2; dir_nu++)
+	     {
+	       /*
+		* 1. For the second deriv, we need no diagonal elements [mu][mu]
+		* 2. For the fermions, [mu][nu] is equivalent to [nu][mu]
+		*/
+	       int n = nu + dir_nu*4;
+	       lprop_mu_nu[m][n] = lprop_mu_nu[n][m];
+	       rprop_mu_nu[m][n] = rprop_mu_nu[n][m];
+	     }	 
+       }
+
+   /*
+    * For shifts in mu == 0 or nu == 0, the antiperiodicity has to be
+    * taken into account. E.g.:
+    *
+    * prop_mu[0].D[t,:] = prop.D[t+\hat{0},:], meaning prop_mu[0].D[T-1,:] = -prop.D[0,:]
+    * prop_mu[4].D[t,:] = prop.D[t-\hat{0},:], meaning prop_mu[4].D[0,:] = -prop.D[T-1,:]
+    *
+    * so: after a forward shift time-slice T-1 must be scaled by -1, and
+    *     after a backwards shift time-slice 0 must be scaled by -1
+    */
+
+   scale_prop_tslice(lprop_mu[0], geo.L[0]-1, -1);
+   scale_prop_tslice(lprop_mu[4], 0, -1);
+
+   scale_prop_tslice(rprop_mu[0], geo.L[0]-1, -1);
+   scale_prop_tslice(rprop_mu[4], 0, -1);
+
+   for(int mu=1; mu<4; mu++)
+     for(int dir=0; dir<2; dir++)
+       {
+   	 int xmu = mu + dir*4;
+   	 /* Remember:
+   	  *
+   	  * prop_mu_nu[0][0],
+   	  * prop_mu_nu[0][4],
+   	  * prop_mu_nu[4][0], and
+   	  * prop_mu_nu[4][4]
+   	  *
+   	  * are not allocated.
+   	  */
+
+	 /*
+	  * We only need to fix the sign in either [mu][0] or [0][mu],
+	  * since one is a reference to the other
+	  */
+	 
+   	 /* scale_prop_tslice(rprop_mu_nu[xmu][0], geo.L[0]-1, -1); */
+   	 /* scale_prop_tslice(rprop_mu_nu[xmu][4], 0, -1); */
+
+   	 /* scale_prop_tslice(lprop_mu_nu[xmu][0], geo.L[0]-1, -1); */
+   	 /* scale_prop_tslice(lprop_mu_nu[xmu][4], 0, -1); */
+       
+   	 scale_prop_tslice(rprop_mu_nu[0][xmu], geo.L[0]-1, -1);
+   	 scale_prop_tslice(rprop_mu_nu[4][xmu], 0, -1);
+				           
+   	 scale_prop_tslice(lprop_mu_nu[0][xmu], geo.L[0]-1, -1);
+   	 scale_prop_tslice(lprop_mu_nu[4][xmu], 0, -1);
+       }
+   
+   if(myid==0)
+     printf("one- and two-hop shifted propagators communicated\n");
    
    for(i=0; i<geo.lV; i++)
    {   
@@ -388,82 +659,134 @@ int main(int argc,char* argv[])
          
          for(mu=0; mu<4; mu++)
          {
-            ip1 = geo.plus[i][mu];              
-            im1 = geo.minus[i][mu];
-            
-            // handle cases where fields wrap around the T direction
-            faciip1=1;
-            faciim1=1;
-            if(mu==0)
-            {
-               if((xx[0]+geo.Pos[0]*geo.lL[0]) == 0)
-                  faciim1 = -1;
-               if((xx[0]+geo.Pos[0]*geo.lL[0]) == geo.L[0]-1)
-                  faciip1 = -1;   
-            }
-            
-            lDmur[mu] = (qcd_complex_16){0,0};
-            
-            if((faciim1 == -1) || (faciip1 == -1))
-            for(ic2=0; ic2<3; ic2++)   
-            for(ic3=0; ic3<3; ic3++)
-            {
-               //calculate: propagator(i) D_mu propagator(i)
-
-               // x x x+mu
-               lDmur[mu] = qcd_CADD(lDmur[mu],
-                                    qcd_CMUL(lprop.D[i][id1][id2][ic1][ic2],
-                                             qcd_CMUL(u.D[i][mu][ic2][ic3],
-                                                      qcd_CSCALE(rprop.D[ip1][id3][id4][ic3][ic4],faciip1))));
-               // x  x-mu  x-mu
-               lDmur[mu] = qcd_CSUB(lDmur[mu],
-                                    qcd_CMUL(lprop.D[i][id1][id2][ic1][ic2],
-                                             qcd_CMUL(qcd_CONJ(u.D[im1][mu][ic3][ic2]),
-                                                      qcd_CSCALE(rprop.D[im1][id3][id4][ic3][ic4],faciim1))));
-               // x+mu  x  x
-               lDmur[mu] = qcd_CSUB(lDmur[mu],
-                                    qcd_CMUL(qcd_CSCALE(lprop.D[ip1][id1][id2][ic1][ic2],faciip1),
-                                             qcd_CMUL(qcd_CONJ(u.D[i][mu][ic3][ic2]),
-                                                      rprop.D[i][id3][id4][ic3][ic4])));
-               // x-mu  x-mu  x
-               lDmur[mu] = qcd_CADD(lDmur[mu],
-                                    qcd_CMUL(qcd_CSCALE(lprop.D[im1][id1][id2][ic1][ic2],faciim1),
-                                             qcd_CMUL(u.D[im1][mu][ic2][ic3],
-                                                      rprop.D[i][id3][id4][ic3][ic4])));
-            }//end ic2, ic3 loops
-            else
-            for(ic2=0; ic2<3; ic2++)   
-            for(ic3=0; ic3<3; ic3++)
-            {
-               //calculate: propagator(i) D_mu propagator(i)
-
-               // x x x+mu
-               lDmur[mu] = qcd_CADD(lDmur[mu],
-                                    qcd_CMUL(lprop.D[i][id1][id2][ic1][ic2],
-                                             qcd_CMUL(u.D[i][mu][ic2][ic3],
-                                                      rprop.D[ip1][id3][id4][ic3][ic4])));
-               // x  x-mu  x-mu
-               lDmur[mu] = qcd_CSUB(lDmur[mu],
-                                    qcd_CMUL(lprop.D[i][id1][id2][ic1][ic2],
-                                             qcd_CMUL(qcd_CONJ(u.D[im1][mu][ic3][ic2]),
-                                                      rprop.D[im1][id3][id4][ic3][ic4])));
-               // x+mu  x  x
-               lDmur[mu] = qcd_CSUB(lDmur[mu],
-                                    qcd_CMUL(lprop.D[ip1][id1][id2][ic1][ic2],
-                                             qcd_CMUL(qcd_CONJ(u.D[i][mu][ic3][ic2]),
-                                                      rprop.D[i][id3][id4][ic3][ic4])));
-               // x-mu  x-mu  x
-               lDmur[mu] = qcd_CADD(lDmur[mu],
-                                    qcd_CMUL(lprop.D[im1][id1][id2][ic1][ic2],
-                                             qcd_CMUL(u.D[im1][mu][ic2][ic3],
-                                                      rprop.D[i][id3][id4][ic3][ic4])));
-            }//end ic2, ic3 loops
-            
+	   qcd_propagator *lp_m = &(lprop_mu[4+mu]);
+	   qcd_propagator *lp_p = &(lprop_mu[mu]);
+	   qcd_propagator *rp_m = &(rprop_mu[4+mu]);
+	   qcd_propagator *rp_p = &(rprop_mu[mu]);
+	   
+	   lDmur[mu] = (qcd_complex_16){0,0};
+           
+	   for(ic2=0; ic2<3; ic2++)   
+	     for(ic3=0; ic3<3; ic3++)
+	       {
+		 //calculate: propagator(i) D_mu propagator(i)		   
+		 // x x x+mu
+		 lDmur[mu] = qcd_CADD(lDmur[mu],
+				      qcd_CMUL(lprop.D[i][id1][id2][ic1][ic2],
+					       qcd_CMUL(u_fb[0].D[i][mu][ic2][ic3],
+							rp_p->D[i][id3][id4][ic3][ic4])));
+		 // x  x-mu  x-mu
+		 lDmur[mu] = qcd_CSUB(lDmur[mu],
+				      qcd_CMUL(lprop.D[i][id1][id2][ic1][ic2],
+					       qcd_CMUL(u_fb[1].D[i][mu][ic2][ic3],
+							rp_m->D[i][id3][id4][ic3][ic4])));
+		 // x+mu  x  x
+		 lDmur[mu] = qcd_CSUB(lDmur[mu],
+				      qcd_CMUL(lp_p->D[i][id1][id2][ic1][ic2],
+					       qcd_CMUL(qcd_CONJ(u_fb[0].D[i][mu][ic3][ic2]),
+							rprop.D[i][id3][id4][ic3][ic4])));
+		 // x-mu  x-mu  x
+		 lDmur[mu] = qcd_CADD(lDmur[mu],
+				      qcd_CMUL(lp_m->D[i][id1][id2][ic1][ic2],
+					       qcd_CMUL(qcd_CONJ(u_fb[1].D[i][mu][ic3][ic2]),
+							rprop.D[i][id3][id4][ic3][ic4])));
+	       }//end ic2, ic3 loops	   
          }//end mu loop
 
+	 qcd_complex_16 lDmunur[4][4];
+	 for(int mu=0; mu<4; mu++)
+	   for(int nu=0; nu<4; nu++)
+	     {
+	       if(mu == nu)
+		 continue;
 
+	       /*
+		* We will, in certain cases, need the "L"s at a
+		* neighboring site. Because of the redundancy when
+		* defining the "L"s we can choose to only take the
+		* "L"s of neighbors in, say, the mu direction
+		*/
+	       ip1 = geo.plus[i][mu];              
+	       im1 = geo.minus[i][mu];
 
+	       lDmunur[mu][nu] = (qcd_complex_16){0,0};
+	       for(ic2=0; ic2<3; ic2++)   
+		 for(ic3=0; ic3<3; ic3++)
+		   {
+		     /* D^{-> ->} */
+		     lDmunur[mu][nu] = qcd_CADD(lDmunur[mu][nu],
+						qcd_CMUL(lprop.D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(u_mu_nu[0][mu][0][nu].D[i][ic2][ic3],
+								  rprop_mu_nu[mu][nu].D[i][id3][id4][ic3][ic4])));
+		     lDmunur[mu][nu] = qcd_CSUB(lDmunur[mu][nu],
+						qcd_CMUL(lprop.D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(u_mu_nu[0][mu][1][nu].D[i][ic2][ic3],
+								  rprop_mu_nu[mu][nu+4].D[i][id3][id4][ic3][ic4])));
+		     lDmunur[mu][nu] = qcd_CSUB(lDmunur[mu][nu],
+						qcd_CMUL(lprop.D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(u_mu_nu[1][mu][0][nu].D[i][ic2][ic3],
+								  rprop_mu_nu[mu+4][nu].D[i][id3][id4][ic3][ic4])));
+		     lDmunur[mu][nu] = qcd_CADD(lDmunur[mu][nu],
+						qcd_CMUL(lprop.D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(u_mu_nu[1][mu][1][nu].D[i][ic2][ic3],
+								  rprop_mu_nu[mu+4][nu+4].D[i][id3][id4][ic3][ic4])));
+		     /* D^{<- <-} */
+		     lDmunur[mu][nu] = qcd_CADD(lDmunur[mu][nu],
+						qcd_CMUL(lprop_mu_nu[mu][nu].D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(qcd_CONJ(u_mu_nu[0][nu][0][mu].D[i][ic3][ic2]),
+								  rprop.D[i][id3][id4][ic3][ic4])));
+		     lDmunur[mu][nu] = qcd_CSUB(lDmunur[mu][nu],
+						qcd_CMUL(lprop_mu_nu[mu+4][nu].D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(qcd_CONJ(u_mu_nu[0][nu][1][mu].D[i][ic3][ic2]),
+								  rprop.D[i][id3][id4][ic3][ic4])));
+		     lDmunur[mu][nu] = qcd_CSUB(lDmunur[mu][nu],
+						qcd_CMUL(lprop_mu_nu[mu][nu+4].D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(qcd_CONJ(u_mu_nu[1][nu][0][mu].D[i][ic3][ic2]),
+								  rprop.D[i][id3][id4][ic3][ic4])));
+		     lDmunur[mu][nu] = qcd_CADD(lDmunur[mu][nu],
+						qcd_CMUL(lprop_mu_nu[mu+4][nu+4].D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(qcd_CONJ(u_mu_nu[1][nu][1][mu].D[i][ic3][ic2]),
+								  rprop.D[i][id3][id4][ic3][ic4])));
+		     
+		     /* D^{-> <-} */
+		     lDmunur[mu][nu] = qcd_CADD(lDmunur[mu][nu],
+						qcd_CMUL(lprop_mu[nu+4].D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(qcd_CONJ(u_mu_nu[1][nu][1][mu].D[ip1][ic3][ic2]),
+								  rprop_mu[mu].D[i][id3][id4][ic3][ic4])));
+		     lDmunur[mu][nu] = qcd_CSUB(lDmunur[mu][nu],
+						qcd_CMUL(lprop_mu[nu].D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(qcd_CONJ(u_mu_nu[0][nu][1][mu].D[ip1][ic3][ic2]),
+								  rprop_mu[mu].D[i][id3][id4][ic3][ic4])));
+		     lDmunur[mu][nu] = qcd_CSUB(lDmunur[mu][nu],
+						qcd_CMUL(lprop_mu[nu+4].D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(qcd_CONJ(u_mu_nu[1][nu][0][mu].D[im1][ic3][ic2]),
+								  rprop_mu[mu+4].D[i][id3][id4][ic3][ic4])));
+		     lDmunur[mu][nu] = qcd_CADD(lDmunur[mu][nu],
+						qcd_CMUL(lprop_mu[nu].D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(qcd_CONJ(u_mu_nu[0][nu][0][mu].D[im1][ic3][ic2]),
+								  rprop_mu[mu+4].D[i][id3][id4][ic3][ic4])));
 
+		     /* D^{<- ->} */
+		     lDmunur[mu][nu] = qcd_CADD(lDmunur[mu][nu],
+						qcd_CMUL(lprop_mu[mu+4].D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(u_mu_nu[0][mu][0][nu].D[im1][ic2][ic3],
+								  rprop_mu[nu].D[i][id3][id4][ic3][ic4])));
+		     lDmunur[mu][nu] = qcd_CSUB(lDmunur[mu][nu],
+						qcd_CMUL(lprop_mu[mu].D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(u_mu_nu[1][mu][0][nu].D[ip1][ic2][ic3],
+								  rprop_mu[nu].D[i][id3][id4][ic3][ic4])));
+		     lDmunur[mu][nu] = qcd_CSUB(lDmunur[mu][nu],
+						qcd_CMUL(lprop_mu[mu+4].D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(u_mu_nu[0][mu][1][nu].D[im1][ic2][ic3],
+								  rprop_mu[nu+4].D[i][id3][id4][ic3][ic4])));
+		     lDmunur[mu][nu] = qcd_CADD(lDmunur[mu][nu],
+						qcd_CMUL(lprop_mu[mu].D[i][id1][id2][ic1][ic2],
+							 qcd_CMUL(u_mu_nu[1][mu][1][nu].D[ip1][ic2][ic3],
+								  rprop_mu[nu+4].D[i][id3][id4][ic3][ic4])));
+		     
+		   }
+	     }
+	 
          //local operators
          /*********** local scalar density ***********/
          vfun_s[id1][id4][ic1][ic4] = qcd_CADD(vfun_s[id1][id4][ic1][ic4], qcd_CMUL(lxr,
@@ -495,7 +818,6 @@ int main(int argc,char* argv[])
             vfun_t[mu*4+nu][id1][id4][ic1][ic4] = qcd_CADD(vfun_t[mu*4+nu][id1][id4][ic1][ic4], qcd_CMUL(lxr,
                                                                                                 g5sig[mu][nu][id2][id3]));
          }
-
 
          for(mu=0; mu<4; mu++)
          for(nu=0; nu<=mu; nu++)
@@ -558,7 +880,32 @@ int main(int argc,char* argv[])
             }
          }//end mu/nu/rho loop
       
-      
+
+	 for(mu=0; mu<4; mu++)
+	   {
+	     for(nu=0; nu<4; nu++)
+	       {
+		 if(nu == mu)
+		   continue;
+		 for(tau=0; tau<4; tau++)
+		   {
+		     if(mu==tau)
+		       continue;
+		     if(nu==tau)
+		       continue;
+
+		     /*********** second derivative vector operator ***********/
+		     if(qcd_NORM(qcd_GAMMA[mu][id2][id3])>1e-4)
+		       {        
+			 vfun_vDD[mu*16+nu*4+tau][id1][id4][ic1][ic4] = qcd_CADD(vfun_vDD[mu*16+nu*4+tau][id1][id4][ic1][ic4],
+										 qcd_CMUL(qcd_GAMMA[mu][id2][id3],
+											  lDmunur[nu][tau]));
+		       }
+		   }
+	       }
+	   }
+		 
+	 
       }//end id1,id2,id3,id4,ic1,ic4 loops   
    }//end i loop
 
@@ -657,6 +1004,31 @@ int main(int argc,char* argv[])
 
    if(myid==0) printf("global 1-derivative vertex functions calculated and written\n");
 
+   MPI_Reduce(&(vfun_vDD[0][0][0][0][0].re), &(vfun_tmp[0][0][0][0][0].re), 64*4*4*3*3*2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+   if(myid==0)
+   for(mu=0; mu<4; mu++)
+     {
+       for(nu=0; nu<4; nu++)
+	 {
+	   if(mu==nu)
+	     continue;
+	   for(tau=0; tau<4; tau++)
+	     {
+	       if(mu==tau)
+		 continue;
+	       if(nu==tau)
+		 continue;
+	       for(id1=0; id1<4; id1++)
+	       for(id4=0; id4<4; id4++)
+	       for(ic1=0; ic1<3; ic1++)
+	       for(ic4=0; ic4<3; ic4++)
+		 fprintf(fp_vfun_vDD,"%i %i %i %i %i %i %i %+e %+e\n",mu,nu,tau,id1,id4,ic1,ic4,vfun_tmp[mu*16+nu*4+tau][id1][id4][ic1][ic4].re/(8.*4.*geo.V),vfun_tmp[mu*16+nu*4+tau][id1][id4][ic1][ic4].im/(8.*4.*geo.V));
+	     }
+	 }
+     }
+
+   if(myid==0) printf("global 2nd-derivative vertex function calculated and written\n");
+
    if(myid==0)
    {
       fclose(fp_vfun_s);
@@ -668,14 +1040,45 @@ int main(int argc,char* argv[])
       fclose(fp_vfun_aD);
       fclose(fp_vfun_tD);
       fclose(fp_vfun_d1);
+      fclose(fp_vfun_vDD);
       fclose(fp_pprop);
    }
-   
-   
+      
    qcd_destroyPropagator(&lprop);
    qcd_destroyPropagator(&rprop);
    qcd_destroyPropagator(&prop);
    qcd_destroyGaugeField(&u);
+
+   for(mu=0; mu<8; mu++)
+     {
+       qcd_destroyPropagator(&lprop_mu[mu]);
+       qcd_destroyPropagator(&rprop_mu[mu]);
+     }
+
+   qcd_destroyGaugeField(&u_fb[0]);
+   qcd_destroyGaugeField(&u_fb[1]);
+   
+   for(int mu=0; mu<4; mu++)
+     for(int dir_mu=0; dir_mu<2; dir_mu++)
+       {
+	 int m = mu + dir_mu*4;
+	 for(int nu=mu+1; nu<4; nu++)
+	   for(int dir_nu=0; dir_nu<2; dir_nu++)
+	     {
+	       int n = nu + dir_nu*4;
+	       qcd_destroyPropagator(&lprop_mu_nu[m][n]);
+	       qcd_destroyPropagator(&rprop_mu_nu[m][n]);
+	     }
+       }
+
+   for(int mu=0; mu<4; mu++)
+     for(int dir_mu=0; dir_mu<2; dir_mu++)
+       for(int nu=0; nu<4; nu++)
+   	 for(int dir_nu=0; dir_nu<2; dir_nu++)
+   	   if(mu != nu)
+   	     qcd_destroyGaugeTransformation(&u_mu_nu[dir_mu][mu][dir_nu][nu]);
+
+
    qcd_destroyGeometry(&geo);
    MPI_Finalize();
 }//end main 
