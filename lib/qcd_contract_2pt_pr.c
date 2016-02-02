@@ -15,13 +15,12 @@
 #include <qcd.h>
 
 int qcd_projector12_2pt(qcd_complex_16 gamma12[4][4], qcd_complex_16 gamma13[4][4], qcd_complex_16 gamma23[4][4], 
-						qcd_complex_16 *block[4][4], qcd_complex_16 *block_pr[9][4][4], qcd_geometry *geo){
+			qcd_complex_16 *block[4][4], qcd_complex_16 *block_pr[9][4][4], qcd_geometry *geo){
 	
   qcd_uint_2 ga,gap,j;
-  qcd_uint_4 lx,ly,lz,v,v3;
+  qcd_uint_4 lx,ly,lz,v3;
   qcd_complex_16 multiterm[4][4],diagterm[4][4];
-  int lv3 = geo->lL[1]*geo->lL[2]*geo->lL[3];
-    
+      
 	for(lx=0; lx<geo->lL[1]; lx++) 
 	for(ly=0; ly<geo->lL[2]; ly++) 
 	for(lz=0; lz<geo->lL[3]; lz++){ 
@@ -59,9 +58,8 @@ int qcd_projector32_2pt(qcd_complex_16 gamma12[4][4], qcd_complex_16 gamma13[4][
 						qcd_complex_16 *block[4][4], qcd_complex_16 *block_pr[9][4][4], qcd_geometry *geo){
 	
   qcd_uint_2 ga,gap,j;
-  qcd_uint_4 lx,ly,lz,v,v3;
+  qcd_uint_4 lx,ly,lz,v3;
   qcd_complex_16 multiterm[4][4],diagterm[4][4];
-  int lv3 = geo->lL[1]*geo->lL[2]*geo->lL[3];
     
 	for(lx=0; lx<geo->lL[1]; lx++) 
 	for(ly=0; ly<geo->lL[2]; ly++) 
@@ -101,9 +99,8 @@ int qcd_projector32_2pt(qcd_complex_16 gamma12[4][4], qcd_complex_16 gamma13[4][
 //======================================================================
 int qcd_noprojector_2pt(qcd_complex_16 *block[4][4], qcd_complex_16 *block_pr[9][4][4], qcd_geometry *geo){
 	
-  qcd_uint_2 ga,gap,j;
-  qcd_uint_4 lx,ly,lz,v,v3;
-  int lv3 = geo->lL[1]*geo->lL[2]*geo->lL[3];
+  qcd_uint_2 ga,gap;
+  qcd_uint_4 lx,ly,lz,v3;
     
 	for(lx=0; lx<geo->lL[1]; lx++) 
 	for(ly=0; ly<geo->lL[2]; ly++) 
@@ -677,7 +674,7 @@ void qcd_contractions2pt_pr(qcd_uint_4 particle_id, qcd_complex_16 *block12[4][4
 
   qcd_int_4 ctr1,ctr2,ctr3,ctr12,ctr21,ctr13,ctr31,ctr23,ctr32,v3;
   qcd_uint_2 al,be,alp,bep,check;
-  qcd_complex_16 C,C1,C2,C3,C21,C12,C31,C13,C23,C32;
+  qcd_complex_16 C1,C2,C3,C21,C12,C31,C13,C23,C32;
   qcd_complex_16 gamma12[4][4],gamma13[4][4],gamma23[4][4];
 
   qcd_int_2 cg1cg1_ind[16*16][4],cg2cg2_ind[16*16][4],cg3cg3_ind[16*16][4];
@@ -690,7 +687,7 @@ void qcd_contractions2pt_pr(qcd_uint_4 particle_id, qcd_complex_16 *block12[4][4
   
   qcd_complex_16 *block_pr[9][4][4];
   
-  qcd_uint_4 i,j,k,det,sflag;
+  qcd_uint_4 i,j,k;
   
   for(i=0;i<9;i++)
 	for(j=0;j<4;j++)

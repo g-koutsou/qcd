@@ -27,11 +27,8 @@ int qcd_gaussIteration3d_opt(qcd_propagator *uprop,qcd_propagator *dprop,qcd_pro
                                     qcd_uint_4 t_start, qcd_uint_4 t_stop, qcd_uint_4 t_src)
 {
    qcd_uint_8 i,j;
-   qcd_uint_2 c1,mu,nu,b; 
-   qcd_uint_2 bl1[4] = {2,2,1,1};
-   qcd_uint_2 bl2[4] = {3,3,3,2};
-   qcd_uint_4 x,y,z,b0,b1,b2,b3,t,tt,k;
-   qcd_complex_16 tmp[3];
+   qcd_uint_2 c1,mu,nu; 
+   qcd_uint_4 x,y,z,t,tt,k;
    qcd_real_8 nrm = 1.0/(1.0 + alpha*6.0);
    qcd_vector v2_u,v2_d,v2_s,v2_c;
    qcd_real_8 *uu;

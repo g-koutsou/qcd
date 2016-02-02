@@ -17,8 +17,8 @@
 
 int qcd_projector_3pt(qcd_complex_16 *block[5], qcd_complex_16 *block_pr[10][4][4], qcd_geometry *geo, qcd_uint_4 prid){
 	
-  qcd_uint_2 ga,gap,j;
-  qcd_uint_4 lx,ly,lz,v,v3;
+  qcd_uint_2 ga,gap;
+  qcd_uint_4 lx,ly,lz,v3;
   
   qcd_uint_4 projlist[5] = {3,4,13,15,16},proj;
   
@@ -46,8 +46,8 @@ int qcd_projector_3pt(qcd_complex_16 *block[5], qcd_complex_16 *block_pr[10][4][
 int qcd_projector32_3pt(qcd_complex_16 gamma12[4][4], qcd_complex_16 gamma13[4][4], qcd_complex_16 gamma23[4][4], 
 						qcd_complex_16 *block_pr[10][4][4], qcd_geometry *geo){
 	
-  qcd_uint_2 ga,gap,j;
-  qcd_uint_4 lx,ly,lz,v,v3;
+  qcd_uint_2 ga,gap;
+  qcd_uint_4 lx,ly,lz,v3,j;
   qcd_complex_16 multiterm[4][4],diagterm[4][4];
   
   for(lx=0; lx<geo->lL[1]; lx++)
@@ -2133,7 +2133,7 @@ void qcd_contractions3pt_new(qcd_uint_4 p_id, qcd_uint_4 np, qcd_complex_16 *blo
   
   qcd_complex_16 *block_pr[10][4][4];
   
-  qcd_uint_4 i,j,k,det;
+  qcd_uint_4 i,j,k;
     
 //-- Allocation of local blocks  
   

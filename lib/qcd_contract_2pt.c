@@ -418,8 +418,8 @@ void qcd_contractions2pt(qcd_uint_4 particle_id, qcd_complex_16 *block[4][4],
 			 qcd_propagator *uprop,qcd_propagator *dprop,qcd_propagator *sprop,qcd_propagator *cprop,
 			 qcd_geometry *geo, qcd_uint_4 lt){
 
-  qcd_int_4 ctr,ctr2;
-  qcd_uint_2 al,be,alp,bep,check,ga;
+  qcd_int_4 ctr,ctr2 = 0;
+  qcd_uint_2 al,be,alp,bep,ga;
   qcd_complex_16 C;
 
   qcd_int_2 cg5cg5_ind[16*16][4],cgcg_ind[16*16][4];
