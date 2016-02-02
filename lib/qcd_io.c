@@ -421,7 +421,7 @@ int qcd_writeGaugeLime(char *fname, qcd_gaugeField *u, char *message)
    LimeWriter *limewriter;
    LimeRecordHeader *limeheader;
    int ME_flag=0, MB_flag=0, limeStatus;
-   qcd_uint_8 message_length;
+   uint64_t message_length;
    MPI_Offset offset;
    MPI_Datatype subblock;  //MPI-type, 5d subarray
    MPI_File mpifid;
@@ -1760,7 +1760,7 @@ int qcd_writeVectorLime(char *fname, int type, qcd_vector *v)
    LimeWriter *limewriter;
    LimeRecordHeader *limeheader = NULL;
    int ME_flag=0, MB_flag=0, limeStatus;
-   qcd_uint_8 message_length;
+   uint64_t message_length;
    MPI_Offset offset;
    MPI_Datatype subblock;  //MPI-type, 5d subarray
    MPI_File mpifid;
