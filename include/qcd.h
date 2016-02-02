@@ -173,6 +173,7 @@ struct {
 #include <qcd_contract_2pt_pr.h>
 #include <qcd_currents_udsc.h>
 #include <qcd_smearing_opt.h>
+#include <qcd_shifts.h>
 
 /* prototypes for qcd_init.c*/
 void qcd_antilexic(qcd_uint_2 x[], qcd_uint_8 l, const qcd_uint_2 dim[]);

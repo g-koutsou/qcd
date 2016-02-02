@@ -190,9 +190,6 @@ int qcd_communicateGaugePInverse(qcd_gaugeField *u)
    return 0;
 }//end qcd_communicateGaugePInverse
 
-
-
-
 /* start sending gauge-field boundaries to + and - neighbors
  * that's what is needed during APE-smearing
  */ 
@@ -232,6 +229,58 @@ int qcd_communicateGaugePM(qcd_gaugeField *u)
    return 0;
 }//end qcd_communicateGaugePM
 
+/* start sending gauge-field boundaries to - neighbors
+ * in direction b
+ */ 
+int qcd_communicateGaugeMdir(qcd_gaugeField *u, qcd_uint_2 b)
+{
+  if(u->geo->numOfRequests != 0)
+    {
+      fprintf(stderr,"process %i: Error in qcd_communicateGaugePM! Previous communication not finished\n",u->geo->myid);
+      return(1);
+    }
+  
+  //start communication   
+  if(u->geo->lL[b] < u->geo->L[b])
+    {
+      //start communication in b direction
+      //send to - / recieve from +
+      MPI_Isend(&(u->D[0][0][0][0]), 1, u->geo->stypeU[b], u->geo->Pminus[b], 3*b, MPI_COMM_WORLD, &(u->geo->requests[u->geo->numOfRequests++]));
+      MPI_Irecv(&(u->Bplus[b][0][0][0]), 1, u->geo->rtypeU[b], u->geo->Pplus[b], 3*b, MPI_COMM_WORLD, &(u->geo->requests[u->geo->numOfRequests++]));
+    }
+  
+  return 0;
+}//end qcd_communicateGaugeMdir
+
+/* start sending gauge-field boundaries to + neighbors in diection b
+ * 
+ */ 
+int qcd_communicateGaugePdir(qcd_gaugeField *u, qcd_uint_2 b)
+{
+  qcd_uint_8 startpos = 1;
+  
+  if(u->geo->numOfRequests != 0)
+    {
+      fprintf(stderr,"process %i: Error in qcd_communicateGaugePM! Previous communication not finished\n",u->geo->myid);
+      return(1);
+    }
+  
+  //start communication   
+  if(u->geo->lL[b] < u->geo->L[b])
+    {         
+      startpos=u->geo->lL[b]-1;
+      for(int bb=0; bb<b; bb++)
+	startpos *= u->geo->lL[bb];
+      
+      //send to + / recieve from -
+      MPI_Isend(&(u->D[startpos][0][0][0]), 1, u->geo->stypeU[b], u->geo->Pplus[b], 3*b+2, MPI_COMM_WORLD, &(u->geo->requests[u->geo->numOfRequests++]));
+      MPI_Irecv(&(u->Bminus[b][0][0][0]), 1, u->geo->rtypeU[b], u->geo->Pminus[b], 3*b+2, MPI_COMM_WORLD, &(u->geo->requests[u->geo->numOfRequests++]));
+    }
+  //end communication-start loop  
+  
+  return 0;
+}//end qcd_communicateGaugePdir
+
 
 /* start sending gauge-transformation field boundaries to - neighbors
  * that's what is needed to  carry out a gauge transformation
@@ -261,6 +310,94 @@ int qcd_communicateTransformationM(qcd_gaugeTransformation *u)
    return 0;
 }//end qcd_communicateTransformationM
 
+/* start sending gauge-transformation field boundaries to - and + neighbors
+ */ 
+int qcd_communicateTransformationPM(qcd_gaugeTransformation *u)
+{
+   qcd_uint_2 b,bb;
+   qcd_uint_8 startpos;
+   
+   if(u->geo->numOfRequests != 0)
+   {
+      fprintf(stderr,"process %i: Error in qcd_communicateTransformationPM! Previous communication not finished\n",u->geo->myid);
+      return(1);
+   }
+   
+   //start communication   
+   for(b=0; b<4; b++)
+   {
+      if(u->geo->lL[b] < u->geo->L[b])
+      {
+         //start communication in b direction
+         //send to - / recieve from +
+         MPI_Isend(&(u->D[0][0][0]), 1, u->geo->stypeT[b], u->geo->Pminus[b], 3*b, MPI_COMM_WORLD, &(u->geo->requests[u->geo->numOfRequests++]));
+         MPI_Irecv(&(u->Bplus[b][0][0]), 1, u->geo->rtypeT[b], u->geo->Pplus[b], 3*b, MPI_COMM_WORLD, &(u->geo->requests[u->geo->numOfRequests++]));
+         
+         startpos=u->geo->lL[b]-1;
+         for(bb=0; bb<b; bb++)
+            startpos *= u->geo->lL[bb];
+            
+         //send to + / recieve from -
+         MPI_Isend(&(u->D[startpos][0][0]), 1, u->geo->stypeT[b], u->geo->Pplus[b], 3*b+1, MPI_COMM_WORLD, &(u->geo->requests[u->geo->numOfRequests++]));
+         MPI_Irecv(&(u->Bminus[b][0][0]), 1, u->geo->rtypeT[b], u->geo->Pminus[b], 3*b+1, MPI_COMM_WORLD, &(u->geo->requests[u->geo->numOfRequests++]));
+      }
+      
+   }//end communication-start loop  
+  return 0;
+}//end qcd_communicateTransformationPM
+
+
+/* start sending gauge-transformation field boundaries to - neighbors
+ * that's what is needed to  carry out a gauge transformation
+ */ 
+int qcd_communicateGaugeTransformationMdir(qcd_gaugeTransformation *u, qcd_uint_2 b)
+{
+   
+   if(u->geo->numOfRequests != 0)
+   {
+      fprintf(stderr,"process %i: Error in qcd_communicateTransformationM! Previous communication not finished\n",u->geo->myid);
+      return(1);
+   }
+   
+   //start communication   
+   if(u->geo->lL[b] < u->geo->L[b])
+     {
+       //start communication in b direction
+       //send to - / recieve from +
+       MPI_Isend(&(u->D[0][0][0]), 1, u->geo->stypeT[b], u->geo->Pminus[b], 3*b, MPI_COMM_WORLD, &(u->geo->requests[u->geo->numOfRequests++]));
+       MPI_Irecv(&(u->Bplus[b][0][0]), 1, u->geo->rtypeT[b], u->geo->Pplus[b], 3*b, MPI_COMM_WORLD, &(u->geo->requests[u->geo->numOfRequests++]));
+     }      
+      
+   return 0;
+}//end qcd_communicateTransformationM
+
+/* start sending gauge-transformation field boundaries to + neighbors in diection b
+ * 
+ */ 
+int qcd_communicateGaugeTransformationPdir(qcd_gaugeTransformation *u, qcd_uint_2 b)
+{
+  
+  if(u->geo->numOfRequests != 0)
+    {
+      fprintf(stderr,"process %i: Error in qcd_communicateGaugeTransformationPdir! Previous communication not finished\n",u->geo->myid);
+      return(1);
+    }
+  
+  //start communication   
+  if(u->geo->lL[b] < u->geo->L[b])
+    {         
+      qcd_uint_8 startpos=u->geo->lL[b]-1;
+      for(int bb=0; bb<b; bb++)
+	startpos *= u->geo->lL[bb];
+      
+      //send to + / recieve from -
+      MPI_Isend(&(u->D[startpos][0][0]), 1, u->geo->stypeU[b], u->geo->Pplus[b], 3*b+2, MPI_COMM_WORLD, &(u->geo->requests[u->geo->numOfRequests++]));
+      MPI_Irecv(&(u->Bminus[b][0][0]), 1, u->geo->rtypeU[b], u->geo->Pminus[b], 3*b+2, MPI_COMM_WORLD, &(u->geo->requests[u->geo->numOfRequests++]));
+    }
+  //end communication-start loop  
+  
+  return 0;
+}//end qcd_communicateGaugePdir
 
 
 /* start sending propagator boundaries to + neighbors
@@ -296,8 +433,6 @@ int qcd_communicatePropagatorP(qcd_propagator *p)
       
    return 0;
 }//end qcd_communicatePropagatorP
-
-
 
 int qcd_communicatePropagatorPM(qcd_propagator *p)
 {
@@ -335,6 +470,55 @@ int qcd_communicatePropagatorPM(qcd_propagator *p)
 }//end qcd_communicatePropagatorPM
 
 
+int qcd_communicatePropagatorMdir(qcd_propagator *p, int b)
+{   
+   if(p->geo->numOfRequests != 0)
+   {
+      fprintf(stderr,"process %i: Error in qcd_communicatePropagatorMdir! Previous communication not finished\n",p->geo->myid);
+      return(1);
+   }
+   
+   if(p->geo->lL[b] < p->geo->L[b])
+     {
+       //start communication in b direction
+       //send to - / recieve from +
+       MPI_Isend(&(p->D[0][0][0][0][0]), 1, p->geo->stypeP[b], p->geo->Pminus[b], 3*b, MPI_COMM_WORLD, &(p->geo->requests[p->geo->numOfRequests++]));
+       MPI_Irecv(&(p->Bplus[b][0][0][0][0]), 1, p->geo->rtypeP[b], p->geo->Pplus[b], 3*b, MPI_COMM_WORLD, &(p->geo->requests[p->geo->numOfRequests++]));
+     }
+      
+   return 0;
+}//end qcd_communicatePropagatorMdir
+
+
+
+/* start sending propagator boundaries to + neighbors
+ * needed for certain observables
+ */ 
+int qcd_communicatePropagatorPdir(qcd_propagator *p, int b)
+{
+   qcd_uint_2 bb;
+   qcd_uint_8 startpos;
+   
+   if(p->geo->numOfRequests != 0)
+   {
+      fprintf(stderr,"process %i: Error in qcd_communicatePropagatorPdir! Previous communication not finished\n",p->geo->myid);
+      return(1);
+   }
+   
+   if(p->geo->lL[b] < p->geo->L[b])
+     {
+      
+       startpos=p->geo->lL[b]-1;
+       for(bb=0; bb<b; bb++)
+	 startpos *= p->geo->lL[bb];
+            
+       //send to + / recieve from -
+       MPI_Isend(&(p->D[startpos][0][0][0][0]), 1, p->geo->stypeP[b], p->geo->Pplus[b], 3*b+1, MPI_COMM_WORLD, &(p->geo->requests[p->geo->numOfRequests++]));
+       MPI_Irecv(&(p->Bminus[b][0][0][0][0]), 1, p->geo->rtypeP[b], p->geo->Pminus[b], 3*b+1, MPI_COMM_WORLD, &(p->geo->requests[p->geo->numOfRequests++]));
+     }
+      
+   return 0;
+}//end qcd_communicatePropagatorPdir
 
 
 

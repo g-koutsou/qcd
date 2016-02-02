@@ -20,6 +20,7 @@ SOURCES=\
 	qcd_contract_2pt\
 	qcd_contract_2pt_pr\
 	qcd_currents_udsc\
+	qcd_shifts\
 	qcd_smearing_opt
 
 include $(wildcard *.d)

@@ -23,7 +23,8 @@ TARGETS=b_minus_Dx\
 	twop-hadr\
 	threep-block\
 	twop-block\
-        zfac_NEW_format
+	sourceExp\
+        zfac
 
 
 LIBDIR = ../lib
