@@ -168,6 +168,7 @@ int main(int argc,char* argv[])
    FILE *fp_vfun_t, *fp_vfun_vD, *fp_vfun_aD;
    FILE *fp_vfun_tD, *fp_vfun_d1;
    FILE *fp_vfun_vDD;
+   FILE *fp_vfun_aDD;
    FILE *fp_pprop;      
   
    int params_len;               // needed to read inputfiles
@@ -184,6 +185,7 @@ int main(int argc,char* argv[])
    char vfun_tD_name[qcd_MAX_STRING_LENGTH];    // output file name, 1 derivative tensor operator vertex function
    char vfun_d1_name[qcd_MAX_STRING_LENGTH];    // output file name, 1 derivative d1 operator vertex function
    char vfun_vDD_name[qcd_MAX_STRING_LENGTH];    // output file name, 2nd derivative vector operator vertex function
+   char vfun_aDD_name[qcd_MAX_STRING_LENGTH];    // output file name, 2nd derivative axial vector operator vertex function
    char pprop_name[qcd_MAX_STRING_LENGTH];      // name of output file, momentum propagator
    
    char param_name[qcd_MAX_STRING_LENGTH];      // name of parameter file
@@ -212,6 +214,7 @@ int main(int argc,char* argv[])
    qcd_complex_16 vfun_d1[16][4][4][3][3];      // vertex function 1 derivative d1 operator
    qcd_complex_16 vfun_tmp[64][4][4][3][3];     // temp variable
    qcd_complex_16 vfun_vDD[64][4][4][3][3];      // vertex function 2nd derivative vector operator
+   qcd_complex_16 vfun_aDD[64][4][4][3][3];      // vertex function 2nd derivative axial vector operator
    
    qcd_complex_16 lxr, lDmur[4];
    
@@ -324,6 +327,9 @@ int main(int argc,char* argv[])
 
    strcpy(vfun_vDD_name,qcd_getParam("<vertex_function_vectorDD_name>",params,params_len));
    if(myid==0) printf("Got output file name: %s\n",vfun_vDD_name);
+
+   strcpy(vfun_aDD_name,qcd_getParam("<vertex_function_axialDD_name>",params,params_len));
+   if(myid==0) printf("Got output file name: %s\n",vfun_aDD_name);
 
    strcpy(pprop_name,qcd_getParam("<pprop_name>",params,params_len));
    if(myid==0) printf("Got output file name: %s\n",pprop_name);
@@ -461,6 +467,7 @@ int main(int argc,char* argv[])
       if( (fp_vfun_tD=fopen(vfun_tD_name,"w"))==NULL) j++;
       if( (fp_vfun_d1=fopen(vfun_d1_name,"w"))==NULL) j++;
       if( (fp_vfun_vDD=fopen(vfun_vDD_name,"w"))==NULL) j++;
+      if( (fp_vfun_aDD=fopen(vfun_aDD_name,"w"))==NULL) j++;      
       if( (fp_pprop=fopen(pprop_name,"w"))==NULL) j++;
       if(j>0) fprintf(stderr,"Error while opening output files for writing!\n");
    }
@@ -503,6 +510,7 @@ int main(int argc,char* argv[])
    memset(&(vfun_tD[0][0][0][0][0].re),0,64*4*4*3*3*sizeof(qcd_complex_16));
    memset(&(vfun_d1[0][0][0][0][0].re),0,16*4*4*3*3*sizeof(qcd_complex_16));
    memset(&(vfun_vDD[0][0][0][0][0].re),0,64*4*4*3*3*sizeof(qcd_complex_16));
+   memset(&(vfun_aDD[0][0][0][0][0].re),0,64*4*4*3*3*sizeof(qcd_complex_16));   
 
    qcd_gaugeField *u_fb;
    u_fb = getGaugeFieldFwdBwd(u);
@@ -901,6 +909,13 @@ int main(int argc,char* argv[])
 										 qcd_CMUL(qcd_GAMMA[mu][id2][id3],
 											  lDmunur[nu][tau]));
 		       }
+		     /*********** second derivative axial vector operator ***********/
+		     if(qcd_NORM(qcd_G5GAMMA[mu][id2][id3])>1e-4)
+		       {        
+			 vfun_aDD[mu*16+nu*4+tau][id1][id4][ic1][ic4] = qcd_CADD(vfun_aDD[mu*16+nu*4+tau][id1][id4][ic1][ic4],
+										 qcd_CMUL(qcd_G5GAMMA[mu][id2][id3],
+											  lDmunur[nu][tau]));
+		       }
 		   }
 	       }
 	   }
@@ -1027,7 +1042,32 @@ int main(int argc,char* argv[])
 	 }
      }
 
-   if(myid==0) printf("global 2nd-derivative vertex function calculated and written\n");
+   if(myid==0) printf("global 2nd-derivative vector vertex function calculated and written\n");
+
+   MPI_Reduce(&(vfun_aDD[0][0][0][0][0].re), &(vfun_tmp[0][0][0][0][0].re), 64*4*4*3*3*2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+   if(myid==0)
+   for(mu=0; mu<4; mu++)
+     {
+       for(nu=0; nu<4; nu++)
+	 {
+	   if(mu==nu)
+	     continue;
+	   for(tau=0; tau<4; tau++)
+	     {
+	       if(mu==tau)
+		 continue;
+	       if(nu==tau)
+		 continue;
+	       for(id1=0; id1<4; id1++)
+	       for(id4=0; id4<4; id4++)
+	       for(ic1=0; ic1<3; ic1++)
+	       for(ic4=0; ic4<3; ic4++)
+		 fprintf(fp_vfun_aDD,"%i %i %i %i %i %i %i %+e %+e\n",mu,nu,tau,id1,id4,ic1,ic4,vfun_tmp[mu*16+nu*4+tau][id1][id4][ic1][ic4].re/(8.*4.*geo.V),vfun_tmp[mu*16+nu*4+tau][id1][id4][ic1][ic4].im/(8.*4.*geo.V));
+	     }
+	 }
+     }
+
+   if(myid==0) printf("global 2nd-derivative axial vector vertex function calculated and written\n");
 
    if(myid==0)
    {
@@ -1041,6 +1081,7 @@ int main(int argc,char* argv[])
       fclose(fp_vfun_tD);
       fclose(fp_vfun_d1);
       fclose(fp_vfun_vDD);
+      fclose(fp_vfun_aDD);
       fclose(fp_pprop);
    }
       
