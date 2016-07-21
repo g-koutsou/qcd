@@ -29,6 +29,7 @@ TARGETS=b_minus_Dx\
 	smear_APE4D\
 	createUnityGauge\
 	convertPropToASCII\
+	convertVectorToASCII\
 	test_projectors
 
 

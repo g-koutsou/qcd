@@ -40,6 +40,7 @@ int qcd_getVector(char *fname, int type, qcd_uint_2 nu, qcd_uint_2 c2, qcd_vecto
 int qcd_writePropagatorCMI(char *fname, qcd_propagator *p);
 int qcd_writePropagator(char *fname, int type, qcd_propagator *p);
 int qcd_writePropagatorASCII(char *fname_basis, qcd_propagator *prop);
+int qcd_writeVectorASCII(char *fname_basis, int mu, qcd_vector *vec);
 int qcd_writeVectorCMI(char *fname, qcd_uint_2 nu, qcd_uint_2 c2, qcd_vector *v);
 int qcd_writeVectorLime(char *fname, int type, qcd_vector *v);
 int qcd_writeVector(char *fname, int type, qcd_uint_2 nu, qcd_uint_2 c2, qcd_vector *v);

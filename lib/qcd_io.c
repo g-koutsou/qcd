@@ -1707,6 +1707,40 @@ int qcd_writePropagatorASCII(char *fname_basis, qcd_propagator *prop){
   return 0;
 }
 
+//-C. Kallidonis July 2016
+//- Function to write a vector in ASCII format
+//- Each process writes its own chunk
+int qcd_writeVectorASCII(char *fname_basis, int mu, qcd_vector *vec){
+
+  FILE *outf;
+  char *filename;
+
+  asprintf(&filename,"%s.%05d.%d",fname_basis,mu,vec->geo->myid);
+  outf=fopen(filename,"w");
+  if(outf==NULL){
+    if(vec->geo->myid==0) fprintf(stderr,"Cannot open %s for writing\n",filename);
+    exit(EXIT_FAILURE);
+  }
+
+  for(int x=0; x<vec->geo->lL[1]; x++){
+    int gx = x + vec->geo->lL[1]*vec->geo->Pos[1];
+    for(int y=0; y<vec->geo->lL[2]; y++){
+      int gy = y + vec->geo->lL[2]*vec->geo->Pos[2];
+      for(int z=0; z<vec->geo->lL[3]; z++){
+	int gz = z + vec->geo->lL[3]*vec->geo->Pos[3];
+	for(int t=0; t<vec->geo->lL[0]; t++){
+	  int gt = t + vec->geo->lL[0]*vec->geo->Pos[0];
+	  for(int mu=0; mu<4; mu++){
+	    for(int c1=0; c1<3; c1++){
+	      fprintf(outf,"%02d %02d %02d %02d %02d %02d\t%+e %+e\n",gx,gy,gz,gt,mu,c1,vec->D[qcd_LEXIC(t,x,y,z,vec->geo->lL)][mu][c1].re,vec->D[qcd_LEXIC(t,x,y,z,vec->geo->lL)][mu][c1].im);
+	    }}}}}
+  }
+
+  fclose(outf);
+
+  return 0;
+}
+
 
 int qcd_writeVectorCMI(char *fname, qcd_uint_2 nu, qcd_uint_2 c2, qcd_vector *v)
 {
