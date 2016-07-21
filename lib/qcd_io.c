@@ -1671,6 +1671,42 @@ int qcd_writePropagator(char *fname, int type, qcd_propagator *p)
 }//end qcd_writePropagator
 
 
+//-C. Kallidonis July 2016
+//- Function to write a propagator in ASCII format
+//- Each process writes its own chunk
+int qcd_writePropagatorASCII(char *fname_basis, qcd_propagator *prop){
+
+  FILE *outf;
+  char *filename;
+
+  asprintf(&filename,"%s_%d",fname_basis,prop->geo->myid);
+  outf=fopen(filename,"w");
+  if(outf==NULL){
+    if(prop->geo->myid==0) fprintf(stderr,"Cannot open %s for writing\n",filename);
+    exit(EXIT_FAILURE);
+  }
+
+  for(int x=0; x<prop->geo->lL[1]; x++){
+    int gx = x + prop->geo->lL[1]*prop->geo->Pos[1];
+    for(int y=0; y<prop->geo->lL[2]; y++){
+      int gy = y + prop->geo->lL[2]*prop->geo->Pos[2];
+      for(int z=0; z<prop->geo->lL[3]; z++){
+	int gz = z + prop->geo->lL[3]*prop->geo->Pos[3];
+	for(int t=0; t<prop->geo->lL[0]; t++){
+	  int gt = t + prop->geo->lL[0]*prop->geo->Pos[0];
+	  for(int mu=0; mu<4; mu++){
+	    for(int nu=0; nu<4; nu++){
+	      for(int c1=0; c1<3; c1++){
+		for(int c2=0; c2<3; c2++){
+		  fprintf(outf,"%02d %02d %02d %02d %02d %02d %02d %02d\t%+e %+e\n",gx,gy,gz,gt,mu,nu,c1,c2,prop->D[qcd_LEXIC(t,x,y,z,prop->geo->lL)][mu][nu][c1][c2].re,prop->D[qcd_LEXIC(t,x,y,z,prop->geo->lL)][mu][nu][c1][c2].im);
+		}}}}}}}
+  }
+
+  fclose(outf);
+
+  return 0;
+}
+
 
 int qcd_writeVectorCMI(char *fname, qcd_uint_2 nu, qcd_uint_2 c2, qcd_vector *v)
 {
