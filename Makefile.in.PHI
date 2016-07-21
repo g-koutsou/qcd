@@ -1,0 +1,7 @@
+AR=ar
+RANLIB=ranlib
+CC=mpiicc
+CFLAGS=-O3 -std=c99 -openmp -I./ -I$(HOME)/install/include/
+LDFLAGS=-L$(HOME)/install/lib
+LIBS=-llime -lgslcblas -lgsl -lxml2 -lm -liomp5
+
