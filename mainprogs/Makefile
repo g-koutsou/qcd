@@ -27,6 +27,8 @@ TARGETS=b_minus_Dx\
 	twop-block\
         zfac_NEW_format\
 	smear_APE4D\
+	createUnityGauge\
+	convertPropToASCII\
 	test_projectors
 
 

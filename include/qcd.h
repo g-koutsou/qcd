@@ -185,6 +185,8 @@ void qcd_destroyVector3d(qcd_vector3d *vec);
 int qcd_initPropagator(qcd_propagator *prp, qcd_geometry *geo);
 void qcd_destroyPropagator(qcd_propagator *prp);
 int qcd_initGaugeField(qcd_gaugeField *u, qcd_geometry *geo);
+int qcd_setZeroGaugeField(qcd_gaugeField *u, qcd_geometry *geo);
+int qcd_setUnityGaugeField(qcd_gaugeField *u, qcd_geometry *geo);
 void qcd_destroyGaugeField(qcd_gaugeField *u);
 int qcd_initGaugeTransformation(qcd_gaugeTransformation *u, qcd_geometry *geo);
 void qcd_destroyGaugeTransformation(qcd_gaugeTransformation *u);

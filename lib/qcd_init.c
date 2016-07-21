@@ -665,6 +665,49 @@ int qcd_initGaugeField(qcd_gaugeField *u, qcd_geometry *geo)
 }//end qcd_initGaugeField
 
 
+// C. Kallidonis
+// Function to set a gauge field to zero
+int qcd_setZeroGaugeField(qcd_gaugeField *u, qcd_geometry *geo){
+
+  if(!u->initialized){
+    fprintf(stderr,"Error in qcd_setZeroGaugeField! GaugeField not initialized\n");
+    return 1;
+  }
+
+  for(int v=0;v<geo->lV;v++){
+    for(int mu=0;mu<4;mu++){
+      for(int c1=0;c1<3;c1++){
+	for(int c2=0;c2<3;c2++){
+	  u->D[v][mu][c1][c2] = (qcd_complex_16) {0.0,0.0};
+	}
+      }
+    }
+  }
+
+  return(0);
+}
+
+// C. Kallidonis
+// Function to set a gauge field to zero
+int qcd_setUnityGaugeField(qcd_gaugeField *u, qcd_geometry *geo){
+
+  if(!u->initialized){
+    fprintf(stderr,"Error in qcd_setUnityGaugeField! GaugeField not initialized\n");
+    return 1;
+  }
+
+  for(int v=0;v<geo->lV;v++){
+    for(int mu=0;mu<4;mu++){
+      for(int c1=0;c1<3;c1++){
+	u->D[v][mu][c1][c1] = (qcd_complex_16) {1.0,0.0};
+      }
+    }
+  }
+
+  return(0);
+}
+
+
 void qcd_destroyGaugeField(qcd_gaugeField *u)
 {
    if(!u->initialized)
